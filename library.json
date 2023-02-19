@@ -1,0 +1,30 @@
+{
+    "name": "HomeAssistantEntities",
+    "keywords": "esp8266, esp32, mqtt, ha, homeassistant",
+    "description": "Home Assistant entities for MQTT.",
+    "authors":
+    {
+      "name": "Johan Böhlin"
+    },
+    "version": "1.0.0",
+    "license": "MIT",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/Johboh/MQTTRemote.git"
+    },
+    "frameworks": "arduino",
+    "platforms": ["espressif8266", "espressif32"],
+    "dependencies": [
+        {
+          "owner": "bblanchon",
+          "name": "ArduinoJson",
+          "version": "^6.20.0"
+        },
+        {
+          "owner": "johboh",
+          "name": "MQTTRemote",
+          "version": "^1.0.0"
+        }
+      ]
+  }
