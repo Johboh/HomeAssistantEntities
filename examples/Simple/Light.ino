@@ -2,6 +2,13 @@
 #include <HaBridge.h>
 #include <HaEntityLight.h>
 #include <MQTTRemote.h>
+#ifdef ESP32
+#include <WiFi.h>
+#elif ESP8266
+#include <ESP8266WiFi.h>
+#else
+#error "Unsupported hardware. Sorry!"
+#endif
 
 #define LED_PIN D1
 
