@@ -1,6 +1,7 @@
 #include <Ardunio.h>
 #include <HaBridge.h>
-#include <HaEntityLight.h>
+#include <HaEntityBrightness.h>
+#include <HaEntityTemperature.h>
 #include <MQTTRemote.h>
 #ifdef ESP32
 #include <WiFi.h>
@@ -31,13 +32,11 @@ void setupJsonForThisDevice() {
   _json_this_device_doc["model"] = "esp32s2";
   _json_this_device_doc["manufacturer"] = "custom inc.";
 }
-§ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_password);
+MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_password);
 HaBridge ha_bridge(_mqtt_remote, _json_this_device_doc, "kitchen"); // "kitchen" is the name of this device.
-// "Kitchen bench" is the human readable string, as how it will show in Home Assistant
-// "bench" is the name of the light in MQTT.
-HaEntityLight _ha_entity_light(ha_bridge, "Kitchen bench", "bench");
+HaEntityBrightness _ha_entity_brightness(ha_bridge, "Kitchen brightness");
+HaEntityTemperature _ha_entity_temperature(ha_bridge, "Kitchen temperature");
 
-bool _was_connected = false;
 unsigned long _last_publish_ms = 0;
 
 void setup() {
@@ -56,24 +55,19 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Publish Home Assistant Configuration.
-  _ha_entity_light.publishConfiguration();
+  _ha_entity_brightness.publishConfiguration();
+  _ha_entity_temperature.publishConfiguration();
 }
 
 void loop() {
   _mqtt_remote.handle();
 
-  // Subscribe to new light state pushed by Home Assistant.
-  auto connected = _mqtt_remote.connected();
-  if (!_was_connected && connected) {
-    _ha_entity_light.setOnState([&](bool on) { digitalWrite(LED_PIN, on); });
-  }
-  _was_connected = connected;
-
-  // Publish light status every 2 second.
+  // Publish temperature and brightness status every 2 second.
   auto now = millis();
   if (_last_publish_ms - now > 2000) {
     bool on = digitalRead(LED_PIN);
-    _ha_entity_light.publishLight(std::optional<bool>{on}, std::optional<uint8_t>{255});
+    _ha_entity_brightness.publishBrightness(128);
+    _ha_entity_temperature.publishTemperature(25.5);
     _last_publish_ms = now;
   }
 }
