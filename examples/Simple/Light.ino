@@ -5,6 +5,8 @@
 
 #define LED_PIN D1
 
+const char wifi_ssid[] = "my-wifi-ssid";
+const char wifi_password[] = "my-wifi-password";
 const char mqtt_client_id[] = "my-client";
 const char mqtt_host[] = "192.168.1.1";
 const char mqtt_username[] = "my-username";
@@ -32,7 +34,21 @@ unsigned long _last_publish_ms = 0;
 
 void setup() {
   Serial.begin(115200);
-  setupJsonForThisDevice();
+  setupJsonForThisDevice(); // Populate json dict.
+
+  // Setup WiFI
+  WiFi.begin(wifi_ssid, wifi_password);
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("Connection Failed! Rebooting...");
+    delay(5000);
+    ESP.restart();
+  }
+  Serial.println("have wifi");
+  Serial.print("IP number: ");
+  Serial.println(WiFi.localIP());
+
+  // Publish Home Assistant Configuration.
+  _ha_entity_light.publishConfiguration();
 }
 
 void loop() {
