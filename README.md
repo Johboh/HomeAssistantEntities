@@ -5,6 +5,10 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 
 See Examples for [sensors](examples/Sensors/Sensors.ino) as well as [actuators](examples/Actuators/Actuators.ino).
 
+### Supported platforms
+- ESP32
+- ESP8266
+
 ### Dependencies
 - https://github.com/Johboh/MQTTRemote @^1.0.3
 - https://github.com/bblanchon/ArduinoJson @^6.20.0
