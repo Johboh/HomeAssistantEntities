@@ -4,13 +4,21 @@
 #define COMPONENT "sensor"
 #define OBJECT_ID "temperature"
 
-HaEntityTemperature::HaEntityTemperature(HaBridge &ha_bridge, String name, String child_object_id, bool force_update)
-    : _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
+HaEntityTemperature::HaEntityTemperature(HaBridge &ha_bridge, String name, String child_object_id, bool force_update,
+                                         Unit unit)
+    : _unit(unit) _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityTemperature::publishConfiguration() {
   DynamicJsonDocument doc(256);
   doc["name"] = _name;
-  doc["unit_of_measurement"] = "°C";
+  switch (_unit) {
+  case Unit::C:
+    doc["unit_of_measurement"] = "°C";
+    break;
+  case Unit::F:
+    doc["unit_of_measurement"] = "°F";
+    break;
+  }
   doc["device_class"] = "temperature";
   doc["force_update"] = _force_update;
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);

@@ -6,10 +6,14 @@
 #include <HaEntity.h>
 
 /**
- * @brief Represent a Temperature sensor (°C).
+ * @brief Represent a Temperature sensor (°C or °F).
  */
 class HaEntityTemperature : public HaEntity {
 public:
+  enum class Unit {
+    C,
+    F,
+  };
   /**
    * @brief Construct a new Ha Entity Temperature object
    *
@@ -24,8 +28,10 @@ public:
    * @param force_update In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
    * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
    * message (not only when the sensor’s new state is different to the current one).
+   * @param unit the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
    */
-  HaEntityTemperature(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false);
+  HaEntityTemperature(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false,
+                      Unit unit = Unit::C);
 
 public:
   void publishConfiguration() override;
@@ -34,11 +40,12 @@ public:
   /**
    * @brief Publish the temperature.
    *
-   * @param temperature temperature in °C.
+   * @param temperature temperature in °C or °F, depending on what was selected at construction.
    */
   void publishTemperature(double temperature);
 
 private:
+  Unit _unit;
   String _name;
   bool _force_update;
   HaBridge &_ha_bridge;
