@@ -1,9 +1,9 @@
 #ifndef __HA_ENTITY_ATMOSPHERIC_PRESSURE_H__
 #define __HA_ENTITY_ATMOSPHERIC_PRESSURE_H__
 
-#include "HaBridge.h"
-#include "HaEntity.h"
 #include <Arduino.h>
+#include <HaBridge.h>
+#include <HaEntity.h>
 
 /**
  * @brief Represent a Atmospheric pressure sensor (hPa).

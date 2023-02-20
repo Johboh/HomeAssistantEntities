@@ -1,9 +1,9 @@
 #ifndef __HA_ENTITY_RETRIES_H__
 #define __HA_ENTITY_RETRIES_H__
 
-#include "HaBridge.h"
-#include "HaEntity.h"
 #include <Arduino.h>
+#include <HaBridge.h>
+#include <HaEntity.h>
 
 /**
  * @brief Represent a retries sensor. BUT! At this point there is no Home Assistant configuration, just the value.

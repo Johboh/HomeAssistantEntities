@@ -1,21 +1,26 @@
-#ifndef __HA_ENTITY_JSON_H__
-#define __HA_ENTITY_JSON_H__
+#ifndef __HA_ENTITY_WEIGHT_H__
+#define __HA_ENTITY_WEIGHT_H__
 
-#include "ArduinoJson.h"
-#include "HaBridge.h"
-#include "HaEntity.h"
 #include <Arduino.h>
+#include <HaBridge.h>
+#include <HaEntity.h>
 
 /**
- * @brief Represent a raw JSON sensor with a state topic on which you post your JSON.
+ * @brief Represent a Weight sensor (g or kg).
  */
-class HaEntityJson : public HaEntity {
+class HaEntityWeight : public HaEntity {
+public:
+  enum class Unit {
+    g,
+    kg,
+  };
+
 public:
   /**
-   * @brief Construct a new Ha Entity Json object
+   * @brief Construct a new Ha Entity Weight object
    *
    * @param name this is the human readable name that will be used for the entity in Home Assistant. Example: "Bathroom
-   * json"
+   * weight"
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
    * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
@@ -25,31 +30,31 @@ public:
    * @param force_update In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
    * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
    * message (not only when the sensor’s new state is different to the current one).
+   * @param unit the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
    */
-  HaEntityJson(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false);
+  HaEntityWeight(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false,
+                 Unit unit = Unit::kg);
 
 public:
   void publishConfiguration() override;
   void republishState() override;
 
   /**
-   * @brief Publish the JSON.
+   * @brief Publish the weight.
    *
-   * @param json_doc the JSON document to publish.
+   * @param weight weight in g or kg, depending on what was selected at construction.
    */
-  void publishJson(JsonDocument &json_doc);
+  void publishWeight(double weight);
 
 private:
-  void publishMessage(String &message);
-
-private:
+  Unit _unit;
   String _name;
   bool _force_update;
   HaBridge &_ha_bridge;
   String _child_object_id;
 
 private:
-  std::optional<String> _json_message;
+  std::optional<double> _weight;
 };
 
-#endif // __HA_ENTITY_JSON_H__
+#endif // __HA_ENTITY_WEIGHT_H__

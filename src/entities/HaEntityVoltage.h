@@ -1,9 +1,9 @@
 #ifndef __HA_ENTITY_VOLTAGE_H__
 #define __HA_ENTITY_VOLTAGE_H__
 
-#include "HaBridge.h"
-#include "HaEntity.h"
 #include <Arduino.h>
+#include <HaBridge.h>
+#include <HaEntity.h>
 
 /**
  * @brief Represent a Voltage sensor (V).

@@ -1,9 +1,9 @@
 #ifndef __HA_ENTITY_LIGHT_H__
 #define __HA_ENTITY_LIGHT_H__
 
-#include "HaBridge.h"
-#include "HaEntity.h"
 #include <Arduino.h>
+#include <HaBridge.h>
+#include <HaEntity.h>
 #include <functional>
 
 /**
