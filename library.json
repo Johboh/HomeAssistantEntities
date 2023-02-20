@@ -1,12 +1,12 @@
 {
     "name": "HomeAssistantEntities",
     "keywords": "esp8266, esp32, mqtt, ha, homeassistant",
-    "description": "Home Assistant entities for MQTT.",
+    "description": "Library for providing sensors and actuators to Home Assistant using MQTT.",
     "authors":
     {
       "name": "Johan Böhlin"
     },
-    "version": "1.0.2",
+    "version": "2.0.0",
     "license": "MIT",
     "repository":
     {
