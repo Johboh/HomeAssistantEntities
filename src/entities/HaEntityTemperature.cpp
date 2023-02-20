@@ -6,7 +6,7 @@
 
 HaEntityTemperature::HaEntityTemperature(HaBridge &ha_bridge, String name, String child_object_id, bool force_update,
                                          Unit unit)
-    : _unit(unit) _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
+    : _unit(unit), _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityTemperature::publishConfiguration() {
   DynamicJsonDocument doc(256);
