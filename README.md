@@ -32,3 +32,9 @@ See Examples for [sensors](examples/Sensors/Sensors.ino) as well as [actuators](
 - https://github.com/Johboh/MQTTRemote @^1.0.3
   - _Note_: If you don't want to depend on [MQTTRemote](https://github.com/Johboh/MQTTRemote), you can copy the [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/src/IMQTTRemote.h) interface from the MQTTRemote repo and implement/adapt/forward to your own MQTT implementation. This library only depend on the [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/src/IMQTTRemote.h) interface.
 - https://github.com/bblanchon/ArduinoJson @^6.20.0
+- Needs C++17 for `std::optional`.
+  - For platform I/O in `platformio.ini`:
+    ```C++
+    build_unflags=-std=gnu++11 # "Disable" C++11
+    build_flags=-std=gnu++17 # "Enable" C++17
+    ```
