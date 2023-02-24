@@ -1,5 +1,5 @@
 # HomeAssistantEntities
-Library for providing sensors and actuators to Home Assistant using MQTT.
+Arduino library for providing sensors and actuators to Home Assistant using MQTT.
 
 Home Assistant has a well defined way of defining sensors and actuators using MQTT. This library register a device with one or mulitple sensors and provide a way to publish new values for them, as well as listen for commands from Home Assistant.
 
