@@ -16,9 +16,6 @@
  * a brightness sensor and a temperature sensor.
  */
 
-// Change this to your LED pin
-#define LED_PIN GPIO_NUM_15
-
 const char wifi_ssid[] = "my-wifi-ssid";
 const char wifi_password[] = "my-wifi-password";
 const char mqtt_client_id[] = "my-client";
@@ -82,7 +79,6 @@ void loop() {
   // Publish temperature and brightness status every 10 seconds.
   auto now = millis();
   if (now - _last_publish_ms > 10000) {
-    bool on = digitalRead(LED_PIN);
     _ha_entity_brightness.publishBrightness(128);
     _ha_entity_temperature.publishTemperature(25.5);
     _last_publish_ms = now;

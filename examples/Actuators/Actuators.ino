@@ -15,7 +15,13 @@
  */
 
 // Change this to your LED pin
+#ifdef ESP32
 #define LED_PIN GPIO_NUM_15
+#elif ESP8266
+#define LED_PIN D2
+#else
+#error "Unsupported hardware. Sorry!"
+#endif
 
 const char wifi_ssid[] = "my-wifi-ssid";
 const char wifi_password[] = "my-wifi-password";
