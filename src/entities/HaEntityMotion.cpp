@@ -8,7 +8,7 @@ HaEntityMotion::HaEntityMotion(HaBridge &ha_bridge, String name, String child_ob
     : _name(name), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityMotion::publishConfiguration() {
-  DynamicJsonDocument doc(256);
+  DynamicJsonDocument doc(512);
   doc["name"] = _name;
   doc["device_class"] = "motion";
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);

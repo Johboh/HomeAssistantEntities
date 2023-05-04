@@ -8,7 +8,7 @@ HaEntityBrightness::HaEntityBrightness(HaBridge &ha_bridge, String name, String 
     : _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityBrightness::publishConfiguration() {
-  DynamicJsonDocument doc(256);
+  DynamicJsonDocument doc(512);
   doc["name"] = _name;
   doc["unit_of_measurement"] = "%";
   doc["force_update"] = _force_update;

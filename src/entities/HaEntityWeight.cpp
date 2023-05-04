@@ -8,7 +8,7 @@ HaEntityWeight::HaEntityWeight(HaBridge &ha_bridge, String name, String child_ob
     : _unit(unit), _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityWeight::publishConfiguration() {
-  DynamicJsonDocument doc(256);
+  DynamicJsonDocument doc(512);
   doc["name"] = _name;
   doc["device_class"] = "weight";
   doc["force_update"] = _force_update;

@@ -9,7 +9,7 @@ HaEntityAtmosphericPressure::HaEntityAtmosphericPressure(HaBridge &ha_bridge, St
     : _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityAtmosphericPressure::publishConfiguration() {
-  DynamicJsonDocument doc(256);
+  DynamicJsonDocument doc(512);
   doc["name"] = _name;
   doc["unit_of_measurement"] = "hPa";
   doc["force_update"] = _force_update;

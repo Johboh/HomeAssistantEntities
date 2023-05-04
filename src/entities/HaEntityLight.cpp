@@ -12,7 +12,7 @@ HaEntityLight::HaEntityLight(HaBridge &ha_bridge, String name, String child_obje
     : _name(name), _ha_bridge(ha_bridge), _child_object_id(child_object_id), _support_brightness(support_brightness) {}
 
 void HaEntityLight::publishConfiguration() {
-  DynamicJsonDocument doc(256);
+  DynamicJsonDocument doc(512);
   doc["name"] = _name;
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
   doc["command_topic"] =
