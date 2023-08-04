@@ -52,9 +52,9 @@ HaBridge ha_bridge(_mqtt_remote, _json_this_device_doc, "kitchen");
 // Create the two lights with the "Human readable" strings. This what will show up in Home Assistant.
 // As we have two entities of the same type (light) for the same device, we need to add a child object
 // id to separate them.
-// Last boolean is if we support brightness, which we do.
-HaEntityLight _ha_entity_light_left_bench(ha_bridge, "Kitchen left bench", "kitchen_left_bench", true);
-HaEntityLight _ha_entity_light_right_bench(ha_bridge, "Kitchen right bench", "kitchen_right_bench", true);
+HaEntityLight::Capabilities capabilities = {.with_brightness = true};
+HaEntityLight _ha_entity_light_left_bench(ha_bridge, "Kitchen left bench", "kitchen_left_bench", capabilities);
+HaEntityLight _ha_entity_light_right_bench(ha_bridge, "Kitchen right bench", "kitchen_right_bench", capabilities);
 
 bool _was_connected = false;
 unsigned long _last_publish_ms = 0;
@@ -85,7 +85,7 @@ void loop() {
     _ha_entity_light_right_bench.publishConfiguration();
 
     // Subscribe to new light "on" state pushed by Home Assistant.
-    _ha_entity_light_left_bench.setOnState([&](bool on) { digitalWrite(LED_PIN, on); });
+    _ha_entity_light_left_bench.setOnOn([&](bool on) { digitalWrite(LED_PIN, on); });
     _ha_entity_light_right_bench.setOnBrightness(
         [&](uint8_t brightness) { Serial.println("Got brightness " + String(brightness) + " for right light"); });
   }
@@ -97,8 +97,9 @@ void loop() {
     bool on = digitalRead(LED_PIN);
     // Left light is state of LED, and we publish brightess as well as we "know" it at this time.
     // Right light is inverse state of LED, but we don't publish brightness as we don't "know" it as this time.
-    _ha_entity_light_left_bench.publishLight(std::optional<bool>{on}, std::optional<uint8_t>{255});
-    _ha_entity_light_right_bench.publishLight(std::optional<bool>{!on}, std::nullopt);
+    _ha_entity_light_left_bench.publishIsOn(on);
+    _ha_entity_light_left_bench.publishBrightness(255);
+    _ha_entity_light_right_bench.publishIsOn(!on);
     _last_publish_ms = now;
   }
 }
