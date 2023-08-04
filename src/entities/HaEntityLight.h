@@ -5,6 +5,7 @@
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <functional>
+#include <set>
 
 /**
  * @brief Represent a Light that can be controlled from Home Assistant. It goes two ways, as the light can be changed
@@ -13,6 +14,13 @@
  */
 class HaEntityLight : public HaEntity {
 public:
+  struct Capabilities {
+    bool with_brightness = false;
+    bool with_rgb_color = false;
+    // if non empty, the supported effects.
+    std::set<String> effects;
+  };
+
   /**
    * @brief Construct a new Ha Entity Light object
    *
@@ -24,43 +32,96 @@ public:
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID.
-   * @param support_brightness if true, light supports brightness. If we add more capabilites, consider changing the
-   * bool inte a list of capabilities.
+   * @param capabilities what this light supports.
    */
-  HaEntityLight(HaBridge &ha_bridge, String name, String child_object_id, bool support_brightness = false);
+  HaEntityLight(HaBridge &ha_bridge, String name, String child_object_id, Capabilities &capabilities);
 
 public:
   void publishConfiguration() override;
   void republishState() override;
 
   /**
-   * @brief Publish the light.
+   * @brief Publish the current on state.
    *
-   * @param on if light is on or off. Or absent (std::nullopt) if state is unknown.
-   * @param brightness of the light, between 0 and 255. Or absent (std::nullopt) if brightness is unknown or this
-   * capability is not supported. Will only be posted if the light is setup with this capability in the constructor.
+   * @param on if light is on or off.
    */
-  void publishLight(std::optional<bool> on, std::optional<uint8_t> brightness = std::nullopt);
+  void publishIsOn(bool on);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new state that should be set.
+   * @brief Publish the current brightness.
+   *
+   * @param brightness of the light, between 0 and 255. Will only be published if the light is setup with this
+   * capability in the constructor.
    */
-  bool setOnState(std::function<void(bool)> state_callback);
+  void publishBrightness(uint8_t brightness);
+
+  /**
+   * @brief Publish the current selected effect.
+   *
+   * @param effect currently selected. Should be any of the effects from the Capabilities. Will only be published if the
+   * light is setup with this capability in the constructor.
+   */
+  void publishEffect(String &effect);
+
+  struct RGB {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+
+    bool operator==(const RGB &other) const { return (r == other.r) && (g == other.g) && (b == other.b); }
+
+    bool operator!=(const RGB &other) const { return !(*this == other); }
+  };
+
+  /**
+   * @brief Publish the current RGB value.
+   *
+   * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
+   * constructor.
+   */
+  void publishRgb(uint8_t r, uint8_t g, uint8_t b) { publishRgb({r, g, b}); }
+
+  /**
+   * @brief Publish the current RGB value.
+   *
+   * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
+   * constructor.
+   */
+  void publishRgb(RGB rgb);
+
+  /**
+   * @brief Set callback for receving callbacks when there is a new on state that should be set.
+   */
+  bool setOnOn(std::function<void(bool)> on_state_callback);
 
   /**
    * @brief Set callback for receving callbacks when there is a new brightness that should be set. Will only be
-   * respected if the light is setup with this capability in the constructor
+   * respected if the light is setup with this capability.
    */
   bool setOnBrightness(std::function<void(uint8_t)> brightness_callback);
+
+  /**
+   * @brief Set callback for receving callbacks when there is a new effect that should be set. Will only be
+   * respected if the light is setup with this capability.
+   */
+  bool setOnEffect(std::function<void(String)> effect_callback);
+
+  /**
+   * @brief Set callback for receving callbacks when there is a new RGB value that should be set. Will only be
+   * respected if the light is setup with this capability.
+   */
+  bool setOnRgb(std::function<void(RGB)> effect_callback);
 
 private:
   String _name;
   HaBridge &_ha_bridge;
   String _child_object_id;
-  bool _support_brightness;
+  Capabilities _capabilities;
 
 private:
   std::optional<bool> _on;
+  std::optional<RGB> _rgb;
+  std::optional<String> _effect;
   std::optional<uint8_t> _brightness;
 };
 
