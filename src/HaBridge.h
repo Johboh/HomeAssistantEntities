@@ -23,7 +23,8 @@ public:
    * subscribing to a state. This is also the path key used under the MQTT
    * "homeassistant/<component>/<node_id>" path for publishing the configuration. Example for a state topic for
    * a temperature for bathroom: "bathroom" which will lead to state topic "bathroom/sensor/temperature/state", and the
-   * Home Assistant Configuration will be published under "homeassistant/sensor/bathroom/temperature/config"
+   * Home Assistant Configuration will be published under "homeassistant/sensor/bathroom/temperature/config" Valid
+   * characters are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param verbose True to do extra debug logging and printouts.
    */
   HaBridge(IMQTTRemote &remote, JsonDocument &this_device_json_doc, String node_id, bool verbose = true);
@@ -43,13 +44,15 @@ public:
    * @param component This is the first path after "homeassistant/" in the topic and defines the kind of component it
    * is. Examples are "sensor", "binary_sensor", "cover", "light", etc.
    * @param object_id this is the object identifier, which is what the sensor/acturator is measuring/actuating. Examples
-   * "voltage", "brightness", "movement", "curtain", "light" etc.
+   * "voltage", "brightness", "movement", "curtain", "light" etc. Valid characters
+   * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
    * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock_upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID.
+   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
+   * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param specific_doc Any entity specific values. See brief documentation.
    */
   void publishConfiguration(String component, String object_id, String child_object_id,
@@ -75,13 +78,16 @@ public:
    * @brief Get the topic to use for publishing state, subscribing to events and to use in the home assistant setup.
    *
    * @param topic_type The type of topic.
-   * @param component the component type, as in "light", "sensor", "binary_sensor" etc.
-   * @param object_id the entity object ID, as in "brightness", "voltage", etc.
+   * @param component the component type, as in "light", "sensor", "binary_sensor" etc. Must be any of Home Assistant
+   * acceptable components, see https://www.home-assistant.io/integrations/mqtt/
+   * @param object_id the entity object ID, as in "brightness", "voltage", etc. Valid characters
+   * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
    * entity type for the same node ID. Example: If you have a lock for the node ID "door", the state topic would be
    * "door/binary_sensor/lock/state" This works if you only have one lock on your door, but if you have two locks, you
    * want to add a child object ID to them. By setting the child_object_id to say "upper", the state topic will be
-   * ""door/binary_sensor/lock/upper/state".
+   * ""door/binary_sensor/lock/upper/state". Valid characters
+   * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
   String getTopic(TopicType topic_type, String component, String object_id, String child_object_id = "");
 

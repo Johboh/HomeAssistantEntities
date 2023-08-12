@@ -23,7 +23,8 @@ public:
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID.
+   * all state/command topics and so on. Leave as empty string for no child object ID.  Valid characters
+   * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
   HaEntityCurtain(HaBridge &ha_bridge, String name, String child_object_id);
 
