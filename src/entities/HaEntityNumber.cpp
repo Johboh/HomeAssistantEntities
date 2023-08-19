@@ -8,7 +8,12 @@ HaEntityNumber::HaEntityNumber(HaBridge &ha_bridge, String name, String object_i
 
 void HaEntityNumber::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  doc["name"] = _name;
+  _name.trim();
+  if (!_name.isEmpty()) {
+    doc["name"] = _name;
+  } else {
+    doc["name"] = (char *)NULL;
+  }
   // TODO (johboh): Allow setting doc["device_class"]?
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);

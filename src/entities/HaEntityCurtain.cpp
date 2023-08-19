@@ -13,7 +13,12 @@ HaEntityCurtain::HaEntityCurtain(HaBridge &ha_bridge, String name, String child_
 
 void HaEntityCurtain::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  doc["name"] = _name;
+  _name.trim();
+  if (!_name.isEmpty()) {
+    doc["name"] = _name;
+  } else {
+    doc["name"] = (char *)NULL;
+  }
   doc["device_class"] = "curtain";
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_STATE);
   doc["command_topic"] =

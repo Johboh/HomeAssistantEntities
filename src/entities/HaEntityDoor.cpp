@@ -9,7 +9,12 @@ HaEntityDoor::HaEntityDoor(HaBridge &ha_bridge, String name, String child_object
 
 void HaEntityDoor::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  doc["name"] = _name;
+  _name.trim();
+  if (!_name.isEmpty()) {
+    doc["name"] = _name;
+  } else {
+    doc["name"] = (char *)NULL;
+  }
   doc["device_class"] = "door";
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);

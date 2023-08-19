@@ -16,8 +16,13 @@ public:
   /**
    * @brief Construct a new Ha Entity Curtain object
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. Example: "Bathroom
-   * curtain"
+   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
+   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
+   * Example: if device name is "Bathroom" and entity name "curtain", friendly name wil lbe "Bathroom curtain". If no
+   * device, friendly name will be just "curtain". If a device is set, this name can be left empty if this entity is the
+   * one main entity (or only) entity of this device. See
+   * https://developers.home-assistant.io/docs/core/entity/#has_entity_name-true-mandatory-for-new-integrations for more
+   * information.
    * @param child_object_id non optional child identifier for this entity in case there are several sensors of the same
    * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on

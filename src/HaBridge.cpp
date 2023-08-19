@@ -1,5 +1,10 @@
 #include "HaBridge.h"
 
+DynamicJsonDocument EMPTY_DOCUMENT(1);
+
+HaBridge::HaBridge(IMQTTRemote &remote, String node_id, bool verbose)
+    : _verbose(verbose), _node_id(node_id), _remote(remote), _this_device_json_doc(EMPTY_DOCUMENT) {}
+
 HaBridge::HaBridge(IMQTTRemote &remote, JsonDocument &this_device_json_doc, String node_id, bool verbose)
     : _verbose(verbose), _node_id(node_id), _remote(remote), _this_device_json_doc(this_device_json_doc) {}
 
@@ -16,10 +21,12 @@ void HaBridge::publishConfiguration(String component, String object_id, String c
   unique_id += "_" + object_id;
   doc["unique_id"] = unique_id;
 
-  // Set device keys.
-  auto device = doc.createNestedObject("device");
-  for (JsonPair kvp : _this_device_json_doc.as<JsonObject>()) {
-    device[kvp.key()] = kvp.value();
+  // Set optional device keys.
+  if (!_this_device_json_doc.isNull()) {
+    auto device = doc.createNestedObject("device");
+    for (JsonPair kvp : _this_device_json_doc.as<JsonObject>()) {
+      device[kvp.key()] = kvp.value();
+    }
   }
 
   // Set specific keys.

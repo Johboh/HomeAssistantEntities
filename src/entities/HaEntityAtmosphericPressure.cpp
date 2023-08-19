@@ -10,7 +10,12 @@ HaEntityAtmosphericPressure::HaEntityAtmosphericPressure(HaBridge &ha_bridge, St
 
 void HaEntityAtmosphericPressure::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  doc["name"] = _name;
+  _name.trim();
+  if (!_name.isEmpty()) {
+    doc["name"] = _name;
+  } else {
+    doc["name"] = (char *)NULL;
+  }
   doc["unit_of_measurement"] = "hPa";
   doc["force_update"] = _force_update;
   doc["device_class"] = "atmospheric_pressure";

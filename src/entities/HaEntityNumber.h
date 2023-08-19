@@ -14,8 +14,13 @@ public:
   /**
    * @brief Construct a new Ha Entity Number object
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. Example: "Balcony
-   * LED rainbow effect speed"
+   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
+   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
+   * Example: if device name is "Bathroom" and entity name "number", friendly name wil lbe "Bathroom number". If no
+   * device, friendly name will be just "number". If a device is set, this name can be left empty if this entity is the
+   * one main entity (or only) entity of this device. See
+   * https://developers.home-assistant.io/docs/core/entity/#has_entity_name-true-mandatory-for-new-integrations for more
+   * information.
    * @param object_id object ID for this number. Should be unique for each number for this node/device. Example:
    * "balcony_leds_speed". Valid characters are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param min_value minimum value allowed.

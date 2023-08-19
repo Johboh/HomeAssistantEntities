@@ -9,7 +9,12 @@ HaEntityHumidity::HaEntityHumidity(HaBridge &ha_bridge, String name, String chil
 
 void HaEntityHumidity::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  doc["name"] = _name;
+  _name.trim();
+  if (!_name.isEmpty()) {
+    doc["name"] = _name;
+  } else {
+    doc["name"] = (char *)NULL;
+  }
   doc["device_class"] = "humidity";
   doc["unit_of_measurement"] = "%";
   doc["force_update"] = _force_update;

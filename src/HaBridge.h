@@ -13,12 +13,30 @@
 class HaBridge {
 public:
   /**
-   * @brief Construct a new Ha Entity object.
+   * @brief Construct a new Ha Entity object without a device.
    *
    * @param remote the MQTT Interface / Remote to send messages and subscribe to topics.
-   * @param json_this_device_doc Information about this device, e.g. the router. All these keys will be added to a
-   * "device" key in the Home Assistant configuration for each entity. Only a flat layout structure is supported, no
-   * nesting. We call this from setup function below before we setup the remote.
+   * @param node_id this is used as the root in the MQTT path for publishing values to a state topic, or for
+   * subscribing to a state. This is also the path key used under the MQTT
+   * "homeassistant/<component>/<node_id>" path for publishing the configuration. Example for a state topic for
+   * a temperature for bathroom: "bathroom" which will lead to state topic "bathroom/sensor/temperature/state", and the
+   * Home Assistant Configuration will be published under "homeassistant/sensor/bathroom/temperature/config" Valid
+   * characters are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * @param verbose True to do extra debug logging and printouts.
+   */
+  HaBridge(IMQTTRemote &remote, String node_id, bool verbose = true);
+
+  /**
+   * @brief Construct a new Ha Entity object with a device.
+   *
+   * @param remote the MQTT Interface / Remote to send messages and subscribe to topics.
+   * @param json_this_device_doc Information about this device. The device is this hardware that have all the Home
+   * Assistant entities. A device is not required. If there is a device, the name displayed in the UI will be the device
+   * name combined with the entity name. See
+   * https://developers.home-assistant.io/docs/core/entity/#has_entity_name-true-mandatory-for-new-integrations for more
+   * information. All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
+   * Only a flat layout structure is supported, no nesting. This is called from the setup function below before we setup
+   * the remote.
    * @param node_id this is used as the root in the MQTT path for publishing values to a state topic, or for
    * subscribing to a state. This is also the path key used under the MQTT
    * "homeassistant/<component>/<node_id>" path for publishing the configuration. Example for a state topic for

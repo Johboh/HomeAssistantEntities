@@ -37,7 +37,7 @@ const char mqtt_password[] = "my-password";
 StaticJsonDocument<256> _json_this_device_doc;
 void setupJsonForThisDevice() {
   _json_this_device_doc["identifiers"] = "my_hardware_" + String(mqtt_client_id);
-  _json_this_device_doc["name"] = mqtt_client_id;
+  _json_this_device_doc["name"] = "Kitchen";
   _json_this_device_doc["sw_version"] = "1.0.0";
   _json_this_device_doc["model"] = "my_hardware";
   _json_this_device_doc["manufacturer"] = "custom inc.";
@@ -53,8 +53,8 @@ HaBridge ha_bridge(_mqtt_remote, _json_this_device_doc, "kitchen");
 // As we have two entities of the same type (light) for the same device, we need to add a child object
 // id to separate them.
 HaEntityLight::Capabilities capabilities = {.with_brightness = true};
-HaEntityLight _ha_entity_light_left_bench(ha_bridge, "Kitchen left bench", "kitchen_left_bench", capabilities);
-HaEntityLight _ha_entity_light_right_bench(ha_bridge, "Kitchen right bench", "kitchen_right_bench", capabilities);
+HaEntityLight _ha_entity_light_left_bench(ha_bridge, "left bench", "kitchen_left_bench", capabilities);
+HaEntityLight _ha_entity_light_right_bench(ha_bridge, "right bench", "kitchen_right_bench", capabilities);
 
 bool _was_connected = false;
 unsigned long _last_publish_ms = 0;

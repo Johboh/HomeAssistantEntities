@@ -10,7 +10,12 @@ HaEntityTemperature::HaEntityTemperature(HaBridge &ha_bridge, String name, Strin
 
 void HaEntityTemperature::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  doc["name"] = _name;
+  _name.trim();
+  if (!_name.isEmpty()) {
+    doc["name"] = _name;
+  } else {
+    doc["name"] = (char *)NULL;
+  }
   switch (_unit) {
   case Unit::C:
     doc["unit_of_measurement"] = "°C";

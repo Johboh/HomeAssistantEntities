@@ -9,7 +9,12 @@ HaEntityVoltage::HaEntityVoltage(HaBridge &ha_bridge, String name, String child_
 
 void HaEntityVoltage::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  doc["name"] = _name;
+  _name.trim();
+  if (!_name.isEmpty()) {
+    doc["name"] = _name;
+  } else {
+    doc["name"] = (char *)NULL;
+  }
   doc["device_class"] = "voltage";
   doc["force_update"] = _force_update;
   switch (_unit) {
