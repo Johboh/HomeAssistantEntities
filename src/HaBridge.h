@@ -33,7 +33,7 @@ public:
    * @param json_this_device_doc Information about this device. The device is this hardware that have all the Home
    * Assistant entities. A device is not required. If there is a device, the name displayed in the UI will be the device
    * name combined with the entity name. See
-   * https://developers.home-assistant.io/docs/core/entity/#has_entity_name-true-mandatory-for-new-integrations for more
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information. All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
    * Only a flat layout structure is supported, no nesting. This is called from the setup function below before we setup
    * the remote.

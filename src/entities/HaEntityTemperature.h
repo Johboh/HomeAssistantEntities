@@ -22,7 +22,7 @@ public:
    * Example: if device name is "Bathroom" and entity name "temperature", friendly name wil lbe "Bathroom temperature".
    * If no device, friendly name will be just "temperature". If a device is set, this name can be left empty if this
    * entity is the one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#has_entity_name-true-mandatory-for-new-integrations for more
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
    * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant

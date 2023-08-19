@@ -19,7 +19,7 @@ public:
    * Example: if device name is "Bathroom" and entity name "number", friendly name wil lbe "Bathroom number". If no
    * device, friendly name will be just "number". If a device is set, this name can be left empty if this entity is the
    * one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#has_entity_name-true-mandatory-for-new-integrations for more
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param object_id object ID for this number. Should be unique for each number for this node/device. Example:
    * "balcony_leds_speed". Valid characters are [a-zA-Z0-9_-] (machine readable, not human readable)
