@@ -14,6 +14,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Json (raw "json"-sensor)
 - Lock (locked/unlocked)
 - Motion (detected/not detected)
+- Number
 - Sound (detected/not detected)
 - Temperature (°C/°F)
 - Voltage (mV/V)
@@ -21,7 +22,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 
 ### Currently supported actuators (and sensors)
 - Curtain (open/opening, close/closing, position)
-- Light (on/off & brightness)
+- Light (brightness, rgb, effect)
 - Switch (on/off)
 
 ### Examples
