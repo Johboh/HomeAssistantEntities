@@ -1,5 +1,5 @@
-#ifndef __HA_ENTITY_JSON_H__
-#define __HA_ENTITY_JSON_H__
+#ifndef __HA_ENTITY_STRING_H__
+#define __HA_ENTITY_STRING_H__
 
 #include "ArduinoJson.h"
 #include <Arduino.h>
@@ -7,18 +7,18 @@
 #include <HaEntity.h>
 
 /**
- * @brief Represent a raw JSON sensor with a state topic on which you post your JSON.
- * Also see [HaEntityString] which is very similar. TODO(johboh): merge?
+ * @brief Represent a raw String sensor with a state topic on which you post your string.
+ * Also see [HaEntityJson] which is very similar. TODO(johboh): merge?
  */
-class HaEntityJson : public HaEntity {
+class HaEntityString : public HaEntity {
 public:
   /**
-   * @brief Construct a new Ha Entity Json object
+   * @brief Construct a new Ha Entity String object
    *
    * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
    * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "json", friendly name wil lbe "Bathroom json". If no
-   * device, friendly name will be just "json". If a device is set, this name can be left empty if this entity is the
+   * Example: if device name is "Bathroom" and entity name "string", friendly name wil lbe "Bathroom string". If no
+   * device, friendly name will be just "string". If a device is set, this name can be left empty if this entity is the
    * one main entity (or only) entity of this device. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
@@ -33,20 +33,17 @@ public:
    * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
    * message (not only when the sensor’s new state is different to the current one).
    */
-  HaEntityJson(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false);
+  HaEntityString(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false);
 
 public:
   void publishConfiguration() override;
   void republishState() override;
 
   /**
-   * @brief Publish the JSON.
+   * @brief Publish the String.
    *
-   * @param json_doc the JSON document to publish.
+   * @param json_doc the String to publish.
    */
-  void publishJson(JsonDocument &json_doc);
-
-private:
   void publishMessage(String &message);
 
 private:
@@ -56,7 +53,7 @@ private:
   String _child_object_id;
 
 private:
-  std::optional<String> _json_message;
+  std::optional<String> _message;
 };
 
-#endif // __HA_ENTITY_JSON_H__
+#endif // __HA_ENTITY_STRING_H__

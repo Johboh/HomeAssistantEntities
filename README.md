@@ -16,6 +16,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Motion (detected/not detected)
 - Number
 - Sound (detected/not detected)
+- String (raw "String"-sensor)
 - Temperature (°C/°F)
 - Voltage (mV/V)
 - Weight (g/kg)
@@ -23,6 +24,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 ### Currently supported actuators (and sensors)
 - Curtain (open/opening, close/closing, position)
 - Light (brightness, rgb, effect)
+- Select
 - Switch (on/off)
 
 ### Examples

@@ -30,10 +30,16 @@ HaEntityLight::RGB extractColor(std::string &input) {
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 
 HaEntityLight::HaEntityLight(HaBridge &ha_bridge, String name, String child_object_id, Capabilities &capabilities)
-    : _name(name), _ha_bridge(ha_bridge), _child_object_id(child_object_id), _capabilities(capabilities) {}
+    : _name(name), _ha_bridge(ha_bridge), _child_object_id(child_object_id), _capabilities(capabilities) {
+  // Calculate total string length of all effects to to use when creating JSON document.
+  _total_string_length_of_effects = 0;
+  for (const String &effect : capabilities.effects) {
+    _total_string_length_of_effects += effect.length();
+  }
+}
 
 void HaEntityLight::publishConfiguration() {
-  DynamicJsonDocument doc(1024);
+  DynamicJsonDocument doc(1024 + _total_string_length_of_effects); // This might be problematic.
   _name.trim();
   if (!_name.isEmpty()) {
     doc["name"] = _name;
@@ -61,8 +67,8 @@ void HaEntityLight::publishConfiguration() {
     doc["effect_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
     auto effects = doc["effect_list"].to<JsonArray>();
-    for (std::set<String>::iterator it = _capabilities.effects.begin(); it != _capabilities.effects.end(); ++it) {
-      effects.add(*it);
+    for (const String &effect : _capabilities.effects) {
+      effects.add(effect);
     }
   }
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
