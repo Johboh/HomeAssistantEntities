@@ -3,8 +3,10 @@
 
 #define COMPONENT "event"
 
-HaEntityEvent::HaEntityEvent(HaBridge &ha_bridge, String name, String object_id, std::set<String> event_types)
-    : _name(name), _ha_bridge(ha_bridge), _object_id(object_id), _event_types(event_types) {
+HaEntityEvent::HaEntityEvent(HaBridge &ha_bridge, String name, String object_id, std::set<String> event_types,
+                             HaEntityEvent::DeviceClass device_class)
+    : _name(name), _ha_bridge(ha_bridge), _object_id(object_id), _event_types(event_types),
+      _device_class(device_class) {
   // Calculate total string length of all events to to use when creating JSON document.
   _total_string_length_of_event_types = 0;
   for (const String &event_type : event_types) {
@@ -20,7 +22,20 @@ void HaEntityEvent::publishConfiguration() {
   } else {
     doc["name"] = (char *)NULL;
   }
-  // TODO (johboh): Allow setting doc["device_class"]?
+  switch (_device_class) {
+  case DeviceClass::Button:
+    doc["device_class"] = "button";
+    break;
+  case DeviceClass::Motion:
+    doc["device_class"] = "motion";
+    break;
+  case DeviceClass::Dorrbell:
+    doc["device_class"] = "doorbell";
+    break;
+  case DeviceClass::None:
+    break;
+  }
+
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   auto event_types = doc["event_types"].to<JsonArray>();
   for (const String &event_type : _event_types) {

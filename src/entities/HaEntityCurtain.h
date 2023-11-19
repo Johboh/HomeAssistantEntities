@@ -18,7 +18,7 @@ public:
    *
    * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
    * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "curtain", friendly name wil lbe "Bathroom curtain". If no
+   * Example: if device name is "Bathroom" and entity name "curtain", friendly name will be "Bathroom curtain". If no
    * device, friendly name will be just "curtain". If a device is set, this name can be left empty if this entity is the
    * one main entity (or only) entity of this device. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
