@@ -32,7 +32,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 See Examples for [sensors](examples/Sensors/Sensors.ino) as well as [actuators](examples/Actuators/Actuators.ino).
 
 ### Functionallity verified on the following platforms and frameworks
-- ESP32 (tested with platform I/O [espressif32@5.3.0](https://github.com/platformio/platform-espressif32) / [arduino-esp32@2.0.6](https://github.com/espressif/arduino-esp32) on ESP32-S2 and ESP32-C3)
+- ESP32 (tested with platform I/O [espressif32@6.4.0](https://github.com/platformio/platform-espressif32) / [arduino-esp32@2.0.11](https://github.com/espressif/arduino-esp32) / [ESP-IDF@5.1.1](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C3)
 - ESP8266 (tested with platform I/O [espressif8266@4.2.1](https://github.com/platformio/platform-espressif8266) / [ardunio-core@3.1.2](https://github.com/esp8266/Arduino))
 
 Newer version most probably work too, but they have not been verified.
