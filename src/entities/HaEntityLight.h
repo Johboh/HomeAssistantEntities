@@ -1,11 +1,13 @@
 #ifndef __HA_ENTITY_LIGHT_H__
 #define __HA_ENTITY_LIGHT_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
 #include <functional>
+#include <optional>
 #include <set>
+#include <string>
 
 /**
  * @brief Represent a Light that can be controlled from Home Assistant. It goes two ways, as the light can be changed
@@ -18,7 +20,7 @@ public:
     bool with_brightness = false;
     bool with_rgb_color = false;
     // if non empty, the supported effects.
-    std::set<String> effects;
+    std::set<std::string> effects;
   };
 
   /**
@@ -40,7 +42,7 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param capabilities what this light supports.
    */
-  HaEntityLight(HaBridge &ha_bridge, String name, String child_object_id, Capabilities &capabilities);
+  HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id, Capabilities &capabilities);
 
 public:
   void publishConfiguration() override;
@@ -67,7 +69,7 @@ public:
    * @param effect currently selected. Should be any of the effects from the Capabilities. Will only be published if the
    * light is setup with this capability in the constructor.
    */
-  void publishEffect(String &effect);
+  void publishEffect(std::string &effect);
 
   struct RGB {
     uint8_t r;
@@ -110,7 +112,7 @@ public:
    * @brief Set callback for receving callbacks when there is a new effect that should be set. Will only be
    * respected if the light is setup with this capability.
    */
-  bool setOnEffect(std::function<void(String)> effect_callback);
+  bool setOnEffect(std::function<void(std::string)> effect_callback);
 
   /**
    * @brief Set callback for receving callbacks when there is a new RGB value that should be set. Will only be
@@ -119,16 +121,16 @@ public:
   bool setOnRgb(std::function<void(RGB)> effect_callback);
 
 private:
-  String _name;
+  std::string _name;
   HaBridge &_ha_bridge;
-  String _child_object_id;
+  std::string _child_object_id;
   Capabilities _capabilities;
   unsigned long _total_string_length_of_effects = 0;
 
 private:
   std::optional<bool> _on;
   std::optional<RGB> _rgb;
-  std::optional<String> _effect;
+  std::optional<std::string> _effect;
   std::optional<uint8_t> _brightness;
 };
 

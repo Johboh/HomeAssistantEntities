@@ -1,10 +1,12 @@
 #ifndef __HA_ENTITY_CURTAIN_H__
 #define __HA_ENTITY_CURTAIN_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
 #include <functional>
+#include <optional>
+#include <string>
 
 /**
  * @brief Represent a Curtain that can be controlled from Home Assistant. It goes two ways, as the curtain can be
@@ -31,7 +33,7 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID.  Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityCurtain(HaBridge &ha_bridge, String name, String child_object_id);
+  HaEntityCurtain(HaBridge &ha_bridge, std::string name, std::string child_object_id);
 
 public:
   void publishConfiguration() override;
@@ -72,9 +74,9 @@ public:
   bool setOnPosition(std::function<void(uint8_t)> position_callback);
 
 private:
-  String _name;
+  std::string _name;
   HaBridge &_ha_bridge;
-  String _child_object_id;
+  std::string _child_object_id;
 
 private:
   std::optional<State> _state;

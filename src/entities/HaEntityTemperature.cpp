@@ -1,17 +1,19 @@
 #include "HaEntityTemperature.h"
 #include "ArduinoJson.h"
+#include <HaUtilities.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "temperature"
 
-HaEntityTemperature::HaEntityTemperature(HaBridge &ha_bridge, String name, String child_object_id, bool force_update,
-                                         Unit unit)
-    : _unit(unit), _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
+HaEntityTemperature::HaEntityTemperature(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                                         bool force_update, Unit unit)
+    : _unit(unit), _name(homeassistantentities::trim(name)), _force_update(force_update), _ha_bridge(ha_bridge),
+      _child_object_id(child_object_id) {}
 
 void HaEntityTemperature::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  _name.trim();
-  if (!_name.isEmpty()) {
+
+  if (!_name.empty()) {
     doc["name"] = _name;
   } else {
     doc["name"] = (char *)NULL;
@@ -38,6 +40,6 @@ void HaEntityTemperature::republishState() {
 
 void HaEntityTemperature::publishTemperature(double temperature) {
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id),
-                            String(temperature));
-  _temperature = std::optional<double>{temperature};
+                            std::to_string(temperature));
+  _temperature = temperature;
 }

@@ -1,5 +1,6 @@
 #include "HaEntityLight.h"
 #include "ArduinoJson.h"
+#include <HaUtilities.h>
 #include <regex>
 #include <string>
 
@@ -29,19 +30,21 @@ HaEntityLight::RGB extractColor(std::string &input) {
 
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 
-HaEntityLight::HaEntityLight(HaBridge &ha_bridge, String name, String child_object_id, Capabilities &capabilities)
-    : _name(name), _ha_bridge(ha_bridge), _child_object_id(child_object_id), _capabilities(capabilities) {
+HaEntityLight::HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                             Capabilities &capabilities)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
+      _capabilities(capabilities) {
   // Calculate total string length of all effects to to use when creating JSON document.
   _total_string_length_of_effects = 0;
-  for (const String &effect : capabilities.effects) {
+  for (const std::string &effect : capabilities.effects) {
     _total_string_length_of_effects += effect.length();
   }
 }
 
 void HaEntityLight::publishConfiguration() {
   DynamicJsonDocument doc(1024 + _total_string_length_of_effects); // This might be problematic.
-  _name.trim();
-  if (!_name.isEmpty()) {
+
+  if (!_name.empty()) {
     doc["name"] = _name;
   } else {
     doc["name"] = (char *)NULL;
@@ -67,7 +70,7 @@ void HaEntityLight::publishConfiguration() {
     doc["effect_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
     auto effects = doc["effect_list"].to<JsonArray>();
-    for (const String &effect : _capabilities.effects) {
+    for (const std::string &effect : _capabilities.effects) {
       effects.add(effect);
     }
   }
@@ -92,7 +95,7 @@ void HaEntityLight::republishState() {
 void HaEntityLight::publishIsOn(bool on) {
   _ha_bridge.publishMessage(
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      String(on ? "ON" : "OFF"));
+      std::string(on ? "ON" : "OFF"));
   _on = on;
 }
 
@@ -100,7 +103,7 @@ void HaEntityLight::publishBrightness(uint8_t brightness) {
   if (_capabilities.with_brightness) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS),
-        String(brightness));
+        std::to_string(brightness));
     _brightness = brightness;
   }
 }
@@ -109,12 +112,12 @@ void HaEntityLight::publishRgb(RGB rgb) {
   if (_capabilities.with_rgb_color) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_RGB),
-        String(rgb.r) + "," + String(rgb.g) + "," + String(rgb.b));
+        std::to_string(rgb.r) + "," + std::to_string(rgb.g) + "," + std::to_string(rgb.b));
     _rgb = rgb;
   }
 }
 
-void HaEntityLight::publishEffect(String &effect) {
+void HaEntityLight::publishEffect(std::string &effect) {
   if (!_capabilities.effects.empty()) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_EFFECT), effect);
@@ -125,7 +128,7 @@ void HaEntityLight::publishEffect(String &effect) {
 bool HaEntityLight::setOnOn(std::function<void(bool)> state_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      [state_callback](const char *topic, const char *message) { state_callback(String(message) == "ON"); });
+      [state_callback](const char *topic, const char *message) { state_callback(std::string(message) == "ON"); });
 }
 
 bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
@@ -136,7 +139,7 @@ bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS),
-      [callback](const char *topic, const char *message) { callback(String(message).toInt()); });
+      [callback](const char *topic, const char *message) { callback(std::atoi(message)); });
 }
 
 bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
@@ -154,7 +157,7 @@ bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
       });
 }
 
-bool HaEntityLight::setOnEffect(std::function<void(String)> callback) {
+bool HaEntityLight::setOnEffect(std::function<void(std::string)> callback) {
   if (_capabilities.effects.empty()) {
     Serial.println("HaEntityLight: Trying to setup effect callback but no effect capability available.");
     return false;

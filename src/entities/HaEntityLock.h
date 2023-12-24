@@ -1,9 +1,11 @@
 #ifndef __HA_ENTITY_LOCK_H__
 #define __HA_ENTITY_LOCK_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
+#include <optional>
+#include <string>
 
 /**
  * @brief Represent a Lock binary sensor (if a lock is locked or unlocked).
@@ -28,7 +30,7 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityLock(HaBridge &ha_bridge, String name, String child_object_id = "");
+  HaEntityLock(HaBridge &ha_bridge, std::string name, std::string child_object_id = "");
 
 public:
   void publishConfiguration() override;
@@ -42,9 +44,9 @@ public:
   void publishLock(bool locked);
 
 private:
-  String _name;
+  std::string _name;
   HaBridge &_ha_bridge;
-  String _child_object_id;
+  std::string _child_object_id;
 
 private:
   std::optional<bool> _locked;

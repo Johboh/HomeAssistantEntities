@@ -1,9 +1,11 @@
 #ifndef __HA_ENTITY_VOLTAGE_H__
 #define __HA_ENTITY_VOLTAGE_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
+#include <optional>
+#include <string>
 
 /**
  * @brief Represent a Voltage sensor (V).
@@ -38,7 +40,7 @@ public:
    * message (not only when the sensor’s new state is different to the current one).
    * @param unit the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
    */
-  HaEntityVoltage(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false,
+  HaEntityVoltage(HaBridge &ha_bridge, std::string name, std::string child_object_id = "", bool force_update = false,
                   Unit unit = Unit::V);
 
 public:
@@ -54,10 +56,10 @@ public:
 
 private:
   Unit _unit;
-  String _name;
+  std::string _name;
   bool _force_update;
   HaBridge &_ha_bridge;
-  String _child_object_id;
+  std::string _child_object_id;
 
 private:
   std::optional<double> _voltage;

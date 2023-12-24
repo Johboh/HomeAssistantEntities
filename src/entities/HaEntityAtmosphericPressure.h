@@ -1,9 +1,11 @@
 #ifndef __HA_ENTITY_ATMOSPHERIC_PRESSURE_H__
 #define __HA_ENTITY_ATMOSPHERIC_PRESSURE_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
+#include <optional>
+#include <string>
 
 /**
  * @brief Represent a Atmospheric pressure sensor (hPa).
@@ -31,7 +33,8 @@ public:
    * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
    * message (not only when the sensor’s new state is different to the current one).
    */
-  HaEntityAtmosphericPressure(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false);
+  HaEntityAtmosphericPressure(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+                              bool force_update = false);
 
 public:
   void publishConfiguration() override;
@@ -45,10 +48,10 @@ public:
   void publishAtmosphericPressure(double pressure);
 
 private:
-  String _name;
+  std::string _name;
   bool _force_update;
   HaBridge &_ha_bridge;
-  String _child_object_id;
+  std::string _child_object_id;
 
 private:
   std::optional<double> _pressure;

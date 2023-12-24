@@ -1,16 +1,19 @@
 #include "HaEntityVoltage.h"
 #include "ArduinoJson.h"
+#include <HaUtilities.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "voltage"
 
-HaEntityVoltage::HaEntityVoltage(HaBridge &ha_bridge, String name, String child_object_id, bool force_update, Unit unit)
-    : _unit(unit), _name(name), _force_update(force_update), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
+HaEntityVoltage::HaEntityVoltage(HaBridge &ha_bridge, std::string name, std::string child_object_id, bool force_update,
+                                 Unit unit)
+    : _unit(unit), _name(homeassistantentities::trim(name)), _force_update(force_update), _ha_bridge(ha_bridge),
+      _child_object_id(child_object_id) {}
 
 void HaEntityVoltage::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  _name.trim();
-  if (!_name.isEmpty()) {
+
+  if (!_name.empty()) {
     doc["name"] = _name;
   } else {
     doc["name"] = (char *)NULL;
@@ -37,6 +40,6 @@ void HaEntityVoltage::republishState() {
 
 void HaEntityVoltage::publishVoltage(double voltage) {
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id),
-                            String(voltage));
-  _voltage = std::optional<double>{voltage};
+                            std::to_string(voltage));
+  _voltage = voltage;
 }

@@ -1,10 +1,11 @@
 #ifndef __HA_ENTITY_STRING_H__
 #define __HA_ENTITY_STRING_H__
 
-#include "ArduinoJson.h"
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
+#include <optional>
+#include <string>
 
 /**
  * @brief Represent a raw String sensor with a state topic on which you post your string.
@@ -33,27 +34,27 @@ public:
    * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
    * message (not only when the sensor’s new state is different to the current one).
    */
-  HaEntityString(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false);
+  HaEntityString(HaBridge &ha_bridge, std::string name, std::string child_object_id = "", bool force_update = false);
 
 public:
   void publishConfiguration() override;
   void republishState() override;
 
   /**
-   * @brief Publish the String.
+   * @brief Publish the string.
    *
-   * @param json_doc the String to publish.
+   * @param json_doc the string to publish.
    */
-  void publishMessage(String &message);
+  void publishMessage(std::string &message);
 
 private:
-  String _name;
+  std::string _name;
   bool _force_update;
   HaBridge &_ha_bridge;
-  String _child_object_id;
+  std::string _child_object_id;
 
 private:
-  std::optional<String> _message;
+  std::optional<std::string> _message;
 };
 
 #endif // __HA_ENTITY_STRING_H__

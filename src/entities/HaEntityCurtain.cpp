@@ -1,5 +1,6 @@
 #include "HaEntityCurtain.h"
 #include "ArduinoJson.h"
+#include <HaUtilities.h>
 
 #define COMPONENT "cover"
 #define OBJECT_ID "curtain"
@@ -8,13 +9,13 @@
 
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 
-HaEntityCurtain::HaEntityCurtain(HaBridge &ha_bridge, String name, String child_object_id)
-    : _name(name), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
+HaEntityCurtain::HaEntityCurtain(HaBridge &ha_bridge, std::string name, std::string child_object_id)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityCurtain::publishConfiguration() {
   DynamicJsonDocument doc(512);
-  _name.trim();
-  if (!_name.isEmpty()) {
+
+  if (!_name.empty()) {
     doc["name"] = _name;
   } else {
     doc["name"] = (char *)NULL;
@@ -34,7 +35,7 @@ void HaEntityCurtain::republishState() { publishCurtain(_state, _position); }
 
 void HaEntityCurtain::publishCurtain(std::optional<State> state, std::optional<uint8_t> position) {
   if (state) {
-    String str = "";
+    std::string str = "";
     switch (*state) {
     case State::Open:
       str = "open";
@@ -58,14 +59,14 @@ void HaEntityCurtain::publishCurtain(std::optional<State> state, std::optional<u
     if (str.length() > 0) {
       _ha_bridge.publishMessage(
           _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_STATE), str);
-      _state = std::optional<State>{state};
+      _state = state;
     }
   }
   if (position) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_POSITION),
-        String(std::min((uint8_t)100, *position)));
-    _position = std::optional<uint8_t>{position};
+        std::to_string(std::min((uint8_t)100, *position)));
+    _position = position;
   }
 }
 
@@ -74,7 +75,7 @@ bool HaEntityCurtain::setOnState(std::function<void(Action)> state_callback) {
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_STATE),
       [state_callback](const char *topic, const char *message) {
         Action state = Action::Unknown;
-        auto message_str = String(message);
+        auto message_str = std::string(message);
         if (message_str == "OPEN") {
           state = Action::Open;
         } else if (message_str == "CLOSE") {
@@ -90,5 +91,5 @@ bool HaEntityCurtain::setOnState(std::function<void(Action)> state_callback) {
 bool HaEntityCurtain::setOnPosition(std::function<void(uint8_t)> position_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION),
-      [position_callback](const char *topic, const char *message) { position_callback(String(message).toInt()); });
+      [position_callback](const char *topic, const char *message) { position_callback(std::stoi(message)); });
 }

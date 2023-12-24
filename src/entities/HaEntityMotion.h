@@ -1,9 +1,11 @@
 #ifndef __HA_ENTITY_MOTION_H__
 #define __HA_ENTITY_MOTION_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
+#include <optional>
+#include <string>
 
 /**
  * @brief Represent a Motion binary sensor.
@@ -28,7 +30,7 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityMotion(HaBridge &ha_bridge, String name, String child_object_id = "");
+  HaEntityMotion(HaBridge &ha_bridge, std::string name, std::string child_object_id = "");
 
 public:
   void publishConfiguration() override;
@@ -42,9 +44,9 @@ public:
   void publishMotion(bool detected);
 
 private:
-  String _name;
+  std::string _name;
   HaBridge &_ha_bridge;
-  String _child_object_id;
+  std::string _child_object_id;
 
 private:
   std::optional<bool> _detected;

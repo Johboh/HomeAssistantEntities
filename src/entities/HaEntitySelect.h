@@ -1,11 +1,13 @@
 #ifndef __HA_ENTITY_SELECT_H__
 #define __HA_ENTITY_SELECT_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
 #include <functional>
+#include <optional>
 #include <set>
+#include <string>
 
 /**
  * @brief Represent a Select that can be set by Home Assistant or reported back to Home Assistant.
@@ -27,7 +29,7 @@ public:
    * "balcony_leds_profile". Valid characters are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param options Set of options that can be selected. An empty set or a set with a single item is allowed.
    */
-  HaEntitySelect(HaBridge &ha_bridge, String name, String object_id, std::set<String> options);
+  HaEntitySelect(HaBridge &ha_bridge, std::string name, std::string object_id, std::set<std::string> options);
 
 public:
   void publishConfiguration() override;
@@ -38,22 +40,22 @@ public:
    *
    * @param option thte option selected.
    */
-  void publishSelection(String option);
+  void publishSelection(std::string option);
 
   /**
    * @brief Set callback for receving callbacks when there is a new option that should be set.
    */
-  bool setOnSelected(std::function<void(String)> select_callback);
+  bool setOnSelected(std::function<void(std::string)> select_callback);
 
 private:
-  String _name;
+  std::string _name;
   HaBridge &_ha_bridge;
-  String _object_id;
-  std::set<String> _options;
+  std::string _object_id;
+  std::set<std::string> _options;
   unsigned long _total_string_length_of_options = 0;
 
 private:
-  std::optional<String> _selection;
+  std::optional<std::string> _selection;
 };
 
 #endif // __HA_ENTITY_SELECT_H__

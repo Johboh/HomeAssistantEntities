@@ -1,9 +1,11 @@
 #ifndef __HA_ENTITY_LOCK_H__
 #define __HA_ENTITY_LOCK_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
+#include <optional>
+#include <string>
 
 /**
  * @brief Represent a Number sensor/actuator.
@@ -26,7 +28,8 @@ public:
    * @param min_value minimum value allowed.
    * @param max_value maximum value allowed.
    */
-  HaEntityNumber(HaBridge &ha_bridge, String name, String object_id, float min_value = 1.0, float max_value = 100.0);
+  HaEntityNumber(HaBridge &ha_bridge, std::string name, std::string object_id, float min_value = 1.0,
+                 float max_value = 100.0);
 
 public:
   void publishConfiguration() override;
@@ -43,9 +46,9 @@ public:
   bool setOnNumber(std::function<void(float)> callback);
 
 private:
-  String _name;
+  std::string _name;
   HaBridge &_ha_bridge;
-  String _object_id;
+  std::string _object_id;
   float _min_value;
   float _max_value;
 

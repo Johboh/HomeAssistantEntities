@@ -2,8 +2,9 @@
 #define __HA_BRIDGE_H__
 
 #include "ArduinoJson.h"
-#include <Arduino.h>
 #include <IMQTTRemote.h>
+#include <cstdint>
+#include <string>
 
 /**
  * @brief Bridge for MQTT and Home Assistant.
@@ -24,7 +25,7 @@ public:
    * characters are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param verbose True to do extra debug logging and printouts.
    */
-  HaBridge(IMQTTRemote &remote, String node_id, bool verbose = true);
+  HaBridge(IMQTTRemote &remote, std::string node_id, bool verbose = true);
 
   /**
    * @brief Construct a new Ha Entity object with a device.
@@ -45,7 +46,7 @@ public:
    * characters are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param verbose True to do extra debug logging and printouts.
    */
-  HaBridge(IMQTTRemote &remote, JsonDocument &this_device_json_doc, String node_id, bool verbose = true);
+  HaBridge(IMQTTRemote &remote, JsonDocument &this_device_json_doc, std::string node_id, bool verbose = true);
 
 public:
   /**
@@ -73,7 +74,7 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param specific_doc Any entity specific values. See brief documentation.
    */
-  void publishConfiguration(String component, String object_id, String child_object_id,
+  void publishConfiguration(std::string component, std::string object_id, std::string child_object_id,
                             const JsonDocument &specific_doc);
 
   /**
@@ -85,7 +86,7 @@ public:
    * @param retain True to set this message as retained.
    * @returns true on success, or false on failure.
    */
-  bool publishMessage(String topic, String message, bool retain = false);
+  bool publishMessage(std::string topic, std::string message, bool retain = false);
 
   enum class TopicType {
     State,   // Usually when the entity post a state for the entity.
@@ -107,7 +108,8 @@ public:
    * ""door/binary_sensor/lock/upper/state". Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  String getTopic(TopicType topic_type, String component, String object_id, String child_object_id = "");
+  std::string getTopic(TopicType topic_type, std::string component, std::string object_id,
+                       std::string child_object_id = "");
 
   /**
    * @brief Raw IMQTTRemote. Usually only needed for subscription. Otherwise use publishConfiguration() and
@@ -116,11 +118,11 @@ public:
   IMQTTRemote &remote() { return _remote; }
 
 private:
-  String topicType(TopicType topic_type);
+  std::string topicType(TopicType topic_type);
 
 private:
   bool _verbose;
-  String _node_id;
+  std::string _node_id;
   IMQTTRemote &_remote;
   JsonDocument &_this_device_json_doc;
 };

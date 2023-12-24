@@ -1,9 +1,11 @@
 #ifndef __HA_ENTITY_TEMPERATURE_H__
 #define __HA_ENTITY_TEMPERATURE_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
+#include <optional>
+#include <string>
 
 /**
  * @brief Represent a Temperature sensor (°C or °F).
@@ -36,8 +38,8 @@ public:
    * message (not only when the sensor’s new state is different to the current one).
    * @param unit the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
    */
-  HaEntityTemperature(HaBridge &ha_bridge, String name, String child_object_id = "", bool force_update = false,
-                      Unit unit = Unit::C);
+  HaEntityTemperature(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+                      bool force_update = false, Unit unit = Unit::C);
 
 public:
   void publishConfiguration() override;
@@ -52,10 +54,10 @@ public:
 
 private:
   Unit _unit;
-  String _name;
+  std::string _name;
   bool _force_update;
   HaBridge &_ha_bridge;
-  String _child_object_id;
+  std::string _child_object_id;
 
 private:
   std::optional<double> _temperature;

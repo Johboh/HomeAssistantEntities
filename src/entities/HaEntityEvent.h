@@ -1,15 +1,16 @@
 #ifndef __HA_ENTITY_EVENT_H__
 #define __HA_ENTITY_EVENT_H__
 
-#include <Arduino.h>
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <set>
+#include <string>
 #include <variant>
 
-#define ATTRIBUTE_VARIANTS std::variant<int, float, double, bool, String, std::string, const char *>
+#define ATTRIBUTE_VARIANTS std::variant<int, float, double, bool, std::string, const char *>
 
 /**
  * @brief Represent an Event that can be sent to Home Assistant.
@@ -39,7 +40,7 @@ public:
    * @param event_types A set of valid event_type strings.
    * @param device_class the device class for for this event. None to not specify (default).
    */
-  HaEntityEvent(HaBridge &ha_bridge, String name, String object_id, std::set<String> event_types,
+  HaEntityEvent(HaBridge &ha_bridge, std::string name, std::string object_id, std::set<std::string> event_types,
                 DeviceClass device_class = DeviceClass::None);
 
 public:
@@ -52,13 +53,13 @@ public:
    * @param event the event.
    * @param attributes optional attributes to send with the event.
    */
-  void publishEvent(String event, std::map<std::string, ATTRIBUTE_VARIANTS> attributes = {});
+  void publishEvent(std::string event, std::map<std::string, ATTRIBUTE_VARIANTS> attributes = {});
 
 private:
-  String _name;
+  std::string _name;
   HaBridge &_ha_bridge;
-  String _object_id;
-  std::set<String> _event_types;
+  std::string _object_id;
+  std::set<std::string> _event_types;
   DeviceClass _device_class;
   unsigned long _total_string_length_of_event_types = 0;
 };

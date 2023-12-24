@@ -1,9 +1,6 @@
 #ifndef __HA_ENTITY_H__
 #define __HA_ENTITY_H__
 
-#include <Arduino.h>
-#include <functional>
-
 /**
  * @brief Abstract for a HaEntity.
  *
