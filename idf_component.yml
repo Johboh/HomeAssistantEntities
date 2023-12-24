@@ -3,5 +3,5 @@ description: Library for providing sensors and actuators to Home Assistant using
 url: https://github.com/Johboh/HomeAssistantEntities
 dependencies:
   idf: ">=4.4"
-  nlohmann-json:
+  johboh/nlohmann-json:
     version: ">=3.11.3"

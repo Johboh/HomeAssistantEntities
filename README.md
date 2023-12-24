@@ -2,7 +2,7 @@
 [![Test](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/test.yaml/badge.svg)](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/test.yaml)
 [![GitHub release](https://img.shields.io/github/release/Johboh/HomeAssistantEntities.svg)](https://github.com/Johboh/HomeAssistantEntities/releases)
 
-Arduino library for providing sensors and actuators to Home Assistant using MQTT.
+Arduino/ESP-IDF library for providing sensors and actuators to Home Assistant using MQTT.
 
 Home Assistant has a well defined way of defining sensors and actuators using MQTT. This library register a device with one or mulitple sensors and provide a way to publish new values for them, as well as listen for commands from Home Assistant.
 
@@ -27,6 +27,20 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Light (brightness, rgb, effect)
 - Select
 - Switch (on/off)
+
+
+### Installation
+#### Platform I/O:
+Add the following to `libs_deps`:
+```
+   Johboh/HomeAssistantEntities
+```
+#### ESP-IDF:
+In your existing `idf_component.yml` or in a new `idf_component.yml` next to your main component:
+```
+dependencies:
+  johboh/HomeAssistantEntities
+```
 
 ### Examples
 See Examples for [sensors](examples/Sensors/Sensors.ino) as well as [actuators](examples/Actuators/Actuators.ino).
