@@ -2,6 +2,7 @@
 #include <HaBridge.h>
 #include <MQTTRemote.h>
 #include <entities/HaEntityLight.h>
+#include <nlohmann/json.hpp>
 #ifdef ESP32
 #include <WiFi.h>
 #elif ESP8266
@@ -34,7 +35,7 @@ const char mqtt_password[] = "my-password";
 // All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
 // Only a flat layout structure is supported, no nesting.
 // We call the setupJsonForThisDevice() from the ardunio setup() function to populate the Json document.
-StaticJsonDocument<256> _json_this_device_doc;
+nlohmann::json _json_this_device_doc;
 void setupJsonForThisDevice() {
   _json_this_device_doc["identifiers"] = "my_hardware_" + String(mqtt_client_id);
   _json_this_device_doc["name"] = "Kitchen";
@@ -47,7 +48,7 @@ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_pas
 // Create the Home Assistant bridge. This is shared across all entities.
 // We only have one per device/hardware. In our example, the name of our device is "kitchen".
 // See constructor of HaBridge for more documentation.
-HaBridge ha_bridge(_mqtt_remote, _json_this_device_doc, "kitchen");
+HaBridge ha_bridge(_mqtt_remote, "kitchen", _json_this_device_doc);
 
 // Create the two lights with the "Human readable" strings. This what will show up in Home Assistant.
 // As we have two entities of the same type (light) for the same device, we need to add a child object

@@ -1,6 +1,6 @@
 #include "HaEntitySwitch.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 
 #define COMPONENT "switch"
 #define OBJECT_ID "switch"
@@ -12,7 +12,7 @@ HaEntitySwitch::HaEntitySwitch(HaBridge &ha_bridge, std::string name, std::strin
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntitySwitch::publishConfiguration() {
-  DynamicJsonDocument doc(512);
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

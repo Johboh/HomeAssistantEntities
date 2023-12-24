@@ -1,0 +1,13 @@
+name: Push to Espressif Component Service
+on: [push]
+jobs:
+  upload_components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Upload component to component registry
+        uses: espressif/github-actions/upload_components@master
+        with:
+          name: "HomeAssistantEntities"
+          namespace: "johboh"
+          api_token: ${{ secrets.ESP_IDF_COMPONENT_API_TOKEN }}

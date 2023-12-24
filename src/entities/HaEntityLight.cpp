@@ -1,6 +1,6 @@
 #include "HaEntityLight.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 #include <regex>
 #include <string>
 
@@ -33,16 +33,10 @@ HaEntityLight::RGB extractColor(std::string &input) {
 HaEntityLight::HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id,
                              Capabilities &capabilities)
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
-      _capabilities(capabilities) {
-  // Calculate total string length of all effects to to use when creating JSON document.
-  _total_string_length_of_effects = 0;
-  for (const std::string &effect : capabilities.effects) {
-    _total_string_length_of_effects += effect.length();
-  }
-}
+      _capabilities(capabilities) {}
 
 void HaEntityLight::publishConfiguration() {
-  DynamicJsonDocument doc(1024 + _total_string_length_of_effects); // This might be problematic.
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
@@ -69,9 +63,9 @@ void HaEntityLight::publishConfiguration() {
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
     doc["effect_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
-    auto effects = doc["effect_list"].to<JsonArray>();
+
     for (const std::string &effect : _capabilities.effects) {
-      effects.add(effect);
+      doc["effect_list"].push_back(effect);
     }
   }
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
@@ -133,7 +127,6 @@ bool HaEntityLight::setOnOn(std::function<void(bool)> state_callback) {
 
 bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
   if (!_capabilities.with_brightness) {
-    Serial.println("HaEntityLight: Trying to setup brightness callback but no brightness capability available.");
     return false;
   }
 
@@ -144,7 +137,6 @@ bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
 
 bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
   if (!_capabilities.with_rgb_color) {
-    Serial.println("HaEntityLight: Trying to setup RGB callback but no RGB capability available.");
     return false;
   }
 
@@ -159,7 +151,6 @@ bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
 
 bool HaEntityLight::setOnEffect(std::function<void(std::string)> callback) {
   if (_capabilities.effects.empty()) {
-    Serial.println("HaEntityLight: Trying to setup effect callback but no effect capability available.");
     return false;
   }
 

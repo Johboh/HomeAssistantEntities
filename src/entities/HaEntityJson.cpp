@@ -1,6 +1,6 @@
 #include "HaEntityJson.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "json"
@@ -10,7 +10,7 @@ HaEntityJson::HaEntityJson(HaBridge &ha_bridge, std::string name, std::string ch
       _child_object_id(child_object_id) {}
 
 void HaEntityJson::publishConfiguration() {
-  DynamicJsonDocument doc(512);
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
@@ -28,9 +28,8 @@ void HaEntityJson::republishState() {
   }
 }
 
-void HaEntityJson::publishJson(JsonDocument &json_doc) {
-  std::string message;
-  serializeJson(json_doc, message);
+void HaEntityJson::publishJson(nlohmann::json &json_doc) {
+  auto message = json_doc.dump();
   publishMessage(message);
   _json_message = message;
 }

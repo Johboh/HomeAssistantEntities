@@ -6,7 +6,7 @@
     {
       "name": "Johan Böhlin"
     },
-    "version": "5.0.0",
+    "version": "6.0.0",
     "license": "MIT",
     "repository":
     {
@@ -17,14 +17,14 @@
     "platforms": ["espressif8266", "espressif32"],
     "dependencies": [
         {
-          "owner": "bblanchon",
-          "name": "ArduinoJson",
-          "version": "^6.20.0"
-        },
-        {
           "owner": "johboh",
           "name": "MQTTRemote",
           "version": "^3.0.0"
+        },
+        {
+          "owner": "johboh",
+          "name": "nlohmann-json",
+          "version": "^3.11.3"
         }
       ]
   }

@@ -125,7 +125,6 @@ private:
   HaBridge &_ha_bridge;
   std::string _child_object_id;
   Capabilities _capabilities;
-  unsigned long _total_string_length_of_effects = 0;
 
 private:
   std::optional<bool> _on;

@@ -1,6 +1,6 @@
 #include "HaEntityDoor.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 
 #define COMPONENT "binary_sensor"
 #define OBJECT_ID "door"
@@ -9,7 +9,7 @@ HaEntityDoor::HaEntityDoor(HaBridge &ha_bridge, std::string name, std::string ch
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityDoor::publishConfiguration() {
-  DynamicJsonDocument doc(512);
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

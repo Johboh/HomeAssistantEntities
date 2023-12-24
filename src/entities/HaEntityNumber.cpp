@@ -1,6 +1,6 @@
 #include "HaEntityNumber.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 
 #define COMPONENT "number"
 
@@ -10,7 +10,7 @@ HaEntityNumber::HaEntityNumber(HaBridge &ha_bridge, std::string name, std::strin
       _max_value(max_value) {}
 
 void HaEntityNumber::publishConfiguration() {
-  DynamicJsonDocument doc(512);
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

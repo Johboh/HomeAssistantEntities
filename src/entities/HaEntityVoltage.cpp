@@ -1,6 +1,6 @@
 #include "HaEntityVoltage.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "voltage"
@@ -11,7 +11,7 @@ HaEntityVoltage::HaEntityVoltage(HaBridge &ha_bridge, std::string name, std::str
       _child_object_id(child_object_id) {}
 
 void HaEntityVoltage::publishConfiguration() {
-  DynamicJsonDocument doc(512);
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

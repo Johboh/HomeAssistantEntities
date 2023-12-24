@@ -1,9 +1,9 @@
 #ifndef __HA_BRIDGE_H__
 #define __HA_BRIDGE_H__
 
-#include "ArduinoJson.h"
 #include <IMQTTRemote.h>
 #include <cstdint>
+#include <nlohmann/json.hpp>
 #include <string>
 
 /**
@@ -14,7 +14,7 @@
 class HaBridge {
 public:
   /**
-   * @brief Construct a new Ha Entity object without a device.
+   * @brief Construct a new Ha Entity object with a device.
    *
    * @param remote the MQTT Interface / Remote to send messages and subscribe to topics.
    * @param node_id this is used as the root in the MQTT path for publishing values to a state topic, or for
@@ -23,30 +23,16 @@ public:
    * a temperature for bathroom: "bathroom" which will lead to state topic "bathroom/sensor/temperature/state", and the
    * Home Assistant Configuration will be published under "homeassistant/sensor/bathroom/temperature/config" Valid
    * characters are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param verbose True to do extra debug logging and printouts.
-   */
-  HaBridge(IMQTTRemote &remote, std::string node_id, bool verbose = true);
-
-  /**
-   * @brief Construct a new Ha Entity object with a device.
-   *
-   * @param remote the MQTT Interface / Remote to send messages and subscribe to topics.
    * @param json_this_device_doc Information about this device. The device is this hardware that have all the Home
    * Assistant entities. A device is not required. If there is a device, the name displayed in the UI will be the device
    * name combined with the entity name. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information. All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
    * Only a flat layout structure is supported, no nesting. This is called from the setup function below before we setup
-   * the remote.
-   * @param node_id this is used as the root in the MQTT path for publishing values to a state topic, or for
-   * subscribing to a state. This is also the path key used under the MQTT
-   * "homeassistant/<component>/<node_id>" path for publishing the configuration. Example for a state topic for
-   * a temperature for bathroom: "bathroom" which will lead to state topic "bathroom/sensor/temperature/state", and the
-   * Home Assistant Configuration will be published under "homeassistant/sensor/bathroom/temperature/config" Valid
-   * characters are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * the remote. set to nlohmann::json::object() if no device information should be set.
    * @param verbose True to do extra debug logging and printouts.
    */
-  HaBridge(IMQTTRemote &remote, JsonDocument &this_device_json_doc, std::string node_id, bool verbose = true);
+  HaBridge(IMQTTRemote &remote, std::string node_id, nlohmann::json &this_device_json_doc, bool verbose = true);
 
 public:
   /**
@@ -75,7 +61,7 @@ public:
    * @param specific_doc Any entity specific values. See brief documentation.
    */
   void publishConfiguration(std::string component, std::string object_id, std::string child_object_id,
-                            const JsonDocument &specific_doc);
+                            const nlohmann::json &specific_doc);
 
   /**
    * @brief Publish a message.
@@ -124,7 +110,7 @@ private:
   bool _verbose;
   std::string _node_id;
   IMQTTRemote &_remote;
-  JsonDocument &_this_device_json_doc;
+  nlohmann::json &_this_device_json_doc;
 };
 
 #endif // __HA_BRIDGE_H__

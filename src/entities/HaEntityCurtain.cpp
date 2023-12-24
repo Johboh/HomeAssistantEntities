@@ -1,6 +1,6 @@
 #include "HaEntityCurtain.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 
 #define COMPONENT "cover"
 #define OBJECT_ID "curtain"
@@ -13,7 +13,7 @@ HaEntityCurtain::HaEntityCurtain(HaBridge &ha_bridge, std::string name, std::str
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityCurtain::publishConfiguration() {
-  DynamicJsonDocument doc(512);
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
@@ -53,7 +53,6 @@ void HaEntityCurtain::publishCurtain(std::optional<State> state, std::optional<u
       str = "stopped";
       break;
     case State::Unknown:
-      Serial.println("HaEntityCurtain: Err: Unknown state to publish.");
       break;
     }
     if (str.length() > 0) {

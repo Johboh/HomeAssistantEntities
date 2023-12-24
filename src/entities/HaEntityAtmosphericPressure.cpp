@@ -1,6 +1,6 @@
 #include "HaEntityAtmosphericPressure.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "atmospheric_pressure"
@@ -11,7 +11,7 @@ HaEntityAtmosphericPressure::HaEntityAtmosphericPressure(HaBridge &ha_bridge, st
       _child_object_id(child_object_id) {}
 
 void HaEntityAtmosphericPressure::publishConfiguration() {
-  DynamicJsonDocument doc(512);
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

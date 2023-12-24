@@ -1,22 +1,16 @@
 #include "HaEntityEvent.h"
-#include "ArduinoJson.h"
 #include <HaUtilities.h>
+#include <nlohmann/json.hpp>
 
 #define COMPONENT "event"
 
 HaEntityEvent::HaEntityEvent(HaBridge &ha_bridge, std::string name, std::string object_id,
                              std::set<std::string> event_types, HaEntityEvent::DeviceClass device_class)
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id), _event_types(event_types),
-      _device_class(device_class) {
-  // Calculate total string length of all events to to use when creating JSON document.
-  _total_string_length_of_event_types = 0;
-  for (const std::string &event_type : event_types) {
-    _total_string_length_of_event_types += event_type.length();
-  }
-}
+      _device_class(device_class) {}
 
 void HaEntityEvent::publishConfiguration() {
-  DynamicJsonDocument doc(512 + _total_string_length_of_event_types); // This might be problematic.
+  nlohmann::json doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
@@ -38,9 +32,9 @@ void HaEntityEvent::publishConfiguration() {
   }
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
-  auto event_types = doc["event_types"].to<JsonArray>();
+
   for (const std::string &event_type : _event_types) {
-    event_types.add(event_type);
+    doc["event_types"].push_back(event_type);
   }
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
 }
@@ -50,13 +44,7 @@ void HaEntityEvent::republishState() {
 }
 
 void HaEntityEvent::publishEvent(std::string event, std::map<std::string, ATTRIBUTE_VARIANTS> attributes) {
-  // Calculate approx. how much json document size we need.
-  unsigned long additional_attribute_size = 0;
-  for (const std::pair<std::string, ATTRIBUTE_VARIANTS> &attribute : attributes) {
-    additional_attribute_size += attribute.first.size() + 10; // Arbritrary value size.
-  }
-
-  DynamicJsonDocument doc(256 + additional_attribute_size);
+  nlohmann::json doc;
   doc["event_type"] = event;
 
   // Add known attributes.
@@ -83,7 +71,6 @@ void HaEntityEvent::publishEvent(std::string event, std::map<std::string, ATTRIB
     }
   }
 
-  std::string message;
-  serializeJson(doc, message);
+  auto message = doc.dump();
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id), message);
 }

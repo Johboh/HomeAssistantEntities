@@ -61,7 +61,6 @@ private:
   std::string _object_id;
   std::set<std::string> _event_types;
   DeviceClass _device_class;
-  unsigned long _total_string_length_of_event_types = 0;
 };
 
 #endif // __HA_ENTITY_EVENT_H__

@@ -1,10 +1,10 @@
 #ifndef __HA_ENTITY_JSON_H__
 #define __HA_ENTITY_JSON_H__
 
-#include "ArduinoJson.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 
@@ -46,7 +46,7 @@ public:
    *
    * @param json_doc the JSON document to publish.
    */
-  void publishJson(JsonDocument &json_doc);
+  void publishJson(nlohmann::json &json_doc);
 
 private:
   void publishMessage(std::string &message);

@@ -52,7 +52,6 @@ private:
   HaBridge &_ha_bridge;
   std::string _object_id;
   std::set<std::string> _options;
-  unsigned long _total_string_length_of_options = 0;
 
 private:
   std::optional<std::string> _selection;
