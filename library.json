@@ -6,7 +6,7 @@
     {
       "name": "Johan Böhlin"
     },
-    "version": "6.0.1",
+    "version": "6.0.2",
     "license": "MIT",
     "repository":
     {
@@ -19,7 +19,7 @@
         {
           "owner": "johboh",
           "name": "MQTTRemote",
-          "version": "^3.0.0",
+          "version": "^4.0.0",
           "frameworks": ["arduino"]
         },
         {
