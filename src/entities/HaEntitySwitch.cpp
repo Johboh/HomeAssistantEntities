@@ -41,5 +41,5 @@ void HaEntitySwitch::publishSwitch(bool on) {
 bool HaEntitySwitch::setOnState(std::function<void(bool)> state_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      [state_callback](const char *topic, const char *message) { state_callback(std::string(message) == "ON"); });
+      [state_callback](std::string topic, std::string message) { state_callback(message == "ON"); });
 }

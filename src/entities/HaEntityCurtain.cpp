@@ -72,14 +72,13 @@ void HaEntityCurtain::publishCurtain(std::optional<State> state, std::optional<u
 bool HaEntityCurtain::setOnState(std::function<void(Action)> state_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_STATE),
-      [state_callback](const char *topic, const char *message) {
+      [state_callback](std::string topic, std::string message) {
         Action state = Action::Unknown;
-        auto message_str = std::string(message);
-        if (message_str == "OPEN") {
+        if (message == "OPEN") {
           state = Action::Open;
-        } else if (message_str == "CLOSE") {
+        } else if (message == "CLOSE") {
           state = Action::Close;
-        } else if (message_str == "STOP") {
+        } else if (message == "STOP") {
           state = Action::Stop;
         }
 
@@ -90,5 +89,5 @@ bool HaEntityCurtain::setOnState(std::function<void(Action)> state_callback) {
 bool HaEntityCurtain::setOnPosition(std::function<void(uint8_t)> position_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION),
-      [position_callback](const char *topic, const char *message) { position_callback(std::stoi(message)); });
+      [position_callback](std::string topic, std::string message) { position_callback(std::stoi(message)); });
 }

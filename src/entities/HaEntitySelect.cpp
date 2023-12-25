@@ -40,5 +40,5 @@ void HaEntitySelect::publishSelection(std::string option) {
 bool HaEntitySelect::setOnSelected(std::function<void(std::string)> select_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
-      [select_callback](const char *topic, const char *message) { select_callback(std::string(message)); });
+      [select_callback](std::string topic, std::string message) { select_callback(message); });
 }

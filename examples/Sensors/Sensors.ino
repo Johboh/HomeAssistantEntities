@@ -30,7 +30,7 @@ const char mqtt_password[] = "my-password";
 // We call the setupJsonForThisDevice() from the ardunio setup() function to populate the Json document.
 nlohmann::json _json_this_device_doc;
 void setupJsonForThisDevice() {
-  _json_this_device_doc["identifiers"] = "my_hardware_" + String(mqtt_client_id);
+  _json_this_device_doc["identifiers"] = "my_hardware_" + std::string(mqtt_client_id);
   _json_this_device_doc["name"] = "Kitchen";
   _json_this_device_doc["sw_version"] = "1.0.0";
   _json_this_device_doc["model"] = "my_hardware";

@@ -41,5 +41,5 @@ void HaEntityNumber::publishNumber(float number) {
 bool HaEntityNumber::setOnNumber(std::function<void(float)> callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
-      [callback](const char *topic, const char *message) { callback(std::stof(message)); });
+      [callback](std::string topic, std::string message) { callback(std::stof(message)); });
 }

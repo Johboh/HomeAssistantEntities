@@ -122,7 +122,7 @@ void HaEntityLight::publishEffect(std::string &effect) {
 bool HaEntityLight::setOnOn(std::function<void(bool)> state_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      [state_callback](const char *topic, const char *message) { state_callback(std::string(message) == "ON"); });
+      [state_callback](std::string topic, std::string message) { state_callback(message == "ON"); });
 }
 
 bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
@@ -132,7 +132,7 @@ bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS),
-      [callback](const char *topic, const char *message) { callback(std::atoi(message)); });
+      [callback](std::string topic, std::string message) { callback(std::stoi(message)); });
 }
 
 bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
@@ -142,9 +142,8 @@ bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_RGB),
-      [callback](const char *topic, const char *message) {
-        auto str = std::string(message);
-        RGB rgb = extractColor(str);
+      [callback](std::string topic, std::string message) {
+        RGB rgb = extractColor(message);
         callback(rgb);
       });
 }
@@ -156,5 +155,5 @@ bool HaEntityLight::setOnEffect(std::function<void(std::string)> callback) {
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_EFFECT),
-      [callback](const char *topic, const char *message) { callback(message); });
+      [callback](std::string topic, std::string message) { callback(message); });
 }
