@@ -16,7 +16,7 @@ void HaEntityWeight::publishConfiguration() {
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
-    doc["name"] = (char *)NULL;
+    doc["name"] = nullptr;
   }
   doc["device_class"] = "weight";
   doc["force_update"] = _force_update;

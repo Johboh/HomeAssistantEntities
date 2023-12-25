@@ -15,7 +15,7 @@ void HaEntityString::publishConfiguration() {
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
-    doc["name"] = (char *)NULL;
+    doc["name"] = nullptr;
   }
   doc["force_update"] = _force_update;
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);

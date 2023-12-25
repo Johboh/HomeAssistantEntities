@@ -6,20 +6,21 @@
     {
       "name": "Johan Böhlin"
     },
-    "version": "6.0.0",
+    "version": "6.0.1",
     "license": "MIT",
     "repository":
     {
       "type": "git",
       "url": "https://github.com/Johboh/MQTTRemote.git"
     },
-    "frameworks": "arduino",
+    "frameworks": ["espidf", "arduino"],
     "platforms": ["espressif8266", "espressif32"],
     "dependencies": [
         {
           "owner": "johboh",
           "name": "MQTTRemote",
-          "version": "^3.0.0"
+          "version": "^3.0.0",
+          "frameworks": ["arduino"]
         },
         {
           "owner": "johboh",

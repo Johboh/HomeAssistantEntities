@@ -16,7 +16,7 @@ void HaEntityHumidity::publishConfiguration() {
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
-    doc["name"] = (char *)NULL;
+    doc["name"] = nullptr;
   }
   doc["device_class"] = "humidity";
   doc["unit_of_measurement"] = "%";

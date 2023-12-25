@@ -15,7 +15,7 @@ void HaEntityEvent::publishConfiguration() {
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
-    doc["name"] = (char *)NULL;
+    doc["name"] = nullptr;
   }
   switch (_device_class) {
   case DeviceClass::Button:

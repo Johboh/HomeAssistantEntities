@@ -14,7 +14,7 @@ void HaEntitySelect::publishConfiguration() {
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
-    doc["name"] = (char *)NULL;
+    doc["name"] = nullptr;
   }
   // TODO (johboh): Allow setting doc["device_class"]?
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);

@@ -16,7 +16,7 @@ void HaEntityBrightness::publishConfiguration() {
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
-    doc["name"] = (char *)NULL;
+    doc["name"] = nullptr;
   }
   doc["unit_of_measurement"] = "%";
   doc["force_update"] = _force_update;
