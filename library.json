@@ -15,6 +15,18 @@
     },
     "frameworks": ["espidf", "arduino"],
     "platforms": ["espressif8266", "espressif32"],
+    "examples": [
+        {
+            "name": "Actuators",
+            "base": "examples/Actuators",
+            "files": ["Actuators.ino"]
+        },
+        {
+            "name": "Sensors",
+            "base": "examples/Sensors",
+            "files": ["Sensors.ino"]
+        }
+    ],
     "dependencies": [
         {
           "owner": "johboh",
