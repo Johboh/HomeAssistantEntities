@@ -1,5 +1,9 @@
 name: Push to Espressif Component Service
-on: [push]
+on:
+  workflow_run:
+    workflows: ["ESP-IDF CI v4", "ESP-IDF CI v5"]
+    types:
+      - completed
 jobs:
   upload_components:
     runs-on: ubuntu-latest
