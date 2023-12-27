@@ -18,12 +18,12 @@
     "examples": [
         {
             "name": "Actuators",
-            "base": "examples/Actuators",
+            "base": "examples/arduino/actuators",
             "files": ["Actuators.ino"]
         },
         {
             "name": "Sensors",
-            "base": "examples/Sensors",
+            "base": "examples/arduino/sensors",
             "files": ["Sensors.ino"]
         }
     ],

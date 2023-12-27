@@ -1,6 +1,8 @@
 # HomeAssistantEntities
-[![Test](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/test.yaml/badge.svg)](https://registry.platformio.org/libraries/johboh/HomeAssistantEntities)
-[![Test](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/esp_upload_component.yaml/badge.svg)](https://components.espressif.com/components/johboh/homeassistantentities)
+[![Platform I/O CI](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/platformio.yaml/badge.svg)](https://registry.platformio.org/libraries/johboh/HomeAssistantEntities)
+[![ESP-IDF v5 CI](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf5.yaml/badge.svg)](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf5.yaml)
+[![ESP-IDF v4 CI](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf4.yaml/badge.svg)](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf4.yaml)
+[![ESP-IDF Component Upload](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/esp_upload_component.yaml/badge.svg)](https://components.espressif.com/components/johboh/HomeAssistantEntities)
 [![GitHub release](https://img.shields.io/github/release/Johboh/HomeAssistantEntities.svg)](https://github.com/Johboh/HomeAssistantEntities/releases)
 
 Arduino (using Arduino IDE or Platform I/O) and ESP-IDF (using Espressif IoT Development Framework or Platform I/O) compatible library for providing sensors and actuators to Home Assistant using MQTT.
@@ -45,10 +47,13 @@ dependencies:
 ```
 
 ### Examples
-See Examples for [sensors](examples/Sensors/Sensors.ino) as well as [actuators](examples/Actuators/Actuators.ino).
+- [Arduino: Sensors](examples/arduino/sensors/Sensors.ino)
+- [Arduino: Actuators](examples/arduino/actuators/Actuators.ino)
+- [ESP-IDF: Sensors](examples/espidf/sensors/main/main.cpp)
+- [ESP-IDF: Actuators](examples/espidf/actuators/main/main.cpp)
 
 ### Functionallity verified on the following platforms and frameworks
-- ESP32 (tested with platform I/O [espressif32@6.4.0](https://github.com/platformio/platform-espressif32) / [arduino-esp32@2.0.11](https://github.com/espressif/arduino-esp32) / [ESP-IDF@5.1.1](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C3)
+- ESP32 (tested with platform I/O [espressif32@6.4.0](https://github.com/platformio/platform-espressif32) / [arduino-esp32@2.0.11](https://github.com/espressif/arduino-esp32) / [ESP-IDF@4.4.6](https://github.com/espressif/esp-idf) / [ESP-IDF@5.1.2](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C3)
 - ESP8266 (tested with platform I/O [espressif8266@4.2.1](https://github.com/platformio/platform-espressif8266) / [ardunio-core@3.1.2](https://github.com/esp8266/Arduino))
 
 Newer version most probably work too, but they have not been verified.

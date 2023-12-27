@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example: [examples/Actuators/Actuators.ino, examples/Sensors/Sensors.ino]
+        example: [examples/arduino/actuators/Actuators.ino, examples/arduino/sensors/Sensors.ino]
 
     steps:
       - uses: actions/checkout@v3

@@ -48,7 +48,7 @@ void HaEntityEvent::publishEvent(std::string event, std::map<std::string, ATTRIB
   doc["event_type"] = event;
 
   // Add known attributes.
-  for (const std::pair<std::string, ATTRIBUTE_VARIANTS> &attribute : attributes) {
+  for (const auto &attribute : attributes) {
     // Keys with name "event_type" is not allowed.
     auto key = attribute.first;
     if (key == "event_type") {
