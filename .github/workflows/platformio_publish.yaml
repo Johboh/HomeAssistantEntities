@@ -1,0 +1,28 @@
+name: Push to PlatformIO registry
+on:
+  release:
+    types: [created]
+
+  workflow_run:
+    workflows: ["PlatformIO CI"]
+    types: completed
+    branch:
+      - main
+jobs:
+  upload_library:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'release' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Publish PlatformIO library
+        run: pio pkg publish --owner johboh --no-notify --no-interactive
+        env:
+          PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
