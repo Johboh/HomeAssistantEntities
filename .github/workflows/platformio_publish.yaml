@@ -2,18 +2,12 @@ name: Push to PlatformIO registry
 on:
   release:
     types: [created]
-
-  workflow_run:
-    workflows: ["PlatformIO CI"]
-    types: completed
-    branch:
-      - main
 jobs:
+  build_examples_for_verification:
+    uses: ./.github/workflows/platformio.yaml
   upload_library:
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'release' &&
-      github.event.workflow_run.conclusion == 'success'
+    needs: [build_examples_for_verification]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4

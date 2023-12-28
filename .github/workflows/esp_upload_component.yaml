@@ -2,18 +2,12 @@ name: Push to Espressif Component Service
 on:
   release:
     types: [created]
-
-  workflow_run:
-    workflows: ["ESP-IDF CI"]
-    types: completed
-    branch:
-      - main
 jobs:
+  build_examples_for_verification:
+    uses: ./.github/workflows/espidf.yaml
   upload_components:
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'release' &&
-      github.event.workflow_run.conclusion == 'success'
+    needs: [build_examples_for_verification]
     steps:
       - uses: actions/checkout@master
       - name: Upload component to component registry

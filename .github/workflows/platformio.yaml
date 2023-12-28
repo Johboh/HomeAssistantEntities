@@ -1,5 +1,5 @@
 name: PlatformIO CI
-on: [push]
+on: [workflow_call, push]
 jobs:
   build:
     runs-on: ubuntu-latest

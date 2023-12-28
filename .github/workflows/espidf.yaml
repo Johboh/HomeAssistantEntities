@@ -1,5 +1,5 @@
 name: ESP-IDF CI
-on: [push]
+on: [workflow_call, push]
 jobs:
   esp_idf_build:
     runs-on: ubuntu-latest
