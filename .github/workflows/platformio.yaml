@@ -5,7 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example: [examples/arduino/actuators/Actuators.ino, examples/arduino/sensors/Sensors.ino]
+        example:
+          - name: actuators
+          - name: sensors
 
     steps:
       - uses: actions/checkout@v3
@@ -24,4 +26,4 @@ jobs:
       - name: Build PlatformIO examples
         run: pio ci --lib="." --board=lolin_s2_mini --board=lolin_c3_mini --board="d1_mini" --project-option="build_unflags = -std=gnu++11" --project-option="build_flags = -std=gnu++17"
         env:
-          PLATFORMIO_CI_SRC: ${{ matrix.example }}
+          PLATFORMIO_CI_SRC: examples/arduino/${{ matrix.example.name }}
