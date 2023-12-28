@@ -1,7 +1,6 @@
 # HomeAssistantEntities
 [![Platform I/O CI](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/platformio.yaml/badge.svg)](https://registry.platformio.org/libraries/johboh/HomeAssistantEntities)
-[![ESP-IDF v5 CI](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf5.yaml/badge.svg)](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf5.yaml)
-[![ESP-IDF v4 CI](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf4.yaml/badge.svg)](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf4.yaml)
+[![ESP-IDF CI](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf.yaml/badge.svg)](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/espidf.yaml)
 [![ESP-IDF Component Upload](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/esp_upload_component.yaml/badge.svg)](https://components.espressif.com/components/johboh/HomeAssistantEntities)
 [![GitHub release](https://img.shields.io/github/release/Johboh/HomeAssistantEntities.svg)](https://github.com/Johboh/HomeAssistantEntities/releases)
 

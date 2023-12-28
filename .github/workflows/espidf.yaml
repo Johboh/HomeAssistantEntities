@@ -1,38 +1,30 @@
 name: ESP-IDF CI
 on: [push]
 jobs:
-  v4:
+  esp_idf_build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example: [examples/espidf/actuators, examples/espidf/sensors]
+        version:
+          - name: v4_build
+            version_number: v4.4.3
+            target: esp32c3
+          - name: v5_build
+            version_number: v5.1.2
+            target: esp32c6
+        example:
+          - name: actuators
+          - name: sensors
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: esp-idf build
-      uses: espressif/esp-idf-ci-action@v1
-      with:
-        esp_idf_version: v4.4.3
-        target: esp32c3
-        path: ${{ matrix.example }}
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
 
-  v5:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        example: [examples/espidf/actuators, examples/espidf/sensors]
-
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: esp-idf build
-      uses: espressif/esp-idf-ci-action@v1
-      with:
-        esp_idf_version: v5.1.2
-        target: esp32c6
-        path: ${{ matrix.example }}
+      - name: ESP-IDF Build
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: ${{ matrix.version.version_number }}
+          target: ${{ matrix.version.target }}
+          path: examples/espidf/${{ matrix.example.name }}
