@@ -36,9 +36,11 @@ public:
    * message (not only when the sensor’s new state is different to the current one).
    * @param with_attributes if true, setup an attribute topic attributes will be published to. With this set, attributes
    * can be published when the message is published, or using a separate call.
+   * @param device_class if set, will set to this device class. Must be one of
+   * https://www.home-assistant.io/integrations/sensor/#device-class
    */
   HaEntityString(HaBridge &ha_bridge, std::string name, std::string child_object_id = "", bool force_update = false,
-                 bool with_attributes = false);
+                 bool with_attributes = false, std::string device_class = "");
 
 public:
   void publishConfiguration() override;
@@ -65,6 +67,7 @@ private:
   bool _force_update;
   HaBridge &_ha_bridge;
   bool _with_attributes;
+  std::string _device_class;
   std::string _child_object_id;
 
 private:

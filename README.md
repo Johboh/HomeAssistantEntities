@@ -42,7 +42,7 @@ In your existing `idf_component.yml` or in a new `idf_component.yml` next to you
 ```
 dependencies:
   johboh/HomeAssistantEntities:
-    version: ">=6.1.0"
+    version: ">=6.1.1"
 ```
 
 ### Examples

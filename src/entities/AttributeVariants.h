@@ -8,10 +8,11 @@
 #include <variant>
 
 namespace Attributes {
-typedef std::variant<int, float, double, bool, std::string, const char *> Variants;
-typedef std::map<std::string, Attributes::Variants> Map;
+using InnerSet = std::set<std::string>;
+using Variants = std::variant<int, float, double, bool, std::string, const char *, InnerSet>;
+using Map = std::map<std::string, Variants>;
 
-bool toJson(nlohmann::json &json, Attributes::Map attributes, std::set<std::string> forbidden_keys = {});
+bool toJson(nlohmann::json &doc, Attributes::Map attributes, std::set<std::string> forbidden_keys = {});
 
 }; // namespace Attributes
 

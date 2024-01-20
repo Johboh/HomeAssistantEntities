@@ -6,9 +6,10 @@
 #define OBJECT_ID "string"
 
 HaEntityString::HaEntityString(HaBridge &ha_bridge, std::string name, std::string child_object_id, bool force_update,
-                               bool with_attributes)
+                               bool with_attributes, std::string device_class)
     : _name(homeassistantentities::trim(name)), _force_update(force_update), _ha_bridge(ha_bridge),
-      _with_attributes(with_attributes), _child_object_id(child_object_id) {}
+      _with_attributes(with_attributes), _device_class(homeassistantentities::trim(device_class)),
+      _child_object_id(child_object_id) {}
 
 void HaEntityString::publishConfiguration() {
   nlohmann::json doc;
@@ -18,6 +19,11 @@ void HaEntityString::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
+
+  if (!_device_class.empty()) {
+    doc["device_class"] = _device_class;
+  }
+
   doc["force_update"] = _force_update;
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);
 
