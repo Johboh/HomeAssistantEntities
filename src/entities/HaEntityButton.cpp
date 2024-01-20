@@ -23,6 +23,8 @@ void HaEntityButton::publishConfiguration() {
   doc["payload_press"] = PAYLOAD_PRESS;
   doc["command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COMMAND);
+
+  _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }
 
 void HaEntityButton::republishState() {}
