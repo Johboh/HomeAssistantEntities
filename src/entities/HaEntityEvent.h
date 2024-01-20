@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_EVENT_H__
 #define __HA_ENTITY_EVENT_H__
 
+#include "AttributeVariants.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -8,9 +9,6 @@
 #include <map>
 #include <set>
 #include <string>
-#include <variant>
-
-#define ATTRIBUTE_VARIANTS std::variant<int, float, double, bool, std::string, const char *>
 
 /**
  * @brief Represent an Event that can be sent to Home Assistant.
@@ -53,7 +51,7 @@ public:
    * @param event the event.
    * @param attributes optional attributes to send with the event.
    */
-  void publishEvent(std::string event, std::map<std::string, ATTRIBUTE_VARIANTS> attributes = {});
+  void publishEvent(std::string event, Attributes::Map attributes = {});
 
 private:
   std::string _name;

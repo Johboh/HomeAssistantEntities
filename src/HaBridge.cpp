@@ -63,6 +63,8 @@ std::string HaBridge::topicType(TopicType topic_type) {
     return "state";
   case TopicType::Command:
     return "command";
+  case TopicType::Attributes:
+    return "attributes";
   }
 
   return "unknown";

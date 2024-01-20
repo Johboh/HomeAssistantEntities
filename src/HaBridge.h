@@ -75,8 +75,9 @@ public:
   bool publishMessage(std::string topic, std::string message, bool retain = false);
 
   enum class TopicType {
-    State,   // Usually when the entity post a state for the entity.
-    Command, // Usually where the entity listen for actions/states to set (i.e. when Home Assistant update the value)
+    State,      // Usually when the entity post a state for the entity.
+    Command,    // Usually where the entity listen for actions/states to set (i.e. when Home Assistant update the value)
+    Attributes, // For attributes.
   };
 
   /**

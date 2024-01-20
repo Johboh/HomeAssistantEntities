@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_MOTION_H__
 #define __HA_ENTITY_MOTION_H__
 
+#include "AttributeVariants.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -29,8 +30,14 @@ public:
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * @param force_update In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
+   * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
+   * message (not only when the sensor’s new state is different to the current one).
+   * @param with_attributes if true, setup an attribute topic attributes will be published to. With this set, attributes
+   * can be published when the message is published, or using a separate call.
    */
-  HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::string child_object_id = "");
+  HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::string child_object_id = "", bool force_update = false,
+                  bool with_attributes = false);
 
 public:
   void publishConfiguration() override;
@@ -38,16 +45,30 @@ public:
 
   /**
    * @brief Publish the boolean value for the binary sensor.
+   * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
+   *
+   * @param value the value to publish.
+   * @param attributes optional attributes to publish.
    */
-  void publishBoolean(bool value);
+  void publishBoolean(bool value, Attributes::Map attributes = {});
+
+  /**
+   * @brief Publish attributes only. with_attributes in constructor must be set.
+   *
+   * @param attributes attributes to publish.
+   */
+  void publishAttributes(Attributes::Map attributes);
 
 private:
   std::string _name;
+  bool _force_update;
   HaBridge &_ha_bridge;
+  bool _with_attributes;
   std::string _child_object_id;
 
 private:
   std::optional<bool> _value;
+  std::optional<Attributes::Map> _attributes;
 };
 
 #endif // __HA_ENTITY_MOVEMENT_H__

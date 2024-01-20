@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_STRING_H__
 #define __HA_ENTITY_STRING_H__
 
+#include "AttributeVariants.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -33,8 +34,11 @@ public:
    * @param force_update In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
    * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
    * message (not only when the sensor’s new state is different to the current one).
+   * @param with_attributes if true, setup an attribute topic attributes will be published to. With this set, attributes
+   * can be published when the message is published, or using a separate call.
    */
-  HaEntityString(HaBridge &ha_bridge, std::string name, std::string child_object_id = "", bool force_update = false);
+  HaEntityString(HaBridge &ha_bridge, std::string name, std::string child_object_id = "", bool force_update = false,
+                 bool with_attributes = false);
 
 public:
   void publishConfiguration() override;
@@ -42,19 +46,30 @@ public:
 
   /**
    * @brief Publish the string.
+   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
    *
-   * @param json_doc the string to publish.
+   * @param str the string to publish.
+   * @param attributes optional attributes to publish.
    */
-  void publishMessage(std::string &message);
+  void publishString(std::string &str, Attributes::Map attributes = {});
+
+  /**
+   * @brief Publish attributes only. with_attributes in constructor must be set.
+   *
+   * @param attributes
+   */
+  void publishAttributes(Attributes::Map attributes);
 
 private:
   std::string _name;
   bool _force_update;
   HaBridge &_ha_bridge;
+  bool _with_attributes;
   std::string _child_object_id;
 
 private:
-  std::optional<std::string> _message;
+  std::optional<std::string> _str;
+  std::optional<Attributes::Map> _attributes;
 };
 
 #endif // __HA_ENTITY_STRING_H__
