@@ -32,7 +32,7 @@ public:
    * the remote. set to nlohmann::json::object() if no device information should be set.
    * @param verbose True to do extra debug logging and printouts.
    */
-  HaBridge(IMQTTRemote &remote, std::string node_id, nlohmann::json &this_device_json_doc, bool verbose = true);
+  HaBridge(IMQTTRemote &remote, std::string node_id, nlohmann::json &this_device_json_doc, bool verbose = false);
 
 public:
   /**
