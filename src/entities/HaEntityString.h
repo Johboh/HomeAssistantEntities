@@ -9,8 +9,8 @@
 #include <string>
 
 /**
- * @brief Represent a raw String sensor with a state topic on which you post your string.
- * Also see [HaEntityJson] which is very similar. TODO(johboh): merge?
+ * @brief Represent a raw String sensor with a state topic on which you post your string. From HA, read only. See
+ * [HaEntityText] for a read/write version. Also see [HaEntityJson] which is very similar. TODO(johboh): merge?
  */
 class HaEntityString : public HaEntity {
 public:
