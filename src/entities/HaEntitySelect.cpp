@@ -5,8 +5,9 @@
 #define COMPONENT "select"
 
 HaEntitySelect::HaEntitySelect(HaBridge &ha_bridge, std::string name, std::string object_id,
-                               std::set<std::string> options)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id), _options(options) {}
+                               Configuration configuration)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id),
+      _configuration(configuration) {}
 
 void HaEntitySelect::publishConfiguration() {
   nlohmann::json doc;
@@ -20,7 +21,7 @@ void HaEntitySelect::publishConfiguration() {
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
 
-  for (const std::string &option : _options) {
+  for (const std::string &option : _configuration.options) {
     doc["options"].push_back(option);
   }
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);

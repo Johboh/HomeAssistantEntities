@@ -5,10 +5,10 @@
 #define COMPONENT "sensor"
 #define OBJECT_ID "weight"
 
-HaEntityWeight::HaEntityWeight(HaBridge &ha_bridge, std::string name, std::string child_object_id, bool force_update,
-                               Unit unit)
-    : _unit(unit), _name(homeassistantentities::trim(name)), _force_update(force_update), _ha_bridge(ha_bridge),
-      _child_object_id(child_object_id) {}
+HaEntityWeight::HaEntityWeight(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                               Configuration configuration)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
+      _configuration(configuration) {}
 
 void HaEntityWeight::publishConfiguration() {
   nlohmann::json doc;
@@ -19,8 +19,8 @@ void HaEntityWeight::publishConfiguration() {
     doc["name"] = nullptr;
   }
   doc["device_class"] = "weight";
-  doc["force_update"] = _force_update;
-  switch (_unit) {
+  doc["force_update"] = _configuration.force_update;
+  switch (_configuration.unit) {
   case Unit::kg:
     doc["unit_of_measurement"] = "kg";
     break;

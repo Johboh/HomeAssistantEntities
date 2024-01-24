@@ -31,9 +31,9 @@ HaEntityLight::RGB extractColor(std::string &input) {
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 
 HaEntityLight::HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id,
-                             Capabilities &capabilities)
+                             Configuration configuration)
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
-      _capabilities(capabilities) {}
+      _configuration(configuration) {}
 
 void HaEntityLight::publishConfiguration() {
   nlohmann::json doc;
@@ -46,25 +46,25 @@ void HaEntityLight::publishConfiguration() {
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
   doc["command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
-  if (_capabilities.with_brightness) {
+  if (_configuration.with_brightness) {
     doc["brightness_state_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS);
     doc["brightness_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS);
   }
-  if (_capabilities.with_rgb_color) {
+  if (_configuration.with_rgb_color) {
     doc["rgb_state_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_RGB);
     doc["rgb_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_RGB);
   }
-  if (!_capabilities.effects.empty()) {
+  if (!_configuration.effects.empty()) {
     doc["effect_state_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
     doc["effect_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
 
-    for (const std::string &effect : _capabilities.effects) {
+    for (const std::string &effect : _configuration.effects) {
       doc["effect_list"].push_back(effect);
     }
   }
@@ -94,7 +94,7 @@ void HaEntityLight::publishIsOn(bool on) {
 }
 
 void HaEntityLight::publishBrightness(uint8_t brightness) {
-  if (_capabilities.with_brightness) {
+  if (_configuration.with_brightness) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS),
         std::to_string(brightness));
@@ -103,7 +103,7 @@ void HaEntityLight::publishBrightness(uint8_t brightness) {
 }
 
 void HaEntityLight::publishRgb(RGB rgb) {
-  if (_capabilities.with_rgb_color) {
+  if (_configuration.with_rgb_color) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_RGB),
         std::to_string(rgb.r) + "," + std::to_string(rgb.g) + "," + std::to_string(rgb.b));
@@ -112,7 +112,7 @@ void HaEntityLight::publishRgb(RGB rgb) {
 }
 
 void HaEntityLight::publishEffect(std::string &effect) {
-  if (!_capabilities.effects.empty()) {
+  if (!_configuration.effects.empty()) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_EFFECT), effect);
     _effect = effect;
@@ -126,7 +126,7 @@ bool HaEntityLight::setOnOn(std::function<void(bool)> state_callback) {
 }
 
 bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
-  if (!_capabilities.with_brightness) {
+  if (!_configuration.with_brightness) {
     return false;
   }
 
@@ -136,7 +136,7 @@ bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
 }
 
 bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
-  if (!_capabilities.with_rgb_color) {
+  if (!_configuration.with_rgb_color) {
     return false;
   }
 
@@ -149,7 +149,7 @@ bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
 }
 
 bool HaEntityLight::setOnEffect(std::function<void(std::string)> callback) {
-  if (_capabilities.effects.empty()) {
+  if (_configuration.effects.empty()) {
     return false;
   }
 

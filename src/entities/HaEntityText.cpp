@@ -23,6 +23,8 @@ void HaEntityText::publishConfiguration() {
   doc["min"] = _configuration.min_text_length;
   doc["max"] = _configuration.max_text_length;
   doc["force_update"] = _configuration.force_update;
+  doc["retain"] = _configuration.retain;
+
   if (_configuration.is_password) {
     doc["mode"] = "password";
   } else {

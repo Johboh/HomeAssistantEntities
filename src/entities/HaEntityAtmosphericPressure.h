@@ -12,6 +12,17 @@
  */
 class HaEntityAtmosphericPressure : public HaEntity {
 public:
+  struct Configuration {
+    /**
+     * @brief In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
+     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
+     * message (not only when the sensor’s new state is different to the current one).
+     */
+    bool force_update = false;
+  };
+
+  static Configuration _default;
+
   /**
    * @brief Construct a new Ha Entity AtmosphericPressure object
    *
@@ -29,12 +40,10 @@ public:
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param force_update In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-   * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-   * message (not only when the sensor’s new state is different to the current one).
+   * @param configuration the configuration for this entity.
    */
   HaEntityAtmosphericPressure(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
-                              bool force_update = false);
+                              Configuration configuration = _default);
 
 public:
   void publishConfiguration() override;
@@ -49,9 +58,9 @@ public:
 
 private:
   std::string _name;
-  bool _force_update;
   HaBridge &_ha_bridge;
   std::string _child_object_id;
+  Configuration _configuration;
 
 private:
   std::optional<double> _pressure;

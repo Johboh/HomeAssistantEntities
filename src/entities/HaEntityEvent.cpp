@@ -4,10 +4,9 @@
 
 #define COMPONENT "event"
 
-HaEntityEvent::HaEntityEvent(HaBridge &ha_bridge, std::string name, std::string object_id,
-                             std::set<std::string> event_types, HaEntityEvent::DeviceClass device_class)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id), _event_types(event_types),
-      _device_class(device_class) {}
+HaEntityEvent::HaEntityEvent(HaBridge &ha_bridge, std::string name, std::string object_id, Configuration configuration)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id),
+      _configuration(configuration) {}
 
 void HaEntityEvent::publishConfiguration() {
   nlohmann::json doc;
@@ -17,7 +16,7 @@ void HaEntityEvent::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
-  switch (_device_class) {
+  switch (_configuration.device_class) {
   case DeviceClass::Button:
     doc["device_class"] = "button";
     break;
@@ -33,7 +32,7 @@ void HaEntityEvent::publishConfiguration() {
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
 
-  for (const std::string &event_type : _event_types) {
+  for (const std::string &event_type : _configuration.event_types) {
     doc["event_types"].push_back(event_type);
   }
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);

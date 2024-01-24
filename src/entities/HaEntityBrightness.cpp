@@ -6,9 +6,9 @@
 #define OBJECT_ID "brightness"
 
 HaEntityBrightness::HaEntityBrightness(HaBridge &ha_bridge, std::string name, std::string child_object_id,
-                                       bool force_update)
-    : _name(homeassistantentities::trim(name)), _force_update(force_update), _ha_bridge(ha_bridge),
-      _child_object_id(child_object_id) {}
+                                       Configuration configuration)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
+      _configuration(configuration) {}
 
 void HaEntityBrightness::publishConfiguration() {
   nlohmann::json doc;
@@ -19,7 +19,7 @@ void HaEntityBrightness::publishConfiguration() {
     doc["name"] = nullptr;
   }
   doc["unit_of_measurement"] = "%";
-  doc["force_update"] = _force_update;
+  doc["force_update"] = _configuration.force_update;
   doc["icon"] = "mdi:brightness-percent";
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);

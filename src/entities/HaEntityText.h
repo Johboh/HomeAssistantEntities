@@ -14,21 +14,40 @@
 class HaEntityText : public HaEntity {
 public:
   struct Configuration {
-    // The minimum size of a text being set or received.
+    /**
+     * @brief The minimum size of a text being set or received.
+     */
     uint8_t min_text_length = 0;
-    // The maximum size of a text being set or received (maximum is 255).
+
+    /**
+     * @brief The maximum size of a text being set or received (maximum is 255).
+     */
     uint8_t max_text_length = 255;
-    // if true, supports publishing the state. Else, write only text.
+
+    /**
+     * @brief if true, supports publishing the state. Else, write only text.
+     */
     bool with_state_topic = false;
-    // true to indicate to HA that this is a password.
+
+    /**
+     * @brief true to indicate to HA that this is a password.
+     */
     bool is_password = false;
+
     /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
      * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
      * message (not only when the sensor’s new state is different to the current one).
      */
     bool force_update = false;
+
+    /**
+     * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
+     */
+    bool retain = false;
   };
+
+  static Configuration _default;
 
   /**
    * @brief Construct a new Ha Entity Text object
@@ -47,8 +66,10 @@ public:
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * @param configuration the configuration for this entity.
    */
-  HaEntityText(HaBridge &ha_bridge, std::string name, std::string child_object_id, Configuration configuration);
+  HaEntityText(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+               Configuration configuration = _default);
 
 public:
   void publishConfiguration() override;
@@ -69,7 +90,6 @@ public:
 
 private:
   std::string _name;
-  bool _force_update;
   HaBridge &_ha_bridge;
   std::string _child_object_id;
   Configuration _configuration;

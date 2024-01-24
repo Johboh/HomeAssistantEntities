@@ -13,6 +13,32 @@
  */
 class HaEntityNumber : public HaEntity {
 public:
+  struct Configuration {
+    /**
+     * @brief The minimum value allowed.
+     */
+    float min_value = 1.0;
+
+    /**
+     * @brief The maximum value allowed.
+     */
+    float max_value = 100.0;
+
+    /**
+     * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
+     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
+     * message (not only when the sensor’s new state is different to the current one).
+     */
+    bool force_update = false;
+
+    /**
+     * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
+     */
+    bool retain = false;
+  };
+
+  static Configuration _default;
+
   /**
    * @brief Construct a new Ha Entity Number object
    *
@@ -25,11 +51,9 @@ public:
    * information.
    * @param object_id object ID for this number. Should be unique for each number for this node/device. Example:
    * "balcony_leds_speed". Valid characters are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param min_value minimum value allowed.
-   * @param max_value maximum value allowed.
+   * @param configuration the configuration for this entity.
    */
-  HaEntityNumber(HaBridge &ha_bridge, std::string name, std::string object_id, float min_value = 1.0,
-                 float max_value = 100.0);
+  HaEntityNumber(HaBridge &ha_bridge, std::string name, std::string object_id, Configuration configuration = _default);
 
 public:
   void publishConfiguration() override;
@@ -49,8 +73,7 @@ private:
   std::string _name;
   HaBridge &_ha_bridge;
   std::string _object_id;
-  float _min_value;
-  float _max_value;
+  Configuration _configuration;
 
 private:
   std::optional<float> _number;

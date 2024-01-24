@@ -16,11 +16,11 @@
  */
 class HaEntityLight : public HaEntity {
 public:
-  struct Capabilities {
+  struct Configuration {
     bool with_brightness = false;
     bool with_rgb_color = false;
     // if non empty, the supported effects.
-    std::set<std::string> effects;
+    std::set<std::string> effects = {};
   };
 
   /**
@@ -42,7 +42,7 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param capabilities what this light supports.
    */
-  HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id, Capabilities &capabilities);
+  HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id, Configuration configuration);
 
 public:
   void publishConfiguration() override;
@@ -124,7 +124,7 @@ private:
   std::string _name;
   HaBridge &_ha_bridge;
   std::string _child_object_id;
-  Capabilities _capabilities;
+  Configuration _configuration;
 
 private:
   std::optional<bool> _on;

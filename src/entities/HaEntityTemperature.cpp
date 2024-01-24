@@ -6,9 +6,9 @@
 #define OBJECT_ID "temperature"
 
 HaEntityTemperature::HaEntityTemperature(HaBridge &ha_bridge, std::string name, std::string child_object_id,
-                                         bool force_update, Unit unit)
-    : _unit(unit), _name(homeassistantentities::trim(name)), _force_update(force_update), _ha_bridge(ha_bridge),
-      _child_object_id(child_object_id) {}
+                                         Configuration configuration)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
+      _configuration(configuration) {}
 
 void HaEntityTemperature::publishConfiguration() {
   nlohmann::json doc;
@@ -18,7 +18,7 @@ void HaEntityTemperature::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
-  switch (_unit) {
+  switch (_configuration.unit) {
   case Unit::C:
     doc["unit_of_measurement"] = "°C";
     break;
@@ -27,7 +27,7 @@ void HaEntityTemperature::publishConfiguration() {
     break;
   }
   doc["device_class"] = "temperature";
-  doc["force_update"] = _force_update;
+  doc["force_update"] = _configuration.force_update;
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }

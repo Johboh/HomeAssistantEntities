@@ -4,10 +4,10 @@
 
 #define COMPONENT "number"
 
-HaEntityNumber::HaEntityNumber(HaBridge &ha_bridge, std::string name, std::string object_id, float min_value,
-                               float max_value)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id), _min_value(min_value),
-      _max_value(max_value) {}
+HaEntityNumber::HaEntityNumber(HaBridge &ha_bridge, std::string name, std::string object_id,
+                               Configuration configuration)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id),
+      _configuration(configuration) {}
 
 void HaEntityNumber::publishConfiguration() {
   nlohmann::json doc;
@@ -17,11 +17,15 @@ void HaEntityNumber::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
+
+  doc["min"] = _configuration.min_value;
+  doc["max"] = _configuration.max_value;
+  doc["force_update"] = _configuration.force_update;
+  doc["retain"] = _configuration.retain;
+
   // TODO (johboh): Allow setting doc["device_class"]?
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
-  doc["min"] = _min_value;
-  doc["max"] = _max_value;
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
 }
 

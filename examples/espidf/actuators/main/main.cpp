@@ -36,9 +36,8 @@ HaBridge ha_bridge(_mqtt_remote, "kitchen", _json_this_device_doc);
 // Create the two lights with the "Human readable" strings. This what will show up in Home Assistant.
 // As we have two entities of the same type (light) for the same device, we need to add a child object
 // id to separate them.
-HaEntityLight::Capabilities capabilities = {.with_brightness = true};
-HaEntityLight _ha_entity_light_left_bench(ha_bridge, "left bench", "kitchen_left_bench", capabilities);
-HaEntityLight _ha_entity_light_right_bench(ha_bridge, "right bench", "kitchen_right_bench", capabilities);
+HaEntityLight _ha_entity_light_left_bench(ha_bridge, "left bench", "kitchen_left_bench", {.with_brightness = true});
+HaEntityLight _ha_entity_light_right_bench(ha_bridge, "right bench", "kitchen_right_bench", {.with_brightness = true});
 
 void haStateTask(void *pvParameters) {
   while (1) {

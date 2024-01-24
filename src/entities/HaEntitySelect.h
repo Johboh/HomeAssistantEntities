@@ -15,6 +15,13 @@
  */
 class HaEntitySelect : public HaEntity {
 public:
+  struct Configuration {
+    /**
+     * @brief Set of options that can be selected. An empty set or a set with a single item is allowed.
+     */
+    std::set<std::string> options;
+  };
+
   /**
    * @brief Construct a new Ha Entity Select object
    *
@@ -27,9 +34,9 @@ public:
    * information.
    * @param object_id object ID for this select. Should be unique for each select for this node/device. Example:
    * "balcony_leds_profile". Valid characters are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param options Set of options that can be selected. An empty set or a set with a single item is allowed.
+   * @param configuration the configuration for this entity.
    */
-  HaEntitySelect(HaBridge &ha_bridge, std::string name, std::string object_id, std::set<std::string> options);
+  HaEntitySelect(HaBridge &ha_bridge, std::string name, std::string object_id, Configuration configuration);
 
 public:
   void publishConfiguration() override;
@@ -51,7 +58,7 @@ private:
   std::string _name;
   HaBridge &_ha_bridge;
   std::string _object_id;
-  std::set<std::string> _options;
+  Configuration _configuration;
 
 private:
   std::optional<std::string> _selection;

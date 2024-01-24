@@ -13,6 +13,23 @@
  */
 class HaEntityBoolean : public HaEntity {
 public:
+  struct Configuration {
+    /**
+     * @brief if true, setup an attribute topic attributes will be published to. With this set, attributes
+     * can be published when the message is published, or using a separate call.
+     */
+    bool with_attributes = false;
+
+    /**
+     * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
+     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
+     * message (not only when the sensor’s new state is different to the current one).
+     */
+    bool force_update = false;
+  };
+
+  static Configuration _default;
+
   /**
    * @brief Construct a new Ha Entity Boolean object
    *
@@ -30,14 +47,10 @@ public:
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param force_update In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-   * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-   * message (not only when the sensor’s new state is different to the current one).
-   * @param with_attributes if true, setup an attribute topic attributes will be published to. With this set, attributes
-   * can be published when the message is published, or using a separate call.
+   * @param configuration the configuration for this entity.
    */
-  HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::string child_object_id = "", bool force_update = false,
-                  bool with_attributes = false);
+  HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+                  Configuration configuration = _default);
 
 public:
   void publishConfiguration() override;
@@ -61,10 +74,9 @@ public:
 
 private:
   std::string _name;
-  bool _force_update;
   HaBridge &_ha_bridge;
-  bool _with_attributes;
   std::string _child_object_id;
+  Configuration _configuration;
 
 private:
   std::optional<bool> _value;
