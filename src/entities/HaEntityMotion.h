@@ -52,4 +52,4 @@ private:
   std::optional<bool> _detected;
 };
 
-#endif // __HA_ENTITY_MOVEMENT_H__
+#endif // __HA_ENTITY_MOTION_H__

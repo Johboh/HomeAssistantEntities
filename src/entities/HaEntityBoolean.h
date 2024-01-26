@@ -1,5 +1,5 @@
-#ifndef __HA_ENTITY_MOTION_H__
-#define __HA_ENTITY_MOTION_H__
+#ifndef __HA_ENTITY_BOOLEAN_H__
+#define __HA_ENTITY_BOOLEAN_H__
 
 #include "AttributeVariants.h"
 #include <HaBridge.h>
@@ -83,4 +83,4 @@ private:
   std::optional<Attributes::Map> _attributes;
 };
 
-#endif // __HA_ENTITY_MOVEMENT_H__
+#endif // __HA_ENTITY_BOOLEAN_H__

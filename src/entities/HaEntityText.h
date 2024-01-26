@@ -1,5 +1,5 @@
-#ifndef __HA_ENTITY_STRING_H__
-#define __HA_ENTITY_STRING_H__
+#ifndef __HA_ENTITY_TEXT_H__
+#define __HA_ENTITY_TEXT_H__
 
 #include <HaBridge.h>
 #include <HaEntity.h>
@@ -103,4 +103,4 @@ private:
   std::optional<std::string> _str;
 };
 
-#endif // __HA_ENTITY_STRING_H__
+#endif // __HA_ENTITY_TEXT_H__

@@ -1,5 +1,5 @@
-#ifndef __HA_ENTITY_LOCK_H__
-#define __HA_ENTITY_LOCK_H__
+#ifndef __HA_ENTITY_NUMBER_H__
+#define __HA_ENTITY_NUMBER_H__
 
 #include <HaBridge.h>
 #include <HaEntity.h>
@@ -79,4 +79,4 @@ private:
   std::optional<float> _number;
 };
 
-#endif // __HA_ENTITY_LOCK_H__
+#endif // __HA_ENTITY_NUMBER_H__
