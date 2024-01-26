@@ -21,7 +21,7 @@ public:
     bool force_update = false;
   };
 
-  static Configuration _default;
+  inline static Configuration _default = Configuration{.force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Brightness object

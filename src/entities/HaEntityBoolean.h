@@ -28,7 +28,7 @@ public:
     bool force_update = false;
   };
 
-  static Configuration _default;
+  inline static Configuration _default = Configuration{.with_attributes = false, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Boolean object

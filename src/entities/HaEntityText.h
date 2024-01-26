@@ -47,7 +47,12 @@ public:
     bool retain = false;
   };
 
-  static Configuration _default;
+  inline static Configuration _default = {.min_text_length = 0,
+                                          .max_text_length = 255,
+                                          .with_state_topic = false,
+                                          .is_password = false,
+                                          .force_update = false,
+                                          .retain = false};
 
   /**
    * @brief Construct a new Ha Entity Text object

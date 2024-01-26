@@ -37,7 +37,7 @@ public:
     bool retain = false;
   };
 
-  static Configuration _default;
+  inline static Configuration _default = {.min_value = 1.0, .max_value = 100.0, .force_update = false, .retain = false};
 
   /**
    * @brief Construct a new Ha Entity Number object

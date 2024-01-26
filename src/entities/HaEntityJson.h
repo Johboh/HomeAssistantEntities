@@ -23,7 +23,7 @@ public:
     bool force_update = false;
   };
 
-  static Configuration _default;
+  inline static Configuration _default = {.force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Json object
