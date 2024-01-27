@@ -8,8 +8,10 @@
 
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 
-HaEntitySwitch::HaEntitySwitch(HaBridge &ha_bridge, std::string name, std::string child_object_id)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
+HaEntitySwitch::HaEntitySwitch(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                               Configuration configuration)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
+      _configuration(configuration) {}
 
 void HaEntitySwitch::publishConfiguration() {
   nlohmann::json doc;
@@ -19,6 +21,9 @@ void HaEntitySwitch::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
+
+  doc["retain"] = _configuration.retain;
+
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
   doc["command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);

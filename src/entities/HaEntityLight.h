@@ -17,10 +17,25 @@
 class HaEntityLight : public HaEntity {
 public:
   struct Configuration {
+    /**
+     * @brief If true, the light supports brightness.
+     */
     bool with_brightness = false;
+
+    /**
+     * @brief if True, the light supports RGB color.
+     */
     bool with_rgb_color = false;
-    // if non empty, the supported effects.
+
+    /**
+     * @brief if non empty, the supported effects.
+     */
     std::set<std::string> effects = {};
+
+    /**
+     * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
+     */
+    bool retain = false;
   };
 
   /**

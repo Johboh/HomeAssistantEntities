@@ -14,6 +14,15 @@
  */
 class HaEntitySwitch : public HaEntity {
 public:
+  struct Configuration {
+    /**
+     * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
+     */
+    bool retain = false;
+  };
+
+  inline static Configuration _default = {.retain = false};
+
   /**
    * @brief Construct a new Ha Entity Switch object
    *
@@ -31,8 +40,10 @@ public:
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * @param configuration the configuration for this entity.
    */
-  HaEntitySwitch(HaBridge &ha_bridge, std::string name, std::string child_object_id);
+  HaEntitySwitch(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                 Configuration configuration = _default);
 
 public:
   void publishConfiguration() override;
@@ -54,6 +65,7 @@ private:
   std::string _name;
   HaBridge &_ha_bridge;
   std::string _child_object_id;
+  Configuration _configuration;
 
 private:
   std::optional<bool> _on;

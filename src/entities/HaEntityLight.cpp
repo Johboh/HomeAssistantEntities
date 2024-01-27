@@ -43,6 +43,9 @@ void HaEntityLight::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
+
+  doc["retain"] = _configuration.retain;
+
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
   doc["command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);

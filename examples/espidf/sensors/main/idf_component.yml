@@ -1,5 +1,5 @@
 dependencies:
   johboh/HomeAssistantEntities:
-    #version: ">=7.0.1"
+    #version: ">=7.0.2"
     # Remove path and enable version to use HomeAssistantEntities from repository
     path: ../../../../

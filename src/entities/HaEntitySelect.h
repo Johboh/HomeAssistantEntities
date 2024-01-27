@@ -20,6 +20,11 @@ public:
      * @brief Set of options that can be selected. An empty set or a set with a single item is allowed.
      */
     std::set<std::string> options;
+
+    /**
+     * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
+     */
+    bool retain = false;
   };
 
   /**
