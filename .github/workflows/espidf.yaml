@@ -15,6 +15,7 @@ jobs:
         example:
           - name: actuators
           - name: sensors
+          - name: all
 
     steps:
       - name: Checkout repo
