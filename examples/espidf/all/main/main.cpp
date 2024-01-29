@@ -102,6 +102,9 @@ HaEntityWeight _ha_entity_weight(ha_bridge, "Weight", "kitchen_weight",
                                                                .force_update = false});
 
 void haStateTask(void *pvParameters) {
+  nlohmann::json jsn;
+  jsn["hello"] = "world";
+
   while (1) {
     _ha_entity_atm.publishAtmosphericPressure(1001.5);
     _ha_entity_bool.publishBoolean(true);
@@ -111,7 +114,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_door.publishDoor(true);
     _ha_entity_event.publishEvent("button_press", {{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_humidity.publishHumidity(55.0);
-    _ha_entity_json.publishJson(device);
+    _ha_entity_json.publishJson(jsn);
     _ha_entity_light.publishIsOn(true);
     _ha_entity_light.publishBrightness(255);
     _ha_entity_light.publishEffect("effect");
