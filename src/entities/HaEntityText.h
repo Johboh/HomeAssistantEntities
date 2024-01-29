@@ -86,7 +86,7 @@ public:
    *
    * @param str the text to publish.
    */
-  void publishText(std::string &str);
+  void publishText(std::string str);
 
   /**
    * @brief Set callback for receving callbacks when there is a new text that should be set.

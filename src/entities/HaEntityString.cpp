@@ -44,7 +44,7 @@ void HaEntityString::republishState() {
   }
 }
 
-void HaEntityString::publishString(std::string &str, Attributes::Map attributes) {
+void HaEntityString::publishString(std::string str, Attributes::Map attributes) {
   _str = str;
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id),
                             str);

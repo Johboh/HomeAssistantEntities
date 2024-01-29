@@ -84,7 +84,7 @@ public:
    * @param effect currently selected. Should be any of the effects from the Capabilities. Will only be published if the
    * light is setup with this capability in the constructor.
    */
-  void publishEffect(std::string &effect);
+  void publishEffect(std::string effect);
 
   struct RGB {
     uint8_t r;

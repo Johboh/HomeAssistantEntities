@@ -46,7 +46,7 @@ void HaEntityText::republishState() {
   }
 }
 
-void HaEntityText::publishText(std::string &str) {
+void HaEntityText::publishText(std::string str) {
   if (!_configuration.with_state_topic) {
     return;
   }

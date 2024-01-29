@@ -70,7 +70,7 @@ public:
    * @param str the string to publish.
    * @param attributes optional attributes to publish.
    */
-  void publishString(std::string &str, Attributes::Map attributes = {});
+  void publishString(std::string str, Attributes::Map attributes = {});
 
   /**
    * @brief Publish attributes only. with_attributes in constructor must be set.

@@ -114,7 +114,7 @@ void HaEntityLight::publishRgb(RGB rgb) {
   }
 }
 
-void HaEntityLight::publishEffect(std::string &effect) {
+void HaEntityLight::publishEffect(std::string effect) {
   if (!_configuration.effects.empty()) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_EFFECT), effect);
