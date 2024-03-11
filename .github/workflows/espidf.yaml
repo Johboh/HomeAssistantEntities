@@ -13,7 +13,7 @@ jobs:
             version_number: v5.1.2
             target: esp32c6
           - name: v52_build
-            version_number: v5.2
+            version_number: v5.2.1
             target: esp32c6
         example:
           - name: actuators
