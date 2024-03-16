@@ -36,14 +36,14 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 #### PlatformIO (Arduino or ESP-IDF):
 Add the following to `libs_deps`:
 ```
-   Johboh/HomeAssistantEntities@^7.0.3
+   Johboh/HomeAssistantEntities@^7.0.4
 ```
 #### Espressif IoT Development Framework:
 In your existing `idf_component.yml` or in a new `idf_component.yml` next to your main component:
 ```
 dependencies:
   johboh/HomeAssistantEntities:
-    version: ">=7.0.3"
+    version: ">=7.0.4"
 ```
 
 ### Examples
