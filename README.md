@@ -43,7 +43,7 @@ In your existing `idf_component.yml` or in a new `idf_component.yml` next to you
 ```
 dependencies:
   johboh/HomeAssistantEntities:
-    version: ">=7.0.2"
+    version: ">=7.0.3"
 ```
 
 ### Examples
@@ -60,8 +60,7 @@ Newer version most probably work too, but they have not been verified.
 
 ### Dependencies
 - https://github.com/Johboh/nlohmann-json @^3.11.3
-- _Optional_: https://github.com/Johboh/MQTTRemote
-  - There is a copy of [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) in this library from [Johboh/MQTTRemote](https://github.com/Johboh/MQTTRemote). You can either add a dependency on [MQTTRemote](https://github.com/Johboh/MQTTRemote), or implement/adapt/forward to your own MQTT implementation. This library only depend on the [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) interface.
+- *An MQTT implementation is required.* There is a copy of [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) in this library from [Johboh/MQTTRemote](https://github.com/Johboh/MQTTRemote). You can either add a dependency on [MQTTRemote](https://github.com/Johboh/MQTTRemote) to get a fully working MQTT client (the examples are using this dependency), or you can implement/adapt/forward to your own MQTT implementation. This library only depend on the [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) interface.
 - Needs C++17 for `std::optional`.
   - For platform I/O in `platformio.ini`:
     ```C++
