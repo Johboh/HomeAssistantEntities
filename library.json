@@ -30,12 +30,6 @@
     "dependencies": [
         {
           "owner": "johboh",
-          "name": "MQTTRemote",
-          "version": "^4.0.0",
-          "frameworks": ["arduino"]
-        },
-        {
-          "owner": "johboh",
           "name": "nlohmann-json",
           "version": "^3.11.3"
         }

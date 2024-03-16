@@ -5,5 +5,3 @@ dependencies:
   idf: ">=4.4"
   johboh/nlohmann-json:
     version: ">=3.11.3"
-  johboh/mqttremote:
-    version: ">=4.0.0"
