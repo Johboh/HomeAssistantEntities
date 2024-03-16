@@ -1,4 +1,4 @@
-version: "7.0.4"
+version: "7.0.5"
 description: Library for providing sensors and actuators to Home Assistant using MQTT.
 url: https://github.com/Johboh/HomeAssistantEntities
 dependencies:
