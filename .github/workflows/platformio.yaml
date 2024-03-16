@@ -24,6 +24,6 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO examples
-        run: pio ci --lib="." --board=lolin_s2_mini --board=lolin_c3_mini --board="d1_mini" --project-option="build_unflags = -std=gnu++11" --project-option="build_flags = -std=gnu++17"
+        run: pio ci --lib="." --board=lolin_s2_mini --board=lolin_c3_mini --board="d1_mini" --project-option="lib_deps=johboh/MQTTRemote@^4.0.1" --project-option="build_unflags = -std=gnu++11" --project-option="build_flags = -std=gnu++17"
         env:
           PLATFORMIO_CI_SRC: examples/arduino/${{ matrix.example.name }}
