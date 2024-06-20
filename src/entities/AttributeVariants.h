@@ -9,7 +9,8 @@
 
 namespace Attributes {
 using InnerSet = std::set<std::string>;
-using Variants = std::variant<int, float, double, bool, std::string, const char *, InnerSet>;
+using Variants =
+    std::variant<uint64_t, uint32_t, uint16_t, uint8_t, int, float, double, bool, std::string, const char *, InnerSet>;
 using Map = std::map<std::string, Variants>;
 
 bool toJson(nlohmann::json &doc, Attributes::Map attributes, std::set<std::string> forbidden_keys = {});

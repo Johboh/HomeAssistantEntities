@@ -9,6 +9,14 @@ void addValue(nlohmann::json &doc, Attributes::Variants value) {
     doc = std::get<float>(value);
   } else if (std::holds_alternative<bool>(value)) {
     doc = std::get<bool>(value);
+  } else if (std::holds_alternative<uint64_t>(value)) {
+    doc = std::get<uint64_t>(value);
+  } else if (std::holds_alternative<uint32_t>(value)) {
+    doc = std::get<uint32_t>(value);
+  } else if (std::holds_alternative<uint16_t>(value)) {
+    doc = std::get<uint16_t>(value);
+  } else if (std::holds_alternative<uint8_t>(value)) {
+    doc = std::get<uint8_t>(value);
   } else if (std::holds_alternative<int>(value)) {
     doc = std::get<int>(value);
   } else if (std::holds_alternative<std::string>(value)) {
