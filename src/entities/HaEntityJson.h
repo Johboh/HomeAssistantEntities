@@ -3,8 +3,8 @@
 
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <IJson.h>
 #include <cstdint>
-#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 
@@ -56,7 +56,7 @@ public:
    *
    * @param json_doc the JSON document to publish.
    */
-  void publishJson(nlohmann::json &json_doc);
+  void publishJson(IJsonDocument &json_doc);
 
 private:
   void publishMessage(std::string &message);

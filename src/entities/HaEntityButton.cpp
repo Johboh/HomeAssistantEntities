@@ -1,6 +1,6 @@
 #include "HaEntityButton.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "button"
 #define OBJECT_ID "button"
@@ -13,7 +13,7 @@ HaEntityButton::HaEntityButton(HaBridge &ha_bridge, std::string name, std::strin
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityButton::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

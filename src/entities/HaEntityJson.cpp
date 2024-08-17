@@ -1,6 +1,6 @@
 #include "HaEntityJson.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "json"
@@ -11,7 +11,7 @@ HaEntityJson::HaEntityJson(HaBridge &ha_bridge, std::string name, std::string ch
       _configuration(configuration) {}
 
 void HaEntityJson::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
@@ -29,8 +29,8 @@ void HaEntityJson::republishState() {
   }
 }
 
-void HaEntityJson::publishJson(nlohmann::json &json_doc) {
-  auto message = json_doc.dump();
+void HaEntityJson::publishJson(IJsonDocument &json_doc) {
+  auto message = toJsonString(json_doc);
   publishMessage(message);
   _json_message = message;
 }

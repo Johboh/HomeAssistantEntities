@@ -1,6 +1,6 @@
 #include "HaEntityWeight.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "weight"
@@ -11,7 +11,7 @@ HaEntityWeight::HaEntityWeight(HaBridge &ha_bridge, std::string name, std::strin
       _configuration(configuration) {}
 
 void HaEntityWeight::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

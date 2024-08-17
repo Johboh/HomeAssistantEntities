@@ -5,9 +5,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example:
-          - name: actuators
-          - name: sensors
+        target:
+          - variant: actuators_arduino_json
+            example: actuators
+            extra_dependencies: "johboh/MQTTRemote@^4.0.4, bblanchon/ArduinoJson@^7.1.0"
+          - variant: actuators_nlohmann_json
+            example: actuators
+            extra_dependencies: "johboh/MQTTRemote@^4.0.4, johboh/nlohmann-json@^3.11.3"
+          - variant: sensors_arduino_json
+            example: sensors
+            extra_dependencies: "johboh/MQTTRemote@^4.0.4, bblanchon/ArduinoJson@^7.1.0"
+          - variant: sensors_nlohmann_json
+            example: sensors
+            extra_dependencies: "johboh/MQTTRemote@^4.0.4, johboh/nlohmann-json@^3.11.3"
 
     steps:
       - uses: actions/checkout@v3
@@ -23,7 +33,8 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build PlatformIO examples
-        run: pio ci --lib="." --board=lolin_s2_mini --board=lolin_c3_mini --board="d1_mini" --project-option="lib_deps=johboh/MQTTRemote@^4.0.1" --project-option="build_unflags = -std=gnu++11" --project-option="build_flags = -std=gnu++17"
+      - name: Build PlatformIO targets
+        run: ${{ env.PLATFORMIO_CI_BASE_CMD }} --project-option="lib_deps=${{ matrix.target.extra_dependencies }}"
         env:
-          PLATFORMIO_CI_SRC: examples/arduino/${{ matrix.example.name }}
+          PLATFORMIO_CI_BASE_CMD: pio ci --lib="." --board=lolin_s2_mini --board=lolin_c3_mini --board="d1_mini" --project-option="build_unflags=-std=gnu++11" --project-option="build_flags=-std=gnu++17" --project-option="platform=espressif32@6.4.0" --project-option="lib_ldf_mode=deep"
+          PLATFORMIO_CI_SRC: ${{ matrix.target.path }}

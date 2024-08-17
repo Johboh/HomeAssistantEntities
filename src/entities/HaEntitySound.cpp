@@ -1,6 +1,6 @@
 #include "HaEntitySound.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "binary_sensor"
 #define OBJECT_ID "sound"
@@ -9,7 +9,7 @@ HaEntitySound::HaEntitySound(HaBridge &ha_bridge, std::string name, std::string 
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntitySound::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

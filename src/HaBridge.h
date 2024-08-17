@@ -1,9 +1,9 @@
 #ifndef __HA_BRIDGE_H__
 #define __HA_BRIDGE_H__
 
+#include <IJson.h>
 #include <IMQTTRemote.h>
 #include <cstdint>
-#include <nlohmann/json.hpp>
 #include <string>
 
 /**
@@ -29,10 +29,10 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information. All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
    * Only a flat layout structure is supported, no nesting. This is called from the setup function below before we setup
-   * the remote. set to nlohmann::json::object() if no device information should be set.
+   * the remote. set to empty document if no device information should be set.
    * @param verbose True to do extra debug logging and printouts.
    */
-  HaBridge(IMQTTRemote &remote, std::string node_id, nlohmann::json &this_device_json_doc, bool verbose = false);
+  HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose = false);
 
 public:
   /**
@@ -61,7 +61,7 @@ public:
    * @param specific_doc Any entity specific values. See brief documentation.
    */
   void publishConfiguration(std::string component, std::string object_id, std::string child_object_id,
-                            const nlohmann::json &specific_doc);
+                            const IJsonDocument &specific_doc);
 
   /**
    * @brief Publish a message.
@@ -111,7 +111,7 @@ private:
   bool _verbose;
   std::string _node_id;
   IMQTTRemote &_remote;
-  nlohmann::json &_this_device_json_doc;
+  IJsonDocument &_this_device_json_doc;
 };
 
 #endif // __HA_BRIDGE_H__

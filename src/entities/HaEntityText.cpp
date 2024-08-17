@@ -1,6 +1,6 @@
 #include "HaEntityText.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "text"
 #define OBJECT_ID "text"
@@ -12,7 +12,7 @@ HaEntityText::HaEntityText(HaBridge &ha_bridge, std::string name, std::string ch
       _configuration(configuration) {}
 
 void HaEntityText::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

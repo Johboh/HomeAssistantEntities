@@ -1,6 +1,6 @@
 #include "HaEntitySwitch.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "switch"
 #define OBJECT_ID "switch"
@@ -14,7 +14,7 @@ HaEntitySwitch::HaEntitySwitch(HaBridge &ha_bridge, std::string name, std::strin
       _configuration(configuration) {}
 
 void HaEntitySwitch::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

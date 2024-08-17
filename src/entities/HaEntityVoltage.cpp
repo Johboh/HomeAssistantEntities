@@ -1,6 +1,6 @@
 #include "HaEntityVoltage.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "voltage"
@@ -11,7 +11,7 @@ HaEntityVoltage::HaEntityVoltage(HaBridge &ha_bridge, std::string name, std::str
       _configuration(configuration) {}
 
 void HaEntityVoltage::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

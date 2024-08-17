@@ -27,11 +27,5 @@
             "files": ["Sensors.ino"]
         }
     ],
-    "dependencies": [
-        {
-          "owner": "johboh",
-          "name": "nlohmann-json",
-          "version": "^3.11.3"
-        }
-      ]
+    "dependencies": []
   }

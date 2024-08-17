@@ -1,12 +1,12 @@
 #include "HaBridge.h"
 #include <HaUtilities.h>
 
-HaBridge::HaBridge(IMQTTRemote &remote, std::string node_id, nlohmann::json &this_device_json_doc, bool verbose)
+HaBridge::HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose)
     : _verbose(verbose), _node_id(node_id), _remote(remote), _this_device_json_doc(this_device_json_doc) {}
 
 void HaBridge::publishConfiguration(std::string component, std::string object_id, std::string child_object_id,
-                                    const nlohmann::json &specific_doc) {
-  nlohmann::json doc;
+                                    const IJsonDocument &specific_doc) {
+  IJsonDocument doc;
   doc["availability_topic"] = _remote.clientId() + "/status";
 
   std::string unique_id = _remote.clientId() + "_" + _node_id;
@@ -19,16 +19,15 @@ void HaBridge::publishConfiguration(std::string component, std::string object_id
   doc["unique_id"] = unique_id;
 
   // Set optional device keys.
-  for (nlohmann::json::iterator it = _this_device_json_doc.begin(); it != _this_device_json_doc.end(); ++it) {
-    doc["device"][it.key()] = it.value();
+  for (auto kv : IJsonIteratorBegin(_this_device_json_doc)) {
+    doc["device"][kv.key()] = kv.value();
   }
 
-  // Set specific keys.
-  for (nlohmann::json::const_iterator it = specific_doc.begin(); it != specific_doc.end(); ++it) {
-    doc[it.key()] = it.value();
+  for (auto kv : IJsonConstIteratorBegin(specific_doc)) {
+    doc[kv.key()] = kv.value();
   }
 
-  auto message = doc.dump();
+  auto message = toJsonString(doc);
   std::string topic = "homeassistant/" + component + "/" + _node_id + "/" + object_id;
   if (coid.length() > 0) {
     topic += "_" + coid;

@@ -1,6 +1,6 @@
 #include "HaEntityHumidity.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "humidity"
@@ -11,7 +11,7 @@ HaEntityHumidity::HaEntityHumidity(HaBridge &ha_bridge, std::string name, std::s
       _configuration(configuration) {}
 
 void HaEntityHumidity::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

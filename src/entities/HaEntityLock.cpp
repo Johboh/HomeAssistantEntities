@@ -1,6 +1,6 @@
 #include "HaEntityLock.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "binary_sensor"
 #define OBJECT_ID "lock"
@@ -9,7 +9,7 @@ HaEntityLock::HaEntityLock(HaBridge &ha_bridge, std::string name, std::string ch
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
 
 void HaEntityLock::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

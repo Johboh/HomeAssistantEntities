@@ -1,6 +1,6 @@
 #include "HaEntityBoolean.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "binary_sensor"
 #define OBJECT_ID "boolean"
@@ -11,7 +11,7 @@ HaEntityBoolean::HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::str
       _configuration(configuration) {}
 
 void HaEntityBoolean::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
@@ -56,9 +56,9 @@ void HaEntityBoolean::publishAttributes(Attributes::Map attributes) {
   }
   _attributes = attributes;
 
-  nlohmann::json doc;
+  IJsonDocument doc;
   if (Attributes::toJson(doc, attributes)) {
-    auto message = doc.dump();
+    auto message = toJsonString(doc);
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::Attributes, COMPONENT, OBJECT_ID, _child_object_id), message);
   }

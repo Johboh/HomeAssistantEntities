@@ -1,6 +1,6 @@
 #include "HaEntityBrightness.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "brightness"
@@ -11,7 +11,7 @@ HaEntityBrightness::HaEntityBrightness(HaBridge &ha_bridge, std::string name, st
       _configuration(configuration) {}
 
 void HaEntityBrightness::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

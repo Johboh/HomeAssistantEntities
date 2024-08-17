@@ -1,6 +1,6 @@
 #include "HaEntityLight.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 #include <regex>
 #include <string>
 
@@ -36,7 +36,7 @@ HaEntityLight::HaEntityLight(HaBridge &ha_bridge, std::string name, std::string 
       _configuration(configuration) {}
 
 void HaEntityLight::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
@@ -67,8 +67,9 @@ void HaEntityLight::publishConfiguration() {
     doc["effect_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
 
+    JsonArrayType effect_list_array = createJsonArray(doc, "effect_list");
     for (const std::string &effect : _configuration.effects) {
-      doc["effect_list"].push_back(effect);
+      addToJsonArray(effect_list_array, effect);
     }
   }
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);

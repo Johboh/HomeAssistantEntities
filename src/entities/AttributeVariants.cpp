@@ -2,44 +2,45 @@
 
 namespace Attributes {
 
-void addValue(nlohmann::json &doc, Attributes::Variants value) {
+void addValue(IJsonDocument &doc, std::string key, Attributes::Variants value) {
   if (std::holds_alternative<double>(value)) {
-    doc = std::get<double>(value);
+    doc[key] = std::get<double>(value);
   } else if (std::holds_alternative<float>(value)) {
-    doc = std::get<float>(value);
+    doc[key] = std::get<float>(value);
   } else if (std::holds_alternative<bool>(value)) {
-    doc = std::get<bool>(value);
+    doc[key] = std::get<bool>(value);
   } else if (std::holds_alternative<uint64_t>(value)) {
-    doc = std::get<uint64_t>(value);
+    doc[key] = std::get<uint64_t>(value);
   } else if (std::holds_alternative<uint32_t>(value)) {
-    doc = std::get<uint32_t>(value);
+    doc[key] = std::get<uint32_t>(value);
   } else if (std::holds_alternative<uint16_t>(value)) {
-    doc = std::get<uint16_t>(value);
+    doc[key] = std::get<uint16_t>(value);
   } else if (std::holds_alternative<uint8_t>(value)) {
-    doc = std::get<uint8_t>(value);
+    doc[key] = std::get<uint8_t>(value);
   } else if (std::holds_alternative<int>(value)) {
-    doc = std::get<int>(value);
+    doc[key] = std::get<int>(value);
   } else if (std::holds_alternative<std::string>(value)) {
-    doc = std::get<std::string>(value);
+    doc[key] = std::get<std::string>(value);
   } else if (std::holds_alternative<const char *>(value)) {
-    doc = std::get<const char *>(value);
+    doc[key] = std::get<const char *>(value);
   }
 }
 
-void addKeyValue(nlohmann::json &doc, std::string key, Attributes::Variants value) {
+void addKeyValue(IJsonDocument &doc, std::string key, Attributes::Variants value) {
   if (std::holds_alternative<Attributes::InnerSet>(value)) {
     auto set = std::get<Attributes::InnerSet>(value);
-    // Recursive call, but only one level deeper.
-    for (const auto &item : set) {
-      doc[key].push_back("temp");
-      Attributes::addValue(doc[key][doc[key].size() - 1], item);
+    JsonArrayType array = createJsonArray(doc, key);
+    for (const auto &value : set) {
+      IJsonDocument temp_doc;
+      addValue(temp_doc, "temp", value);
+      addToJsonArray(array, temp_doc["temp"]);
     }
   } else {
-    Attributes::addValue(doc[key], value);
+    Attributes::addValue(doc, key, value);
   }
 }
 
-bool toJson(nlohmann::json &doc, Attributes::Map attributes, std::set<std::string> forbidden_keys) {
+bool toJson(IJsonDocument &doc, Attributes::Map attributes, std::set<std::string> forbidden_keys) {
   // Add known attributes.
   auto size_before = doc.size();
   for (const auto &attribute : attributes) {

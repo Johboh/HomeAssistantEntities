@@ -1,6 +1,6 @@
 #include "HaEntityNumber.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "number"
 
@@ -10,7 +10,7 @@ HaEntityNumber::HaEntityNumber(HaBridge &ha_bridge, std::string name, std::strin
       _configuration(configuration) {}
 
 void HaEntityNumber::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

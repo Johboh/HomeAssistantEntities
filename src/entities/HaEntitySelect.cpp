@@ -1,6 +1,6 @@
 #include "HaEntitySelect.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "select"
 
@@ -10,7 +10,7 @@ HaEntitySelect::HaEntitySelect(HaBridge &ha_bridge, std::string name, std::strin
       _configuration(configuration) {}
 
 void HaEntitySelect::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
@@ -23,8 +23,9 @@ void HaEntitySelect::publishConfiguration() {
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
 
+  JsonArrayType options_array = createJsonArray(doc, "options");
   for (const std::string &option : _configuration.options) {
-    doc["options"].push_back(option);
+    addToJsonArray(options_array, option);
   }
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
 }

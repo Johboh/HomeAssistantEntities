@@ -1,9 +1,16 @@
 #include <Arduino.h>
+// This is for the Arduino IDE, where we always build with ArduinoJson. arduino-cli will not build/include libraries
+// that are not included anywhere. So we must include ArduinoJson.h so its available for IJson.h later.
+// For Platform IO, this is not the case and these examples are built both with ArduinoJson and nlohmann-json.
+#ifndef PLATFORMIO
+#include <ArduinoJson.h>
+#endif
 #include <HaBridge.h>
+// This is here for CI only. You can remove this include and include ArduinoJson.h or nlohmann/json.hpp directly.
+#include <IJson.h>
 #include <MQTTRemote.h>
 #include <entities/HaEntityBrightness.h>
 #include <entities/HaEntityTemperature.h>
-#include <nlohmann/json.hpp>
 #ifdef ESP32
 #include <WiFi.h>
 #elif ESP8266
@@ -28,7 +35,8 @@ const char mqtt_password[] = "my-password";
 // All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
 // Only a flat layout structure is supported, no nesting.
 // We call the setupJsonForThisDevice() from the ardunio setup() function to populate the Json document.
-nlohmann::json _json_this_device_doc;
+// IJsonDocument can be replaced with nlohmann-json::json or ArduinoJson::JsonDocument
+IJsonDocument _json_this_device_doc;
 void setupJsonForThisDevice() {
   _json_this_device_doc["identifiers"] = "my_hardware_" + std::string(mqtt_client_id);
   _json_this_device_doc["name"] = "Kitchen";

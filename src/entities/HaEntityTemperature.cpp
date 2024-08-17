@@ -1,6 +1,6 @@
 #include "HaEntityTemperature.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "temperature"
@@ -11,7 +11,7 @@ HaEntityTemperature::HaEntityTemperature(HaBridge &ha_bridge, std::string name, 
       _configuration(configuration) {}
 
 void HaEntityTemperature::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;

@@ -1,6 +1,6 @@
 #include "HaEntityAtmosphericPressure.h"
 #include <HaUtilities.h>
-#include <nlohmann/json.hpp>
+#include <IJson.h>
 
 #define COMPONENT "sensor"
 #define OBJECT_ID "atmospheric_pressure"
@@ -11,7 +11,7 @@ HaEntityAtmosphericPressure::HaEntityAtmosphericPressure(HaBridge &ha_bridge, st
       _configuration(configuration) {}
 
 void HaEntityAtmosphericPressure::publishConfiguration() {
-  nlohmann::json doc;
+  IJsonDocument doc;
 
   if (!_name.empty()) {
     doc["name"] = _name;
