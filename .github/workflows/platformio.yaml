@@ -36,5 +36,5 @@ jobs:
       - name: Build PlatformIO targets
         run: ${{ env.PLATFORMIO_CI_BASE_CMD }} --project-option="lib_deps=${{ matrix.target.extra_dependencies }}"
         env:
-          PLATFORMIO_CI_BASE_CMD: pio ci --lib="." --board=lolin_s2_mini --board=lolin_c3_mini --board="d1_mini" --project-option="build_unflags=-std=gnu++11" --project-option="build_flags=-std=gnu++17" --project-option="platform=espressif32@6.4.0" --project-option="lib_ldf_mode=deep"
+          PLATFORMIO_CI_BASE_CMD: pio ci --lib="." --board=lolin_s2_mini --board=lolin_c3_mini --board="d1_mini" --project-option="build_unflags=-std=gnu++11" --project-option="build_flags=-std=gnu++17" --project-option="lib_ldf_mode=deep"
           PLATFORMIO_CI_SRC: ${{ matrix.target.example }}
