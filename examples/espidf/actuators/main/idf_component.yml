@@ -1,7 +1,7 @@
 dependencies:
-  johboh/HomeAssistantEntities:
+  johboh/homeassistantentities:
     #version: ">=7.0.6"
     # Remove path and enable version to use HomeAssistantEntities from repository
     path: ../../../../
-  johboh/MQTTRemote:
+  johboh/mqttremote:
     version: ">=4.0.1"

@@ -51,7 +51,7 @@ Search for `HomeAssistantEntities` by johboh in the library manager. You also ne
 In your existing `idf_component.yml` or in a new `idf_component.yml` next to your main component:
 ```
 dependencies:
-  johboh/HomeAssistantEntities:
+  johboh/homeassistantentities:
     version: ">=7.0.6"
 ```
 
