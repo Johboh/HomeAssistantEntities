@@ -51,9 +51,12 @@ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_pas
 // See constructor of HaBridge for more documentation.
 HaBridge ha_bridge(_mqtt_remote, "kitchen", _json_this_device_doc);
 
-// Create the two sensors with the "Human readable" strings. This what will show up in Home Assistant.
+// Create the three sensors with the "Human readable" strings. This what will show up in Home Assistant.
 HaEntityBrightness _ha_entity_brightness(ha_bridge, "brightness");
-HaEntityTemperature _ha_entity_temperature(ha_bridge, "temperature");
+// For multiple sensors with the same time for the same device, we need to add a child object id to separate them (third
+// parameter).
+HaEntityTemperature _ha_entity_temperature_inside(ha_bridge, "temperature inside", "kitchen_temperature_inside");
+HaEntityTemperature _ha_entity_temperature_outside(ha_bridge, "temperature outside", "kitchen_temperature_outside");
 
 bool _was_connected = false;
 unsigned long _last_publish_ms = 0;
@@ -79,9 +82,10 @@ void loop() {
 
   auto connected = _mqtt_remote.connected();
   if (!_was_connected && connected) {
-    // Publish Home Assistant Configuration for both sensors once connected to MQTT.
+    // Publish Home Assistant Configuration for the sensors once connected to MQTT.
     _ha_entity_brightness.publishConfiguration();
-    _ha_entity_temperature.publishConfiguration();
+    _ha_entity_temperature_inside.publishConfiguration();
+    _ha_entity_temperature_outside.publishConfiguration();
   }
   _was_connected = connected;
 
@@ -89,7 +93,8 @@ void loop() {
   auto now = millis();
   if (now - _last_publish_ms > 10000) {
     _ha_entity_brightness.publishBrightness(128);
-    _ha_entity_temperature.publishTemperature(25.5);
+    _ha_entity_temperature_inside.publishTemperature(22.5);
+    _ha_entity_temperature_outside.publishTemperature(6.8);
     _last_publish_ms = now;
   }
 }
