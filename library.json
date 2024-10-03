@@ -11,7 +11,7 @@
     "repository":
     {
       "type": "git",
-      "url": "https://github.com/Johboh/MQTTRemote.git"
+      "url": "https://github.com/Johboh/HomeAssistantEntities.git"
     },
     "frameworks": ["espidf", "arduino"],
     "platforms": ["espressif8266", "espressif32"],
@@ -19,12 +19,12 @@
         {
             "name": "Actuators",
             "base": "examples/arduino/actuators",
-            "files": ["Actuators.ino"]
+            "files": ["actuators.ino"]
         },
         {
             "name": "Sensors",
             "base": "examples/arduino/sensors",
-            "files": ["Sensors.ino"]
+            "files": ["sensors.ino"]
         }
     ],
     "dependencies": []
