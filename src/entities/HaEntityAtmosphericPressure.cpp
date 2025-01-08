@@ -19,8 +19,9 @@ void HaEntityAtmosphericPressure::publishConfiguration() {
     doc["name"] = nullptr;
   }
   doc["unit_of_measurement"] = "hPa";
-  doc["force_update"] = _configuration.force_update;
+  doc["state_class"] = "measurement";
   doc["device_class"] = "atmospheric_pressure";
+  doc["force_update"] = _configuration.force_update;
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }

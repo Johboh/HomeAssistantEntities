@@ -20,6 +20,7 @@ void HaEntityHumidity::publishConfiguration() {
   }
   doc["device_class"] = "humidity";
   doc["unit_of_measurement"] = "%";
+  doc["state_class"] = "measurement";
   doc["force_update"] = _configuration.force_update;
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);

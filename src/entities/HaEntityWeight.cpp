@@ -19,6 +19,7 @@ void HaEntityWeight::publishConfiguration() {
     doc["name"] = nullptr;
   }
   doc["device_class"] = "weight";
+  doc["state_class"] = "measurement";
   doc["force_update"] = _configuration.force_update;
   switch (_configuration.unit) {
   case Unit::kg:

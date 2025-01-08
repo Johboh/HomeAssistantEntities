@@ -19,6 +19,7 @@ void HaEntityVoltage::publishConfiguration() {
     doc["name"] = nullptr;
   }
   doc["device_class"] = "voltage";
+  doc["state_class"] = "measurement";
   doc["force_update"] = _configuration.force_update;
   switch (_configuration.unit) {
   case Unit::V:
