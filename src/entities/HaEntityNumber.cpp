@@ -18,6 +18,7 @@ void HaEntityNumber::publishConfiguration() {
     doc["name"] = nullptr;
   }
 
+  doc["platform"] = "number";
   doc["min"] = _configuration.min_value;
   doc["max"] = _configuration.max_value;
   doc["force_update"] = _configuration.force_update;
