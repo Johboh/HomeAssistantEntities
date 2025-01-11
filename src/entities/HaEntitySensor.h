@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_SENSOR_H__
 #define __HA_ENTITY_SENSOR_H__
 
+#include "AttributeVariants.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -43,6 +44,12 @@ public:
     std::optional<std::string> state_class = "measurement";
 
     /**
+     * @brief if true, setup an attribute topic attributes will be published to. With this set, attributes
+     * can be published when the message is published, or using a separate call.
+     */
+    bool with_attributes = false;
+
+    /**
      * @brief A custom icon for the sensor. Usually Home Assistant picks a good one. Example "mdi:brightness-percent"
      */
     std::optional<std::string> icon = std::nullopt;
@@ -59,6 +66,7 @@ public:
                                           .unit_of_measurement = std::nullopt,
                                           .device_class = std::nullopt,
                                           .state_class = "measurement",
+                                          .with_attributes = false,
                                           .icon = std::nullopt,
                                           .force_update = false};
 
@@ -92,15 +100,24 @@ public:
    * @brief Publish the value for this sensor.
    *
    * @param value value in unit you specified during object creation.
+   * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void publishValue(double value);
+  void publishValue(double value, Attributes::Map attributes = {});
 
   /**
    * @brief Publish the value for this sensor.
    *
    * @param value value in unit you specified during object creation.
+   * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void publishValue(std::string &value);
+  void publishValue(std::string &value, Attributes::Map attributes = {});
+
+  /**
+   * @brief Publish attributes only. with_attributes in configuration must be set.
+   *
+   * @param attributes attributes to publish.
+   */
+  void publishAttributes(Attributes::Map attributes);
 
   /**
    * @brief Use with caution! In rare cases, there might be a need to override the object ID used for
@@ -119,6 +136,7 @@ private:
 
 private:
   std::optional<std::string> _value;
+  std::optional<Attributes::Map> _attributes;
 };
 
 #endif // __HA_ENTITY_SENSOR_H__
