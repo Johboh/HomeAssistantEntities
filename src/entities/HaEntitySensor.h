@@ -110,7 +110,7 @@ public:
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void publishValue(std::string &value, Attributes::Map attributes = {});
+  void publishValue(std::string value, Attributes::Map attributes = {});
 
   /**
    * @brief Publish attributes only. with_attributes in configuration must be set.

@@ -67,7 +67,7 @@ void HaEntitySensor::publishValue(double value, Attributes::Map attributes) {
   publishValue(value_str, attributes);
 }
 
-void HaEntitySensor::publishValue(std::string &value, Attributes::Map attributes) {
+void HaEntitySensor::publishValue(std::string value, Attributes::Map attributes) {
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id),
                             value);
   _value = value;

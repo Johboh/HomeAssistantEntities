@@ -81,6 +81,12 @@ HaEntityNumber _ha_entity_number(ha_bridge, "Number", "kitchen_number",
 HaEntitySelect _ha_entity_select(ha_bridge, "Select", "kitchen_select",
                                  HaEntitySelect::Configuration{.options = {"option1", "option2"}, .retain = false});
 HaEntitySound _ha_entity_sound(ha_bridge, "Sound", "kitchen_sound");
+HaEntitySensor _ha_entity_sensor(ha_bridge, "Sensor", "kitchen_sensor",
+                                 HaEntitySensor::Configuration{.sensor_type == HaEntitySensor::SensorType::Sensor,
+                                                               .unit_of_measurement = "dBA",
+                                                               .device_class = "sound_pressure",
+                                                               .with_attributes = false,
+                                                               .force_update = false});
 HaEntityString _ha_entity_string(ha_bridge, "String", "kitchen_string",
                                  HaEntityString::Configuration{
                                      .device_class = "enum", .with_attributes = false, .force_update = false});
@@ -100,10 +106,6 @@ HaEntityVoltage _ha_entity_voltage(ha_bridge, "Voltage", "kitchen_voltage",
                                                                   .force_update = false});
 HaEntityWeight _ha_entity_weight(ha_bridge, "Weight", "kitchen_weight",
                                  HaEntityWeight::Configuration{.unit = HaEntityWeight::Unit::kg,
-                                                               .force_update = false});
-HaEntitySensor _ha_entity_sensor(ha_bridge, "Sensor", "kitchen_sensor",
-                                 HaEntitySensor::Configuration{.unit_of_measurement = "dBA",
-                                                               .device_class = "sound_pressure",
                                                                .force_update = false});
 
 void haStateTask(void *pvParameters) {
