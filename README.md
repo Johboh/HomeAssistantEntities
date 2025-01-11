@@ -21,11 +21,14 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Sound (detected/not detected)
 - String (raw "String"-sensor)
 - Temperature (°C/°F)
+- Text
 - Voltage (mV/V)
 - Weight (g/kg)
+- Sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement)
 
 ### Currently supported actuators (and sensors)
 - Curtain (open/opening, close/closing, position)
+- Button
 - Event
 - Light (brightness, rgb, effect)
 - Select
