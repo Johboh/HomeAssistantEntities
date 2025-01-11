@@ -61,9 +61,9 @@ public:
                  Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
+                                             .device_class = configuration.device_class,
                                              .state_class = std::nullopt,
                                              .with_attributes = configuration.with_attributes,
-                                             .device_class = configuration.device_class,
                                              .force_update = configuration.force_update,
                                          })) {
     _ha_entity_sensor.overrideObjectId("string");
