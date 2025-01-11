@@ -24,6 +24,7 @@ void HaEntitySensor::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
+  doc["platform"] = "sensor";
   doc["state_class"] = "measurement";
   if (_configuration.device_class) {
     auto device_class = homeassistantentities::trim(*_configuration.device_class);
