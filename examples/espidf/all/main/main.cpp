@@ -178,7 +178,7 @@ void app_main(void) {
       _ha_entity_text.publishConfiguration();
       _ha_entity_voltage.publishConfiguration();
       _ha_entity_weight.publishConfiguration();
-      _ha_entity_sensor.publishValue();
+      _ha_entity_sensor.publishConfiguration();
     });
 
     // Register for callbacks.
