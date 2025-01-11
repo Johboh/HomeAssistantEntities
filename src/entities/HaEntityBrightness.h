@@ -48,7 +48,7 @@ public:
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
                                              .unit_of_measurement = "%",
-                                             .state_class = "brightness",
+                                             .device_class = "brightness",
                                              .icon = "mdi:brightness-percent",
                                              .force_update = configuration.force_update,
                                          })) {}
