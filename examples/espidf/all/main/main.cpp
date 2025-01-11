@@ -7,7 +7,6 @@
 #include <freertos/task.h>
 #include <nlohmann/json.hpp>
 
-#include <entities/HaEntitSensor.h>
 #include <entities/HaEntityAtmosphericPressure.h>
 #include <entities/HaEntityBoolean.h>
 #include <entities/HaEntityBrightness.h>
@@ -22,6 +21,7 @@
 #include <entities/HaEntityMotion.h>
 #include <entities/HaEntityNumber.h>
 #include <entities/HaEntitySelect.h>
+#include <entities/HaEntitySensor.h>
 #include <entities/HaEntitySound.h>
 #include <entities/HaEntityString.h>
 #include <entities/HaEntitySwitch.h>
