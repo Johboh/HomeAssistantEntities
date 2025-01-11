@@ -2,8 +2,6 @@
 #include <HaUtilities.h>
 #include <IJson.h>
 
-#define COMPONENT "sensor"
-
 HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::string child_object_id,
                                Configuration configuration)
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
@@ -39,8 +37,8 @@ void HaEntitySensor::publishConfiguration() {
   if (_configuration.unit_of_measurement) {
     doc["unit_of_measurement"] = *_configuration.unit_of_measurement;
   }
-  doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id, _child_object_id);
-  _ha_bridge.publishConfiguration(COMPONENT, _object_id, _child_object_id, doc);
+  doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id);
+  _ha_bridge.publishConfiguration(_component, _object_id, _child_object_id, doc);
 }
 
 void HaEntitySensor::republishState() {
@@ -55,7 +53,12 @@ void HaEntitySensor::publishValue(double value) {
 }
 
 void HaEntitySensor::publishValue(std::string &value) {
-  _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id, _child_object_id),
+  _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id),
                             value);
   _value = value;
+}
+
+void HaEntitySensor::overrideComponentAndObjectId(std::string component, std::string object_id) {
+  _component = component;
+  _object_id = object_id;
 }

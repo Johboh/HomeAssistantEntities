@@ -81,12 +81,20 @@ public:
    */
   void publishValue(std::string &value);
 
+  /**
+   * @brief Use with caution! In rare cases, there might be a need to override the component and the object ID used for
+   * a sensor. This must be called before any configuration or values are published.
+   *
+   */
+  void overrideComponentAndObjectId(std::string component, std::string object_id);
+
 private:
   std::string _name;
   HaBridge &_ha_bridge;
   std::string _object_id;
   std::string _child_object_id;
   Configuration _configuration;
+  std::string _component = "sensor";
 
 private:
   std::optional<std::string> _value;

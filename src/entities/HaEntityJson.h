@@ -50,7 +50,9 @@ public:
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
                                              .force_update = configuration.force_update,
-                                         })) {}
+                                         })) {
+    _ha_entity_sensor.overrideComponentAndObjectId("sensor", "json");
+  }
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
