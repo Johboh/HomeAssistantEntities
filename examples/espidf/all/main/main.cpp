@@ -11,6 +11,7 @@
 #include <entities/HaEntityBoolean.h>
 #include <entities/HaEntityBrightness.h>
 #include <entities/HaEntityButton.h>
+#include <entities/HaEntityCarbonDioxide.h>
 #include <entities/HaEntityCurtain.h>
 #include <entities/HaEntityDoor.h>
 #include <entities/HaEntityEvent.h>
@@ -20,6 +21,7 @@
 #include <entities/HaEntityLock.h>
 #include <entities/HaEntityMotion.h>
 #include <entities/HaEntityNumber.h>
+#include <entities/HaEntityParticulateMatter.h>
 #include <entities/HaEntitySelect.h>
 #include <entities/HaEntitySensor.h>
 #include <entities/HaEntitySound.h>
@@ -27,6 +29,7 @@
 #include <entities/HaEntitySwitch.h>
 #include <entities/HaEntityTemperature.h>
 #include <entities/HaEntityText.h>
+#include <entities/HaEntityVolatileOrganicCompounds.h>
 #include <entities/HaEntityVoltage.h>
 #include <entities/HaEntityWeight.h>
 
@@ -61,6 +64,7 @@ HaEntityBoolean _ha_entity_bool(ha_bridge, "Bool", "kitchen_bool",
 HaEntityBrightness _ha_entity_bright(ha_bridge, "Brightness", "kitchen_brightness",
                                      HaEntityBrightness::Configuration{.force_update = false});
 HaEntityButton _ha_entity_button(ha_bridge, "Button", "kitchen_button");
+HaEntityCarbonDioxide _ha_entity_carbon_dioxide(ha_bridge, "Carbon dioxide", "kitchen_carbon_dioxide");
 HaEntityCurtain _ha_entity_curtain(ha_bridge, "Curtain", "kitchen_curtain");
 HaEntityDoor _ha_entity_door(ha_bridge, "Door", "kitchen_door");
 HaEntityEvent _ha_entity_event(ha_bridge, "Event", "kitchen_event",
@@ -78,11 +82,14 @@ HaEntityMotion _ha_entity_motion(ha_bridge, "Motion", "kitchen_motion");
 HaEntityNumber _ha_entity_number(ha_bridge, "Number", "kitchen_number",
                                  HaEntityNumber::Configuration{
                                      .min_value = 0, .max_value = 100, .force_update = false, .retain = false});
+HaEntityParticulateMatter _ha_entity_particulate_matter(ha_bridge, "Particulate matter", "kitchen_particle_matter",
+                                                        HaEntityParticulateMatter::Configuration{
+                                                            .size = HaEntityParticulateMatter::Size::pm25});
 HaEntitySelect _ha_entity_select(ha_bridge, "Select", "kitchen_select",
                                  HaEntitySelect::Configuration{.options = {"option1", "option2"}, .retain = false});
 HaEntitySound _ha_entity_sound(ha_bridge, "Sound", "kitchen_sound");
 HaEntitySensor _ha_entity_sensor(ha_bridge, "Sensor", "kitchen_sensor",
-                                 HaEntitySensor::Configuration{.sensor_type == HaEntitySensor::SensorType::Sensor,
+                                 HaEntitySensor::Configuration{.sensor_type = HaEntitySensor::SensorType::Sensor,
                                                                .unit_of_measurement = "dBA",
                                                                .device_class = "sound_pressure",
                                                                .with_attributes = false,
@@ -101,6 +108,10 @@ HaEntityText _ha_entity_text(ha_bridge, "Text", "kitchen_text",
                                                          .is_password = false,
                                                          .force_update = false,
                                                          .retain = false});
+HaEntityVolatileOrganicCompounds _ha_entity_volatile_organic_compounds(
+    ha_bridge, "Volatile organic compounds", "kitchen_volatile_organic_compounds",
+    HaEntityVolatileOrganicCompounds::Configuration{.unit = HaEntityVolatileOrganicCompounds::Unit::Concentration,
+                                                    .force_update = false});
 HaEntityVoltage _ha_entity_voltage(ha_bridge, "Voltage", "kitchen_voltage",
                                    HaEntityVoltage::Configuration{.unit = HaEntityVoltage::Unit::mV,
                                                                   .force_update = false});
@@ -117,6 +128,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_bool.publishBoolean(true);
     _ha_entity_bool.publishAttributes({{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_bright.publishBrightness(55.0);
+    _ha_entity_carbon_dioxide.publishConcentration(55.0);
     _ha_entity_curtain.publishCurtain(HaEntityCurtain::State::Opening, 50);
     _ha_entity_door.publishDoor(true);
     _ha_entity_event.publishEvent("button_press", {{"attr1", "value1"}, {"attr2", "value2"}});
@@ -129,15 +141,17 @@ void haStateTask(void *pvParameters) {
     _ha_entity_lock.publishLock(true);
     _ha_entity_motion.publishMotion(true);
     _ha_entity_number.publishNumber(55.0);
+    _ha_entity_particulate_matter.publishConcentration(55.0);
     _ha_entity_select.publishSelection("option");
+    _ha_entity_sensor.publishValue(55.0);
     _ha_entity_sound.publishSound(true);
     _ha_entity_string.publishString("string", {{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_switch.publishSwitch(true);
     _ha_entity_temperature.publishTemperature(55.0);
     _ha_entity_text.publishText("text");
+    _ha_entity_volatile_organic_compounds.publishConcentration(55.0);
     _ha_entity_voltage.publishVoltage(55.0);
     _ha_entity_weight.publishWeight(55.0);
-    _ha_entity_sensor.publishValue(55.0);
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }
@@ -163,6 +177,7 @@ void app_main(void) {
       _ha_entity_bool.publishConfiguration();
       _ha_entity_bright.publishConfiguration();
       _ha_entity_button.publishConfiguration();
+      _ha_entity_carbon_dioxide.publishConfiguration();
       _ha_entity_curtain.publishConfiguration();
       _ha_entity_door.publishConfiguration();
       _ha_entity_event.publishConfiguration();
@@ -172,15 +187,17 @@ void app_main(void) {
       _ha_entity_lock.publishConfiguration();
       _ha_entity_motion.publishConfiguration();
       _ha_entity_number.publishConfiguration();
+      _ha_entity_particulate_matter.publishConfiguration();
       _ha_entity_select.publishConfiguration();
+      _ha_entity_sensor.publishConfiguration();
       _ha_entity_sound.publishConfiguration();
       _ha_entity_string.publishConfiguration();
       _ha_entity_switch.publishConfiguration();
       _ha_entity_temperature.publishConfiguration();
       _ha_entity_text.publishConfiguration();
+      _ha_entity_volatile_organic_compounds.publishConfiguration();
       _ha_entity_voltage.publishConfiguration();
       _ha_entity_weight.publishConfiguration();
-      _ha_entity_sensor.publishConfiguration();
     });
 
     // Register for callbacks.

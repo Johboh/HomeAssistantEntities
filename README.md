@@ -8,26 +8,29 @@ Arduino (using Arduino IDE or PlatformIO) and ESP-IDF (using Espressif IoT Devel
 
 Home Assistant has a well defined way of defining sensors and actuators using MQTT. This library register a device with one or mulitple sensors and provide a way to publish new values for them, as well as listen for commands from Home Assistant.
 
-### Currently supported sensors
+### Currently supported sensors*
 - Atmospheric Preassure (hPa)
 - Boolean
 - Binary sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class))
 - Brightness (%)
+- Carbon Dioxide (ppm)
 - Door (open/closed)
 - Humidity (%)
 - Json (raw "json"-sensor)
 - Lock (locked/unlocked)
 - Motion (detected/not detected)
 - Number
+- Particulate matter (μg/m³)
 - Sound (detected/not detected)
 - String (raw "String"-sensor)
 - Temperature (°C/°F)
 - Text
+- Volatile organic compounds (µg/m³ or ppb)
 - Voltage (mV/V)
 - Weight (g/kg)
 - Sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement)
 
-### Currently supported actuators (and sensors)
+### Currently supported actuators (and sensors)*
 - Curtain (open/opening, close/closing, position)
 - Button
 - Event
@@ -35,6 +38,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Select
 - Switch (on/off)
 
+*_If you can't find a sensor/actuator you need, either use the genric sensor, create a pull request to add one or raise an issue on GitHub and we'll add it to this library._
 
 ### Installation
 #### PlatformIO (Arduino or ESP-IDF):
