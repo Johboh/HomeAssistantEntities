@@ -11,6 +11,7 @@
 #include <MQTTRemote.h>
 #include <entities/HaEntityBrightness.h>
 #include <entities/HaEntityTemperature.h>
+#include <entities/haEntitySensor.h>
 #ifdef ESP32
 #include <WiFi.h>
 #elif ESP8266
@@ -57,8 +58,13 @@ HaEntityBrightness _ha_entity_brightness(ha_bridge, "brightness");
 // parameter).
 HaEntityTemperature _ha_entity_temperature_inside(ha_bridge, "temperature inside", "kitchen_temperature_inside");
 HaEntityTemperature _ha_entity_temperature_outside(ha_bridge, "temperature outside", "kitchen_temperature_outside");
+// Generic sensor when any other sensor does not fit.
+HaEntitySensor::Configuration _generic_sensor_cfg = {
+    .unit_of_measurement = "dBA",
+    .device_class = "sound_pressure",
+};
+HaEntitySensor _ha_entity_generic_sensor(ha_bridge, "Sound preassure", "", _generic_sensor_cfg);
 
-bool _was_connected = false;
 unsigned long _last_publish_ms = 0;
 
 void setup() {
@@ -75,24 +81,24 @@ void setup() {
   Serial.println("have wifi");
   Serial.print("IP number: ");
   Serial.println(WiFi.localIP());
+
+  _mqtt_remote.setOnConnected([]() {
+    // Publish Home Assistant Configuration for the sensors once connected to MQTT.
+    _ha_entity_brightness.publishConfiguration();
+    _ha_entity_generic_sensor.publishConfiguration();
+    _ha_entity_temperature_inside.publishConfiguration();
+    _ha_entity_temperature_outside.publishConfiguration();
+  });
 }
 
 void loop() {
   _mqtt_remote.handle();
 
-  auto connected = _mqtt_remote.connected();
-  if (!_was_connected && connected) {
-    // Publish Home Assistant Configuration for the sensors once connected to MQTT.
-    _ha_entity_brightness.publishConfiguration();
-    _ha_entity_temperature_inside.publishConfiguration();
-    _ha_entity_temperature_outside.publishConfiguration();
-  }
-  _was_connected = connected;
-
   // Publish temperature and brightness status every 10 seconds.
   auto now = millis();
   if (now - _last_publish_ms > 10000) {
     _ha_entity_brightness.publishBrightness(128);
+    _ha_entity_generic_sensor.publishValue(100.0);
     _ha_entity_temperature_inside.publishTemperature(22.5);
     _ha_entity_temperature_outside.publishTemperature(6.8);
     _last_publish_ms = now;

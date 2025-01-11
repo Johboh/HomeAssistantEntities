@@ -70,16 +70,16 @@ void app_main(void) {
     // Connected to WIFI.
 
     // Start MQTT
-    _mqtt_remote.start();
+    _mqtt_remote.start([]() {
+      // Publish Home Assistant Configuration for both lights once connected to MQTT.
+      _ha_entity_light_left_bench.publishConfiguration();
+      _ha_entity_light_right_bench.publishConfiguration();
 
-    // Publish Home Assistant Configuration for both lights once connected to MQTT.
-    _ha_entity_light_left_bench.publishConfiguration();
-    _ha_entity_light_right_bench.publishConfiguration();
-
-    // Subscribe to new light "on" state pushed by Home Assistant.
-    _ha_entity_light_left_bench.setOnOn([&](bool on) { gpio_set_level(PIN_LED, on); });
-    _ha_entity_light_right_bench.setOnBrightness(
-        [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for left light", brightness); });
+      // Subscribe to new light "on" state pushed by Home Assistant.
+      _ha_entity_light_left_bench.setOnOn([&](bool on) { gpio_set_level(PIN_LED, on); });
+      _ha_entity_light_right_bench.setOnBrightness(
+          [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for left light", brightness); });
+    });
 
     // Start task for periodically publishing state.
     xTaskCreate(haStateTask, "haStateTask", 2048, NULL, 15, NULL);

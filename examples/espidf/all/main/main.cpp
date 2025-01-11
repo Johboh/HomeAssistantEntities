@@ -7,6 +7,7 @@
 #include <freertos/task.h>
 #include <nlohmann/json.hpp>
 
+#include <entities/HaEntitSensor.h>
 #include <entities/HaEntityAtmosphericPressure.h>
 #include <entities/HaEntityBoolean.h>
 #include <entities/HaEntityBrightness.h>
@@ -100,6 +101,10 @@ HaEntityVoltage _ha_entity_voltage(ha_bridge, "Voltage", "kitchen_voltage",
 HaEntityWeight _ha_entity_weight(ha_bridge, "Weight", "kitchen_weight",
                                  HaEntityWeight::Configuration{.unit = HaEntityWeight::Unit::kg,
                                                                .force_update = false});
+HaEntitySensor _ha_entity_sensor(ha_bridge, "Sensor", "kitchen_sensor",
+                                 HaEntitySensor::Configuration{.unit_of_measurement = "dBA",
+                                                               .device_class = "sound_pressure",
+                                                               .force_update = false});
 
 void haStateTask(void *pvParameters) {
   nlohmann::json jsn;
@@ -130,6 +135,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_text.publishText("text");
     _ha_entity_voltage.publishVoltage(55.0);
     _ha_entity_weight.publishWeight(55.0);
+    _ha_entity_sensor.publishValue(55.0);
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }
@@ -149,30 +155,31 @@ void app_main(void) {
     // Connected to WIFI.
 
     // Start MQTT
-    _mqtt_remote.start();
-
-    // Publish Home Assistant Configuration once connected to MQTT.
-    _ha_entity_atm.publishConfiguration();
-    _ha_entity_bool.publishConfiguration();
-    _ha_entity_bright.publishConfiguration();
-    _ha_entity_button.publishConfiguration();
-    _ha_entity_curtain.publishConfiguration();
-    _ha_entity_door.publishConfiguration();
-    _ha_entity_event.publishConfiguration();
-    _ha_entity_humidity.publishConfiguration();
-    _ha_entity_json.publishConfiguration();
-    _ha_entity_light.publishConfiguration();
-    _ha_entity_lock.publishConfiguration();
-    _ha_entity_motion.publishConfiguration();
-    _ha_entity_number.publishConfiguration();
-    _ha_entity_select.publishConfiguration();
-    _ha_entity_sound.publishConfiguration();
-    _ha_entity_string.publishConfiguration();
-    _ha_entity_switch.publishConfiguration();
-    _ha_entity_temperature.publishConfiguration();
-    _ha_entity_text.publishConfiguration();
-    _ha_entity_voltage.publishConfiguration();
-    _ha_entity_weight.publishConfiguration();
+    _mqtt_remote.start([]() {
+      // Publish Home Assistant Configuration once connected to MQTT.
+      _ha_entity_atm.publishConfiguration();
+      _ha_entity_bool.publishConfiguration();
+      _ha_entity_bright.publishConfiguration();
+      _ha_entity_button.publishConfiguration();
+      _ha_entity_curtain.publishConfiguration();
+      _ha_entity_door.publishConfiguration();
+      _ha_entity_event.publishConfiguration();
+      _ha_entity_humidity.publishConfiguration();
+      _ha_entity_json.publishConfiguration();
+      _ha_entity_light.publishConfiguration();
+      _ha_entity_lock.publishConfiguration();
+      _ha_entity_motion.publishConfiguration();
+      _ha_entity_number.publishConfiguration();
+      _ha_entity_select.publishConfiguration();
+      _ha_entity_sound.publishConfiguration();
+      _ha_entity_string.publishConfiguration();
+      _ha_entity_switch.publishConfiguration();
+      _ha_entity_temperature.publishConfiguration();
+      _ha_entity_text.publishConfiguration();
+      _ha_entity_voltage.publishConfiguration();
+      _ha_entity_weight.publishConfiguration();
+      _ha_entity_sensor.publishValue();
+    });
 
     // Register for callbacks.
     _ha_entity_button.setOnPressed([]() {});
