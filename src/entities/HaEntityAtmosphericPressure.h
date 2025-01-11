@@ -3,6 +3,7 @@
 
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <HaEntitySensor.h>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -43,27 +44,27 @@ public:
    * @param configuration the configuration for this entity.
    */
   HaEntityAtmosphericPressure(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
-                              Configuration configuration = _default);
+                              Configuration configuration = _default)
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .unit_of_measurement = "hPa",
+                                             .device_class = "atmospheric_pressure",
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
-  void publishConfiguration() override;
-  void republishState() override;
+  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
    * @brief Publish the pressure.
    *
    * @param pressure pressure in hPa.
    */
-  void publishAtmosphericPressure(double pressure);
+  void publishAtmosphericPressure(double pressure) { _ha_entity_sensor.publishValue(pressure); }
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _child_object_id;
-  Configuration _configuration;
-
-private:
-  std::optional<double> _pressure;
+  HaEntitySensor _ha_entity_sensor;
 };
 
 #endif // __HA_ENTITY_ATMOSPHERIC_PRESSURE_H__

@@ -3,6 +3,7 @@
 
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <HaEntitySensor.h>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -43,27 +44,27 @@ public:
    * @param configuration the configuration for this entity.
    */
   HaEntityHumidity(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
-                   Configuration configuration = _default);
+                   Configuration configuration = _default)
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .unit_of_measurement = "%",
+                                             .device_class = "humidity",
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
-  void publishConfiguration() override;
-  void republishState() override;
+  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
    * @brief Publish the humidity.
    *
    * @param humidity humidity in %.
    */
-  void publishHumidity(double humidity);
+  void publishHumidity(double humidity) { _ha_entity_sensor.publishValue(humidity); }
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _child_object_id;
-  Configuration _configuration;
-
-private:
-  std::optional<double> _humidity;
+  HaEntitySensor _ha_entity_sensor;
 };
 
 #endif // __HA_ENTITY_HUMIDITY_H__

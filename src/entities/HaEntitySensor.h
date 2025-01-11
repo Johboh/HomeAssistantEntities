@@ -26,6 +26,11 @@ public:
     std::optional<std::string> device_class = std::nullopt;
 
     /**
+     * @brief A custom icon for the sensor. Usually Home Assistant picks a good one. Example "mdi:brightness-percent"
+     */
+    std::optional<std::string> icon = std::nullopt;
+
+    /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
      * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
      * message (not only when the sensor’s new state is different to the current one).
@@ -34,7 +39,7 @@ public:
   };
 
   inline static Configuration _default = {
-      .unit_of_measurement = std::nullopt, .device_class = std::nullopt, .force_update = false};
+      .unit_of_measurement = std::nullopt, .device_class = std::nullopt, .icon = std::nullopt, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Sensor object
@@ -69,6 +74,13 @@ public:
    */
   void publishValue(double value);
 
+  /**
+   * @brief Publish the value for this sensor.
+   *
+   * @param value value in unit you specified during object creation.
+   */
+  void publishValue(std::string &value);
+
 private:
   std::string _name;
   HaBridge &_ha_bridge;
@@ -77,7 +89,7 @@ private:
   Configuration _configuration;
 
 private:
-  std::optional<double> _value;
+  std::optional<std::string> _value;
 };
 
 #endif // __HA_ENTITY_SENSOR_H__

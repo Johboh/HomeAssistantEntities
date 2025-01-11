@@ -32,6 +32,9 @@ void HaEntitySensor::publishConfiguration() {
       doc["device_class"] = device_class;
     }
   }
+  if (_configuration.icon) {
+    doc["icon"] = *_configuration.icon;
+  }
   doc["force_update"] = _configuration.force_update;
   if (_configuration.unit_of_measurement) {
     doc["unit_of_measurement"] = *_configuration.unit_of_measurement;
@@ -47,7 +50,12 @@ void HaEntitySensor::republishState() {
 }
 
 void HaEntitySensor::publishValue(double value) {
+  auto value_str = std::to_string(value);
+  publishValue(value_str);
+}
+
+void HaEntitySensor::publishValue(std::string &value) {
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id, _child_object_id),
-                            std::to_string(value));
+                            value);
   _value = value;
 }

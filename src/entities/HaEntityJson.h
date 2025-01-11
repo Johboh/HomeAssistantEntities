@@ -3,6 +3,7 @@
 
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <HaEntitySensor.h>
 #include <IJson.h>
 #include <cstdint>
 #include <optional>
@@ -45,30 +46,28 @@ public:
    * @param configuration the configuration for this entity.
    */
   HaEntityJson(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
-               Configuration configuration = _default);
+               Configuration configuration = _default)
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
-  void publishConfiguration() override;
-  void republishState() override;
+  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
    * @brief Publish the JSON.
    *
    * @param json_doc the JSON document to publish.
    */
-  void publishJson(IJsonDocument &json_doc);
+  void publishJson(IJsonDocument &json_doc) {
+    auto message = toJsonString(json_doc);
+    _ha_entity_sensor.publishValue(message);
+  }
 
 private:
-  void publishMessage(std::string &message);
-
-private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _child_object_id;
-  Configuration _configuration;
-
-private:
-  std::optional<std::string> _json_message;
+  HaEntitySensor _ha_entity_sensor;
 };
 
 #endif // __HA_ENTITY_JSON_H__

@@ -3,6 +3,7 @@
 
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <HaEntitySensor.h>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -43,30 +44,31 @@ public:
    * @param configuration the configuration for this entity.
    */
   HaEntityBrightness(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
-                     Configuration configuration = _default);
+                     Configuration configuration = _default)
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .unit_of_measurement = "%",
+                                             .state_class = "brightness",
+                                             .icon = "mdi:brightness-percent",
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
-  void publishConfiguration() override;
-  void republishState() override;
+  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
    * @brief Publish the brightness.
    *
    * @param brightness brightness in %.
    */
-  void publishBrightness(double brightness);
+  void publishBrightness(double brightness) { _ha_entity_sensor.publishValue(brightness); }
 
 private:
   std::string stateTopic();
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _child_object_id;
-  Configuration _configuration;
-
-private:
-  std::optional<double> _brightness;
+  HaEntitySensor _ha_entity_sensor;
 };
 
 #endif // __HA_ENTITY_BRIGHTNESS_H__
