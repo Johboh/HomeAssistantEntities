@@ -35,8 +35,8 @@ public:
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
                                              .sensor_type = HaEntitySensor::SensorType::BinarySensor,
-                                             .state_class = std::nullopt,
                                              .device_class = "motion",
+                                             .state_class = std::nullopt,
                                          })) {}
 
 public:
