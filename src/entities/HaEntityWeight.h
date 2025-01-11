@@ -57,7 +57,7 @@ public:
                  Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .unit_of_measurement = configuration.unit == Unit::kg ? "kg" : "g",
+                                             .unit_of_measurement = unit_of_measurement(configuration),
                                              .device_class = "weight",
                                              .force_update = configuration.force_update,
                                          })) {}
@@ -72,6 +72,17 @@ public:
    * @param weight weight in g or kg, depending on what was selected at construction.
    */
   void publishWeight(double weight) { _ha_entity_sensor.publishValue(weight); }
+
+private:
+  std::optional<std::string> unit_of_measurement(const Configuration &configuration) const {
+    switch (configuration.unit) {
+    case Unit::kg:
+      return "kg";
+    case Unit::g:
+      return "g";
+    }
+    return std::nullopt;
+  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

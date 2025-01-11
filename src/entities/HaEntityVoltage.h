@@ -9,13 +9,14 @@
 #include <string>
 
 /**
- * @brief Represent a Voltage sensor (V).
+ * @brief Represent a Voltage sensor (V, mV, uV).
  */
 class HaEntityVoltage : public HaEntity {
 public:
   enum class Unit {
     V,
     mV,
+    uV,
   };
 
   struct Configuration {
@@ -57,7 +58,7 @@ public:
                   Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .unit_of_measurement = configuration.unit == Unit::V ? "V" : "mV",
+                                             .unit_of_measurement = unit_of_measurement(configuration),
                                              .device_class = "voltage",
                                              .force_update = configuration.force_update,
                                          })) {}
@@ -72,6 +73,19 @@ public:
    * @param voltage voltage in mV or V, depending on what was selected at construction.
    */
   void publishVoltage(double voltage) { _ha_entity_sensor.publishValue(voltage); }
+
+private:
+  std::optional<std::string> unit_of_measurement(const Configuration &configuration) const {
+    switch (configuration.unit) {
+    case Unit::V:
+      return "V";
+    case Unit::mV:
+      return "mV";
+    case Unit::uV:
+      return "µV";
+    }
+    return std::nullopt;
+  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

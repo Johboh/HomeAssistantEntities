@@ -57,7 +57,7 @@ public:
                       Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .unit_of_measurement = configuration.unit == Unit::C ? "°C" : "°F",
+                                             .unit_of_measurement = unit_of_measurement(configuration),
                                              .device_class = "temperature",
                                              .force_update = configuration.force_update,
                                          })) {}
@@ -72,6 +72,17 @@ public:
    * @param temperature temperature in °C or °F, depending on what was selected at construction.
    */
   void publishTemperature(double temperature) { _ha_entity_sensor.publishValue(temperature); }
+
+private:
+  std::optional<std::string> unit_of_measurement(const Configuration &configuration) const {
+    switch (configuration.unit) {
+    case Unit::C:
+      return "°C";
+    case Unit::F:
+      return "°F";
+    }
+    return std::nullopt;
+  }
 
 private:
   HaEntitySensor _ha_entity_sensor;
