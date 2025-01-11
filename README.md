@@ -10,7 +10,8 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 
 ### Currently supported sensors
 - Atmospheric Preassure (hPa)
-- Binary Sensor / Boolean
+- Boolean
+- Binary sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class))
 - Brightness (%)
 - Door (open/closed)
 - Humidity (%)
@@ -43,7 +44,7 @@ Add the following to `libs_deps`:
 ```
 You also need a MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
-   johboh/MQTTRemote@^4.0.4
+   johboh/MQTTRemote@^4.0.6
    bblanchon/ArduinoJson@^7.1.0
 ```
 

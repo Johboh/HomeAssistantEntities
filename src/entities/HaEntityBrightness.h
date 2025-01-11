@@ -51,7 +51,7 @@ public:
                                              .icon = "mdi:brightness-percent",
                                              .force_update = configuration.force_update,
                                          })) {
-    _ha_entity_sensor.overrideComponentAndObjectId("sensor", "brightness");
+    _ha_entity_sensor.overrideObjectId("brightness");
   }
 
 public:

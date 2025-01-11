@@ -12,6 +12,7 @@ HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::strin
   } else {
     _object_id = "unknown_device_class";
   }
+  _component = configuration.sensor_type == SensorType::Sensor ? "sensor" : "binary_sensor";
 }
 
 void HaEntitySensor::publishConfiguration() {
@@ -22,8 +23,14 @@ void HaEntitySensor::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
-  doc["platform"] = "sensor";
-  doc["state_class"] = "measurement";
+  doc["platform"] = _component; // we have validated this to be either sensor or binary_sensor
+
+  if (_configuration.state_class) {
+    auto state_class = homeassistantentities::trim(*_configuration.state_class);
+    if (!state_class.empty()) {
+      doc["state_class"] = state_class;
+    }
+  }
   if (_configuration.device_class) {
     auto device_class = homeassistantentities::trim(*_configuration.device_class);
     if (!device_class.empty()) {
@@ -56,9 +63,4 @@ void HaEntitySensor::publishValue(std::string &value) {
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id),
                             value);
   _value = value;
-}
-
-void HaEntitySensor::overrideComponentAndObjectId(std::string component, std::string object_id) {
-  _component = component;
-  _object_id = object_id;
 }

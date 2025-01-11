@@ -51,7 +51,7 @@ public:
                                          HaEntitySensor::Configuration{
                                              .force_update = configuration.force_update,
                                          })) {
-    _ha_entity_sensor.overrideComponentAndObjectId("sensor", "json");
+    _ha_entity_sensor.overrideObjectId("json");
   }
 
 public:
