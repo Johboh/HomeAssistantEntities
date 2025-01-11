@@ -2,6 +2,7 @@
 #define __HA_ENTITY_BOOLEAN_H__
 
 #include "AttributeVariants.h"
+#include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -50,11 +51,20 @@ public:
    * @param configuration the configuration for this entity.
    */
   HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
-                  Configuration configuration = _default);
+                  Configuration configuration = _default)
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .sensor_type = HaEntitySensor::SensorType::BinarySensor,
+                                             .state_class = std::nullopt,
+                                             .with_attributes = configuration.with_attributes,
+                                             .force_update = configuration.force_update,
+                                         })) {
+    _ha_entity_sensor.overrideObjectId("boolean");
+  }
 
 public:
-  void publishConfiguration() override;
-  void republishState() override;
+  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
    * @brief Publish the boolean value for the binary sensor.
@@ -63,24 +73,19 @@ public:
    * @param value the value to publish.
    * @param attributes optional attributes to publish.
    */
-  void publishBoolean(bool value, Attributes::Map attributes = {});
+  void publishBoolean(bool value, Attributes::Map attributes = {}) {
+    _ha_entity_sensor.publishValue(value ? "ON" : "OFF", attributes);
+  }
 
   /**
    * @brief Publish attributes only. with_attributes in constructor must be set.
    *
    * @param attributes attributes to publish.
    */
-  void publishAttributes(Attributes::Map attributes);
+  void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _child_object_id;
-  Configuration _configuration;
-
-private:
-  std::optional<bool> _value;
-  std::optional<Attributes::Map> _attributes;
+  HaEntitySensor _ha_entity_sensor;
 };
 
 #endif // __HA_ENTITY_BOOLEAN_H__

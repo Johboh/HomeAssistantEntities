@@ -2,6 +2,7 @@
 #define __HA_ENTITY_STRING_H__
 
 #include "AttributeVariants.h"
+#include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -57,11 +58,20 @@ public:
    * @param configuration the configuration for this entity.
    */
   HaEntityString(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
-                 Configuration configuration = _default);
+                 Configuration configuration = _default)
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .state_class = std::nullopt,
+                                             .with_attributes = configuration.with_attributes,
+                                             .device_class = configuration.device_class,
+                                             .force_update = configuration.force_update,
+                                         })) {
+    _ha_entity_sensor.overrideObjectId("string");
+  }
 
 public:
-  void publishConfiguration() override;
-  void republishState() override;
+  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
    * @brief Publish the string.
@@ -70,25 +80,19 @@ public:
    * @param str the string to publish.
    * @param attributes optional attributes to publish.
    */
-  void publishString(std::string str, Attributes::Map attributes = {});
+  void publishString(std::string str, Attributes::Map attributes = {}) {
+    _ha_entity_sensor.publishValue(str, attributes);
+  }
 
   /**
    * @brief Publish attributes only. with_attributes in constructor must be set.
    *
    * @param attributes
    */
-  void publishAttributes(Attributes::Map attributes);
+  void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _device_class;
-  std::string _child_object_id;
-  Configuration _configuration;
-
-private:
-  std::optional<std::string> _str;
-  std::optional<Attributes::Map> _attributes;
+  HaEntitySensor _ha_entity_sensor;
 };
 
 #endif // __HA_ENTITY_STRING_H__
