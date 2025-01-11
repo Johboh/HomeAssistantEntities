@@ -37,7 +37,6 @@ public:
                                              .sensor_type = HaEntitySensor::SensorType::BinarySensor,
                                              .state_class = std::nullopt,
                                              .device_class = "door",
-                                             .force_update = configuration.force_update,
                                          })) {}
 
 public:
