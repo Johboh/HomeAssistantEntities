@@ -24,7 +24,7 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install esp32:esp32@3.0.2
           arduino-cli lib install MQTT@2.5.1
-          arduino-cli lib install MQTTRemote
+          arduino-cli lib install MQTTRemote@4.0.6
           arduino-cli lib install ArduinoJson@7.1.0
 
       - name: Install repo as library
