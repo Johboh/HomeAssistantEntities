@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_LOCK_H__
 #define __HA_ENTITY_LOCK_H__
 
+#include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -30,26 +31,28 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityLock(HaBridge &ha_bridge, std::string name, std::string child_object_id = "");
+  HaEntityLock(HaBridge &ha_bridge, std::string name, std::string child_object_id = "")
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .sensor_type = HaEntitySensor::SensorType::BinarySensor,
+                                             .state_class = std::nullopt,
+                                             .device_class = "lock",
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
-  void publishConfiguration() override;
-  void republishState() override;
+  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
    * @brief Publish the lock.
    *
    * @param locked true if lock is locked, or false if unlocked.
    */
-  void publishLock(bool locked);
+  void publishLock(bool locked) { _ha_entity_sensor.publishValue(locked ? "OFF" : "ON"); } // locked == OFF
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _child_object_id;
-
-private:
-  std::optional<bool> _locked;
+  HaEntitySensor _ha_entity_sensor;
 };
 
 #endif // __HA_ENTITY_LOCK_H__

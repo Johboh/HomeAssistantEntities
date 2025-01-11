@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_DOOR_H__
 #define __HA_ENTITY_DOOR_H__
 
+#include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -30,26 +31,28 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityDoor(HaBridge &ha_bridge, std::string name, std::string child_object_id = "");
+  HaEntityDoor(HaBridge &ha_bridge, std::string name, std::string child_object_id = "")
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .sensor_type = HaEntitySensor::SensorType::BinarySensor,
+                                             .state_class = std::nullopt,
+                                             .device_class = "door",
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
-  void publishConfiguration() override;
-  void republishState() override;
+  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
    * @brief Publish the door.
    *
    * @param open true or false if door is open or not.
    */
-  void publishDoor(bool open);
+  void publishDoor(bool open) { _ha_entity_sensor.publishValue(open ? "ON" : "OFF"); }
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _child_object_id;
-
-private:
-  std::optional<bool> _open;
+  HaEntitySensor _ha_entity_sensor;
 };
 
 #endif // __HA_ENTITY_DOOR_H__
