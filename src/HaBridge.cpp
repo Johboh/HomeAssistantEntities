@@ -1,18 +1,20 @@
 #include "HaBridge.h"
 #include <HaUtilities.h>
 
+using namespace homeassistantentities;
+
 HaBridge::HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose)
     : _verbose(verbose), _node_id(node_id), _remote(remote), _this_device_json_doc(this_device_json_doc) {}
 
 void HaBridge::publishConfiguration(std::string component, std::string object_id, std::string child_object_id,
                                     const IJsonDocument &specific_doc) {
   IJsonDocument doc;
-  doc["availability_topic"] = _remote.clientId() + "/status";
+  doc["availability_topic"] = santitizePath(_remote.clientId()) + "/status";
 
   std::string unique_id = _remote.clientId() + "_" + _node_id;
 
   auto coid = homeassistantentities::trim(child_object_id);
-  if (coid.length() > 0) {
+  if (!coid.empty()) {
     unique_id += "_" + coid;
   }
   unique_id += "_" + object_id;
@@ -28,8 +30,9 @@ void HaBridge::publishConfiguration(std::string component, std::string object_id
   }
 
   auto message = toJsonString(doc);
-  std::string topic = "homeassistant/" + component + "/" + _node_id + "/" + object_id;
-  if (coid.length() > 0) {
+  std::string topic =
+      "homeassistant/" + santitizePath(component) + "/" + santitizePath(_node_id) + "/" + santitizePath(object_id);
+  if (!coid.empty()) {
     topic += "_" + coid;
   }
   topic += "/config";
@@ -46,13 +49,13 @@ bool HaBridge::publishMessage(std::string topic, std::string message, bool retai
 
 std::string HaBridge::getTopic(TopicType topic_type, std::string component, std::string object_id,
                                std::string child_object_id) {
-  auto str = _node_id + "/" + component + "/" + object_id;
+  auto str = santitizePath(_node_id) + "/" + santitizePath(component) + "/" + santitizePath(object_id);
 
-  auto coid = homeassistantentities::trim(child_object_id);
-  if (coid.length() > 0) {
-    str += "/" + coid;
+  auto coid = trim(child_object_id);
+  if (!coid.empty()) {
+    str += "/" + santitizePath(coid);
   }
-  str += "/" + topicType(topic_type);
+  str += "/" + santitizePath(topicType(topic_type));
   return str;
 }
 
