@@ -10,8 +10,8 @@
 #include <IJson.h>
 #include <MQTTRemote.h>
 #include <entities/HaEntityBrightness.h>
+#include <entities/HaEntitySensor.h>
 #include <entities/HaEntityTemperature.h>
-#include <entities/haEntitySensor.h>
 #ifdef ESP32
 #include <WiFi.h>
 #elif ESP8266

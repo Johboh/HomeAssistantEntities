@@ -1,9 +1,9 @@
 #ifndef __HA_ENTITY_BRIGHTNESS_H__
 #define __HA_ENTITY_BRIGHTNESS_H__
 
-#include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <HaEntitySensor.h>
 #include <cstdint>
 #include <optional>
 #include <string>

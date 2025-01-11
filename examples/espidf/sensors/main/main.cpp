@@ -3,8 +3,8 @@
 #include <MQTTRemote.h>
 #include <driver/gpio.h>
 #include <entities/HaEntityBrightness.h>
+#include <entities/HaEntitySensor.h>
 #include <entities/HaEntityTemperature.h>
-#include <entities/haEntitySensor.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
