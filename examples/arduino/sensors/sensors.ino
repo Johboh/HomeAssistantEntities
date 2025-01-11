@@ -59,11 +59,12 @@ HaEntityBrightness _ha_entity_brightness(ha_bridge, "brightness");
 HaEntityTemperature _ha_entity_temperature_inside(ha_bridge, "temperature inside", "kitchen_temperature_inside");
 HaEntityTemperature _ha_entity_temperature_outside(ha_bridge, "temperature outside", "kitchen_temperature_outside");
 // Generic sensor when any other sensor does not fit.
+using namespace homeassistantentities::Sensor::DeviceClass;
 HaEntitySensor::Configuration _generic_sensor_cfg = {
-    .unit_of_measurement = "dBA",
-    .device_class = "sound_pressure",
+    .unit_of_measurement = Precipitation::unit_of_measurement(Precipitation::Unit::mm),
+    .device_class = Precipitation::DEVICE_CLASS,
 };
-HaEntitySensor _ha_entity_generic_sensor(ha_bridge, "Sound preassure", "", _generic_sensor_cfg);
+HaEntitySensor _ha_entity_generic_sensor(ha_bridge, "Precipitation", "", _generic_sensor_cfg);
 
 unsigned long _last_publish_ms = 0;
 

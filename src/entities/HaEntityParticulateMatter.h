@@ -1,12 +1,15 @@
 #ifndef __HA_ENTITY_PARTICULATE_MATTER_H__
 #define __HA_ENTITY_PARTICULATE_MATTER_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
 #include <optional>
 #include <string>
+
+using namespace homeassistantentities::Sensor::DeviceClass;
 
 /**
  * @brief Represent a patriculate matter sensor (e.g. PMS5003), μg/m³.
@@ -56,12 +59,13 @@ public:
    */
   HaEntityParticulateMatter(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                             Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .unit_of_measurement = "µg/m³",
-                                             .device_class = device_class(configuration),
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(HaEntitySensor(
+            ha_bridge, name, child_object_id,
+            HaEntitySensor::Configuration{
+                .unit_of_measurement = unit_of_measurement(Pm1::Unit::ug_m3), // all have same size, cheating a bit.
+                .device_class = device_class(configuration),
+                .force_update = configuration.force_update,
+            })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -78,11 +82,11 @@ private:
   std::optional<std::string> device_class(const Configuration &configuration) const {
     switch (configuration.size) {
     case Size::pm1:
-      return "pm1";
+      return Pm1::DEVICE_CLASS;
     case Size::pm25:
-      return "pm25";
+      return Pm25::DEVICE_CLASS;
     case Size::pm10:
-      return "pm10";
+      return Pm10::DEVICE_CLASS;
     }
     return std::nullopt;
   }

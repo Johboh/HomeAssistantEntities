@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_TEMPERATURE_H__
 #define __HA_ENTITY_TEMPERATURE_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
@@ -8,21 +9,18 @@
 #include <optional>
 #include <string>
 
+using namespace homeassistantentities::Sensor::DeviceClass;
+
 /**
- * @brief Represent a Temperature sensor (°C or °F).
+ * @brief Represent a Temperature sensor (see homeassistantentities::Sensor::DeviceClass::Temperature:Unit).
  */
 class HaEntityTemperature : public HaEntity {
 public:
-  enum class Unit {
-    C,
-    F,
-  };
-
   struct Configuration {
     /**
      * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
      */
-    Unit unit = Unit::C;
+    Temperature::Unit unit = Temperature::Unit::C;
 
     /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
@@ -32,7 +30,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.unit = Unit::C, .force_update = false};
+  inline static Configuration _default = {.unit = Temperature::Unit::C, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Temperature object
@@ -55,12 +53,13 @@ public:
    */
   HaEntityTemperature(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                       Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .unit_of_measurement = unit_of_measurement(configuration),
-                                             .device_class = "temperature",
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(
+            HaEntitySensor(ha_bridge, name, child_object_id,
+                           HaEntitySensor::Configuration{
+                               .unit_of_measurement = Temperature::unit_of_measurement(configuration.unit),
+                               .device_class = Temperature::DEVICE_CLASS,
+                               .force_update = configuration.force_update,
+                           })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -69,20 +68,9 @@ public:
   /**
    * @brief Publish the temperature.
    *
-   * @param temperature temperature in °C or °F, depending on what was selected at construction.
+   * @param temperature temperature in the unit specified in the configuration.
    */
   void publishTemperature(double temperature) { _ha_entity_sensor.publishValue(temperature); }
-
-private:
-  std::optional<std::string> unit_of_measurement(const Configuration &configuration) const {
-    switch (configuration.unit) {
-    case Unit::C:
-      return "°C";
-    case Unit::F:
-      return "°F";
-    }
-    return std::nullopt;
-  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

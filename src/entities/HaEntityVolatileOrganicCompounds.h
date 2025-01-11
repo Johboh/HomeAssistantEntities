@@ -1,12 +1,15 @@
 #ifndef __HA_ENTITY_VOLATILE_ORGANIC_COMPOUNDS_H__
 #define __HA_ENTITY_VOLATILE_ORGANIC_COMPOUNDS_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
 #include <optional>
 #include <string>
+
+using namespace homeassistantentities::Sensor::DeviceClass;
 
 /**
  * @brief Represent a volatile organic compounds sensor, concentration in μg/m³ or parts in ppb/parts per billion.
@@ -78,18 +81,18 @@ private:
   std::optional<std::string> unit_of_measurement(const Configuration &configuration) const {
     switch (configuration.unit) {
     case Unit::Concentration:
-      return "µg/m³";
+      return VolatileOrganicCompounds::unit_of_measurement(VolatileOrganicCompounds::Unit::ug_m3);
     case Unit::Parts:
-      return "ppb";
+      return VolatileOrganicCompoundsParts::unit_of_measurement(VolatileOrganicCompoundsParts::Unit::ppb);
     }
     return std::nullopt;
   }
   std::optional<std::string> device_class(const Configuration &configuration) const {
     switch (configuration.unit) {
     case Unit::Concentration:
-      return "volatile_organic_compounds";
+      return VolatileOrganicCompounds::DEVICE_CLASS;
     case Unit::Parts:
-      return "volatile_organic_compounds_parts";
+      return VolatileOrganicCompoundsParts::DEVICE_CLASS;
     }
     return std::nullopt;
   }

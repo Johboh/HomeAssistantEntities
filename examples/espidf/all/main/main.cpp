@@ -56,6 +56,8 @@ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_pas
 // See constructor of HaBridge for more documentation.
 HaBridge ha_bridge(_mqtt_remote, "kitchen", _json_this_device_doc);
 
+using namespace homeassistantentities::Sensor::DeviceClass;
+
 // ALl entities.
 HaEntityAtmosphericPressure _ha_entity_atm(ha_bridge, "Pressure", "kitchen_pressure",
                                            HaEntityAtmosphericPressure::Configuration{.force_update = false});
@@ -89,17 +91,18 @@ HaEntitySelect _ha_entity_select(ha_bridge, "Select", "kitchen_select",
                                  HaEntitySelect::Configuration{.options = {"option1", "option2"}, .retain = false});
 HaEntitySound _ha_entity_sound(ha_bridge, "Sound", "kitchen_sound");
 HaEntitySensor _ha_entity_sensor(ha_bridge, "Sensor", "kitchen_sensor",
-                                 HaEntitySensor::Configuration{.sensor_type = HaEntitySensor::SensorType::Sensor,
-                                                               .unit_of_measurement = "dBA",
-                                                               .device_class = "sound_pressure",
-                                                               .with_attributes = false,
-                                                               .force_update = false});
+                                 HaEntitySensor::Configuration{
+                                     .sensor_type = HaEntitySensor::SensorType::Sensor,
+                                     .unit_of_measurement = Precipitation::unit_of_measurement(Precipitation::Unit::mm),
+                                     .device_class = Precipitation::DEVICE_CLASS,
+                                     .with_attributes = false,
+                                     .force_update = false});
 HaEntityString _ha_entity_string(ha_bridge, "String", "kitchen_string",
                                  HaEntityString::Configuration{
                                      .device_class = "enum", .with_attributes = false, .force_update = false});
 HaEntitySwitch _ha_entity_switch(ha_bridge, "Switch", "kitchen_switch", HaEntitySwitch::Configuration{.retain = false});
 HaEntityTemperature _ha_entity_temperature(ha_bridge, "Temperature", "kitchen_temperature",
-                                           HaEntityTemperature::Configuration{.unit = HaEntityTemperature::Unit::C,
+                                           HaEntityTemperature::Configuration{.unit = Temperature::Unit::C,
                                                                               .force_update = false});
 HaEntityText _ha_entity_text(ha_bridge, "Text", "kitchen_text",
                              HaEntityText::Configuration{.min_text_length = 0,
@@ -113,11 +116,9 @@ HaEntityVolatileOrganicCompounds _ha_entity_volatile_organic_compounds(
     HaEntityVolatileOrganicCompounds::Configuration{.unit = HaEntityVolatileOrganicCompounds::Unit::Concentration,
                                                     .force_update = false});
 HaEntityVoltage _ha_entity_voltage(ha_bridge, "Voltage", "kitchen_voltage",
-                                   HaEntityVoltage::Configuration{.unit = HaEntityVoltage::Unit::mV,
-                                                                  .force_update = false});
+                                   HaEntityVoltage::Configuration{.unit = Voltage::Unit::mV, .force_update = false});
 HaEntityWeight _ha_entity_weight(ha_bridge, "Weight", "kitchen_weight",
-                                 HaEntityWeight::Configuration{.unit = HaEntityWeight::Unit::kg,
-                                                               .force_update = false});
+                                 HaEntityWeight::Configuration{.unit = Weight::Unit::kg, .force_update = false});
 
 void haStateTask(void *pvParameters) {
   nlohmann::json jsn;

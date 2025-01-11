@@ -1,12 +1,15 @@
 #ifndef __HA_ENTITY_SOUND_H__
 #define __HA_ENTITY_SOUND_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
 #include <optional>
 #include <string>
+
+using namespace homeassistantentities::BinarySensor::DeviceClass;
 
 /**
  * @brief Represent a Sound binary sensor (if a sound is detected or not).
@@ -35,7 +38,7 @@ public:
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
                                              .sensor_type = HaEntitySensor::SensorType::BinarySensor,
-                                             .device_class = "sound",
+                                             .device_class = Sound::DEVICE_CLASS,
                                              .state_class = std::nullopt,
                                          })) {}
 

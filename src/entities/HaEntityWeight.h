@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_WEIGHT_H__
 #define __HA_ENTITY_WEIGHT_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
@@ -8,21 +9,18 @@
 #include <optional>
 #include <string>
 
+using namespace homeassistantentities::Sensor::DeviceClass;
+
 /**
- * @brief Represent a Weight sensor (g or kg).
+ * @brief Represent a Weight sensor (see homeassistantentities::Sensor::DeviceClass::Weight:Unit).
  */
 class HaEntityWeight : public HaEntity {
 public:
-  enum class Unit {
-    g,
-    kg,
-  };
-
   struct Configuration {
     /**
      * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
      */
-    Unit unit = Unit::kg;
+    Weight::Unit unit = Weight::Unit::kg;
 
     /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
@@ -32,7 +30,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.unit = Unit::kg, .force_update = false};
+  inline static Configuration _default = {.unit = Weight::Unit::kg, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Weight object
@@ -57,8 +55,8 @@ public:
                  Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .unit_of_measurement = unit_of_measurement(configuration),
-                                             .device_class = "weight",
+                                             .unit_of_measurement = Weight::unit_of_measurement(configuration.unit),
+                                             .device_class = Weight::DEVICE_CLASS,
                                              .force_update = configuration.force_update,
                                          })) {}
 
@@ -69,20 +67,9 @@ public:
   /**
    * @brief Publish the weight.
    *
-   * @param weight weight in g or kg, depending on what was selected at construction.
+   * @param weight weight in the unit specified in the configuration.
    */
   void publishWeight(double weight) { _ha_entity_sensor.publishValue(weight); }
-
-private:
-  std::optional<std::string> unit_of_measurement(const Configuration &configuration) const {
-    switch (configuration.unit) {
-    case Unit::kg:
-      return "kg";
-    case Unit::g:
-      return "g";
-    }
-    return std::nullopt;
-  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

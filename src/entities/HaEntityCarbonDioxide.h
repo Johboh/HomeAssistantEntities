@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_CARBON_DIOXIDE_H__
 #define __HA_ENTITY_CARBON_DIOXIDE_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
@@ -8,8 +9,11 @@
 #include <optional>
 #include <string>
 
+using namespace homeassistantentities::Sensor::DeviceClass;
+
 /**
- * @brief Represent a Carbon Dioxide sensor (e.g. SGP30), ppm/parts per million.
+ * @brief Represent a Carbon Dioxide sensor (e.g. SGP30) (see
+ * homeassistantentities::Sensor::DeviceClass::CarbonDioxide:Unit).
  */
 class HaEntityCarbonDioxide : public HaEntity {
 public:
@@ -45,12 +49,13 @@ public:
    */
   HaEntityCarbonDioxide(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                         Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .unit_of_measurement = "ppm",
-                                             .device_class = "carbon_dioxide",
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(
+            HaEntitySensor(ha_bridge, name, child_object_id,
+                           HaEntitySensor::Configuration{
+                               .unit_of_measurement = CarbonDioxide::unit_of_measurement(CarbonDioxide::Unit::ppm),
+                               .device_class = CarbonDioxide::DEVICE_CLASS,
+                               .force_update = configuration.force_update,
+                           })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }

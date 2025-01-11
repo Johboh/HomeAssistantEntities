@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_VOLTAGE_H__
 #define __HA_ENTITY_VOLTAGE_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
@@ -8,22 +9,18 @@
 #include <optional>
 #include <string>
 
+using namespace homeassistantentities::Sensor::DeviceClass;
+
 /**
- * @brief Represent a Voltage sensor (V, mV, uV).
+ * @brief Represent a Voltage sensor (see homeassistantentities::Sensor::DeviceClass::Voltage:Unit).
  */
 class HaEntityVoltage : public HaEntity {
 public:
-  enum class Unit {
-    V,
-    mV,
-    uV,
-  };
-
   struct Configuration {
     /**
      * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
      */
-    Unit unit = Unit::V;
+    Voltage::Unit unit = Voltage::Unit::V;
 
     /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
@@ -33,7 +30,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.unit = Unit::V, .force_update = false};
+  inline static Configuration _default = {.unit = Voltage::Unit::V, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Voltage object
@@ -58,8 +55,8 @@ public:
                   Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .unit_of_measurement = unit_of_measurement(configuration),
-                                             .device_class = "voltage",
+                                             .unit_of_measurement = Voltage::unit_of_measurement(configuration.unit),
+                                             .device_class = Voltage::DEVICE_CLASS,
                                              .force_update = configuration.force_update,
                                          })) {}
 
@@ -70,22 +67,9 @@ public:
   /**
    * @brief Publish the voltage.
    *
-   * @param voltage voltage in mV or V, depending on what was selected at construction.
+   * @param voltage voltage in the unit specified in the configuration.
    */
   void publishVoltage(double voltage) { _ha_entity_sensor.publishValue(voltage); }
-
-private:
-  std::optional<std::string> unit_of_measurement(const Configuration &configuration) const {
-    switch (configuration.unit) {
-    case Unit::V:
-      return "V";
-    case Unit::mV:
-      return "mV";
-    case Unit::uV:
-      return "µV";
-    }
-    return std::nullopt;
-  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

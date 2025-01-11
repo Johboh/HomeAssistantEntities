@@ -1,6 +1,7 @@
 #ifndef __HA_ENTITY_ATMOSPHERIC_PRESSURE_H__
 #define __HA_ENTITY_ATMOSPHERIC_PRESSURE_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
@@ -8,12 +9,20 @@
 #include <optional>
 #include <string>
 
+using namespace homeassistantentities::Sensor::DeviceClass;
+
 /**
- * @brief Represent a Atmospheric pressure sensor (hPa).
+ * @brief Represent a Atmospheric pressure sensor (see
+ * homeassistantentities::Sensor::DeviceClass::AtmosphericPressure:Unit).
  */
 class HaEntityAtmosphericPressure : public HaEntity {
 public:
   struct Configuration {
+    /**
+     * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
+     */
+    AtmosphericPressure::Unit unit = AtmosphericPressure::Unit::hPa;
+
     /**
      * @brief In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
      * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
@@ -22,7 +31,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.force_update = false};
+  inline static Configuration _default = {.unit = AtmosphericPressure::Unit::hPa, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity AtmosphericPressure object
@@ -45,12 +54,13 @@ public:
    */
   HaEntityAtmosphericPressure(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                               Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .unit_of_measurement = "hPa",
-                                             .device_class = "atmospheric_pressure",
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(
+            HaEntitySensor(ha_bridge, name, child_object_id,
+                           HaEntitySensor::Configuration{
+                               .unit_of_measurement = AtmosphericPressure::unit_of_measurement(configuration.unit),
+                               .device_class = AtmosphericPressure::DEVICE_CLASS,
+                               .force_update = configuration.force_update,
+                           })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -59,7 +69,7 @@ public:
   /**
    * @brief Publish the pressure.
    *
-   * @param pressure pressure in hPa.
+   * @param pressure pressure in the unit specified in the configuration.
    */
   void publishAtmosphericPressure(double pressure) { _ha_entity_sensor.publishValue(pressure); }
 

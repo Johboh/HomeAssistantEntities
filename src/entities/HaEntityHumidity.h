@@ -1,12 +1,15 @@
 #ifndef __HA_ENTITY_HUMIDITY_H__
 #define __HA_ENTITY_HUMIDITY_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
 #include <optional>
 #include <string>
+
+using namespace homeassistantentities::Sensor::DeviceClass;
 
 /**
  * @brief Represent a Air humidity sensor (%).
@@ -45,12 +48,13 @@ public:
    */
   HaEntityHumidity(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                    Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .unit_of_measurement = "%",
-                                             .device_class = "humidity",
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(
+            HaEntitySensor(ha_bridge, name, child_object_id,
+                           HaEntitySensor::Configuration{
+                               .unit_of_measurement = Humidity::unit_of_measurement(Humidity::Unit::Percent),
+                               .device_class = Humidity::DEVICE_CLASS,
+                               .force_update = configuration.force_update,
+                           })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }

@@ -1,12 +1,15 @@
 #ifndef __HA_ENTITY_LOCK_H__
 #define __HA_ENTITY_LOCK_H__
 
+#include "HaDeviceClasses.h"
 #include "HaEntitySensor.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
 #include <optional>
 #include <string>
+
+using namespace homeassistantentities::BinarySensor::DeviceClass;
 
 /**
  * @brief Represent a Lock binary sensor (if a lock is locked or unlocked).
@@ -35,7 +38,7 @@ public:
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
                                              .sensor_type = HaEntitySensor::SensorType::BinarySensor,
-                                             .device_class = "lock",
+                                             .device_class = Lock::DEVICE_CLASS,
                                              .state_class = std::nullopt,
                                          })) {}
 
