@@ -33,7 +33,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.unit = Unit::C, .force_update = false};
+  inline static Configuration _default = {.unit = Unit::dL, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Unit Concentration object
