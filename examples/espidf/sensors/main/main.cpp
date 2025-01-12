@@ -43,11 +43,11 @@ HaEntityTemperature _ha_entity_temperature_outside(ha_bridge, "temperature outsi
 
 // Precipitation sensor using the generic sensor, as there is no specific class for precipitation (yet).
 homeassistantentities::Sensor::Precipitation _precipitation;
-HaEntitySensor::Configuration _generic_sensor_cfg = {
-    .device_class = _precipitation,
-    .unit_of_measurement = Precipitation::Unit::mm,
-};
-HaEntitySensor _ha_entity_generic_sensor(ha_bridge, "precipitation", std::nullopt, _generic_sensor_cfg);
+HaEntitySensor _ha_entity_generic_sensor(ha_bridge, "precipitation", std::nullopt,
+                                         {
+                                             .device_class = _precipitation,
+                                             .unit_of_measurement = Precipitation::Unit::mm,
+                                         });
 
 void haStateTask(void *pvParameters) {
   while (1) {

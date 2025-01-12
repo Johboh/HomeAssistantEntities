@@ -58,68 +58,54 @@ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_pas
 HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc);
 
 // ALl entities.
-HaEntityAtmosphericPressure _ha_entity_atm(ha_bridge, "pressure", std::nullopt,
-                                           HaEntityAtmosphericPressure::Configuration{.force_update = false});
-HaEntityBoolean _ha_entity_bool(ha_bridge, "bool", std::nullopt,
-                                HaEntityBoolean::Configuration{.with_attributes = false, .force_update = false});
-HaEntityBrightness _ha_entity_bright(ha_bridge, "brightness", std::nullopt,
-                                     HaEntityBrightness::Configuration{.force_update = false});
+HaEntityAtmosphericPressure _ha_entity_atm(ha_bridge, "pressure", std::nullopt, {.force_update = false});
+HaEntityBoolean _ha_entity_bool(ha_bridge, "bool", std::nullopt, {.with_attributes = false, .force_update = false});
+HaEntityBrightness _ha_entity_bright(ha_bridge, "brightness", std::nullopt, {.force_update = false});
 HaEntityButton _ha_entity_button(ha_bridge, "button", "");
 HaEntityCarbonDioxide _ha_entity_carbon_dioxide(ha_bridge, "Carbon dioxide");
 HaEntityCurtain _ha_entity_curtain(ha_bridge, "curtain", "left_window");
 HaEntityDoor _ha_entity_door(ha_bridge, "door", "");
 HaEntityEvent _ha_entity_event(ha_bridge, "event", "party",
-                               HaEntityEvent::Configuration{.event_types = {"button_press"},
-                                                            .device_class = HaEntityEvent::DeviceClass::Button});
-HaEntityHumidity _ha_entity_humidity(ha_bridge, "humidity", std::nullopt,
-                                     HaEntityHumidity::Configuration{.force_update = false});
-HaEntityJson _ha_entity_json(ha_bridge, "json", std::nullopt, HaEntityJson::Configuration{.force_update = false});
+                               {.event_types = {"button_press"}, .device_class = HaEntityEvent::DeviceClass::Button});
+HaEntityHumidity _ha_entity_humidity(ha_bridge, "humidity", std::nullopt, {.force_update = false});
+HaEntityJson _ha_entity_json(ha_bridge, "json", std::nullopt, {.force_update = false});
 HaEntityLight
     _ha_entity_light(ha_bridge, "light", "roof",
-                     HaEntityLight::Configuration{
-                         .with_brightness = false, .with_rgb_color = false, .effects = {"colorloop"}, .retain = false});
+                     {.with_brightness = false, .with_rgb_color = false, .effects = {"colorloop"}, .retain = false});
 HaEntityLock _ha_entity_lock(ha_bridge, "lock");
 HaEntityMotion _ha_entity_motion(ha_bridge, "motion");
 HaEntityNumber _ha_entity_number(ha_bridge, "number", "danceability",
-                                 HaEntityNumber::Configuration{
-                                     .min_value = 0, .max_value = 100, .force_update = false, .retain = false});
+                                 {.min_value = 0, .max_value = 100, .force_update = false, .retain = false});
 HaEntityParticulateMatter _ha_entity_particulate_matter(ha_bridge, "Particulate matter", std::nullopt,
-                                                        HaEntityParticulateMatter::Configuration{
-                                                            .size = HaEntityParticulateMatter::Size::pm25});
-HaEntitySelect _ha_entity_select(ha_bridge, "select", "playlist",
-                                 HaEntitySelect::Configuration{.options = {"option1", "option2"}, .retain = false});
+                                                        {.size = HaEntityParticulateMatter::Size::pm25});
+HaEntitySelect _ha_entity_select(ha_bridge, "select", "playlist", {.options = {"option1", "option2"}, .retain = false});
 HaEntitySound _ha_entity_sound(ha_bridge, "sound", "");
 homeassistantentities::Sensor::Precipitation _precipitation;
 HaEntitySensor _ha_entity_sensor(ha_bridge, "sensor", std::nullopt,
-                                 HaEntitySensor::Configuration{.device_class = _precipitation,
-                                                               .unit_of_measurement = Precipitation::Unit::mm,
-                                                               .with_attributes = false,
-                                                               .force_update = false});
+                                 {.device_class = _precipitation,
+                                  .unit_of_measurement = Precipitation::Unit::mm,
+                                  .with_attributes = false,
+                                  .force_update = false});
 HaEntityString _ha_entity_string(ha_bridge, "string", std::nullopt,
-                                 HaEntityString::Configuration{
-                                     .device_class = "enum", .with_attributes = false, .force_update = false});
-HaEntitySwitch _ha_entity_switch(ha_bridge, "switch", "party", HaEntitySwitch::Configuration{.retain = false});
+                                 {.device_class = "enum", .with_attributes = false, .force_update = false});
+HaEntitySwitch _ha_entity_switch(ha_bridge, "switch", "party", {.retain = false});
 HaEntityTemperature _ha_entity_temperature(ha_bridge, "temperature", std::nullopt,
-                                           HaEntityTemperature::Configuration{.unit = Temperature::Unit::C,
-                                                                              .force_update = false});
+                                           {.unit = Temperature::Unit::C, .force_update = false});
 HaEntityText _ha_entity_text(ha_bridge, "text", "billboard",
-                             HaEntityText::Configuration{.min_text_length = 0,
-                                                         .max_text_length = 255,
-                                                         .with_state_topic = false,
-                                                         .is_password = false,
-                                                         .force_update = false,
-                                                         .retain = false});
+                             {.min_text_length = 0,
+                              .max_text_length = 255,
+                              .with_state_topic = false,
+                              .is_password = false,
+                              .force_update = false,
+                              .retain = false});
 HaEntityUnitConcentration _ha_entity_unit_concentration(ha_bridge, "concentration", std::nullopt,
-                                                        HaEntityUnitConcentration::Configuration{
-                                                            .unit = HaEntityUnitConcentration::Unit::mL});
+                                                        {.unit = HaEntityUnitConcentration::Unit::mL});
 HaEntityVolatileOrganicCompounds _ha_entity_volatile_organic_compounds(
     ha_bridge, "volatile organic compounds", std::nullopt,
-    HaEntityVolatileOrganicCompounds::Configuration{.unit = HaEntityVolatileOrganicCompounds::Unit::Concentration,
-                                                    .force_update = false});
+    {.unit = HaEntityVolatileOrganicCompounds::Unit::Concentration, .force_update = false});
 HaEntityVoltage _ha_entity_voltage(ha_bridge, "voltage", std::nullopt,
-                                   HaEntityVoltage::Configuration{.unit = Voltage::Unit::mV, .force_update = false});
-HaEntityWeight _ha_entity_weight(ha_bridge, "weight", std::nullopt,
-                                 HaEntityWeight::Configuration{.unit = Weight::Unit::kg, .force_update = false});
+                                   {.unit = Voltage::Unit::mV, .force_update = false});
+HaEntityWeight _ha_entity_weight(ha_bridge, "weight", std::nullopt, {.unit = Weight::Unit::kg, .force_update = false});
 
 void haStateTask(void *pvParameters) {
   nlohmann::json jsn;
