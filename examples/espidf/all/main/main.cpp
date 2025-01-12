@@ -58,7 +58,8 @@ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_pas
 HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc);
 
 // ALl entities.
-HaEntityAtmosphericPressure _ha_entity_atm(ha_bridge, "pressure", std::nullopt, {.force_update = false});
+HaEntityAtmosphericPressure _ha_entity_atm(ha_bridge, "pressure", std::nullopt,
+                                           HaEntityAtmosphericPressure::Configuration{.force_update = false});
 HaEntityBoolean _ha_entity_bool(ha_bridge, "bool", std::nullopt, {.with_attributes = false, .force_update = false});
 HaEntityBrightness _ha_entity_bright(ha_bridge, "brightness", std::nullopt, {.force_update = false});
 HaEntityButton _ha_entity_button(ha_bridge, "button", "");
@@ -82,10 +83,10 @@ HaEntitySelect _ha_entity_select(ha_bridge, "select", "playlist", {.options = {"
 HaEntitySound _ha_entity_sound(ha_bridge, "sound", "");
 homeassistantentities::Sensor::Precipitation _precipitation;
 HaEntitySensor _ha_entity_sensor(ha_bridge, "sensor", std::nullopt,
-                                 {.device_class = _precipitation,
-                                  .unit_of_measurement = Precipitation::Unit::mm,
-                                  .with_attributes = false,
-                                  .force_update = false});
+                                 HaEntitySensor::Configuration{.device_class = _precipitation,
+                                                               .unit_of_measurement = Precipitation::Unit::mm,
+                                                               .with_attributes = false,
+                                                               .force_update = false});
 HaEntityString _ha_entity_string(ha_bridge, "string", std::nullopt,
                                  {.device_class = "enum", .with_attributes = false, .force_update = false});
 HaEntitySwitch _ha_entity_switch(ha_bridge, "switch", "party", {.retain = false});
