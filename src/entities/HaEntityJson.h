@@ -9,6 +9,8 @@
 #include <optional>
 #include <string>
 
+using namespace homeassistantentities::Sensor::Undefined;
+
 /**
  * @brief Represent a raw JSON sensor with a state topic on which you post your JSON.
  * Also see [HaEntitystd::string] which is very similar. TODO(johboh): merge?
@@ -45,14 +47,13 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityJson(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityJson(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
+                                             .device_class = _json,
                                              .force_update = configuration.force_update,
-                                         })) {
-    _ha_entity_sensor.overrideObjectId("json");
-  }
+                                         })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -69,6 +70,7 @@ public:
   }
 
 private:
+  const Json _json;
   HaEntitySensor _ha_entity_sensor;
 };
 

@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor::DeviceClass;
+using namespace homeassistantentities::Sensor;
 
 /**
  * @brief Represent a patriculate matter sensor (e.g. PMS5003), μg/m³.
@@ -57,15 +57,15 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityParticulateMatter(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityParticulateMatter(HaBridge &ha_bridge, std::string name,
+                            std::optional<std::string> child_object_id = std::nullopt,
                             Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(
-            ha_bridge, name, child_object_id,
-            HaEntitySensor::Configuration{
-                .unit_of_measurement = unit_of_measurement(Pm1::Unit::ug_m3), // all have same size, cheating a bit.
-                .device_class = device_class(configuration),
-                .force_update = configuration.force_update,
-            })) {}
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .device_class = deviceClass(configuration),
+                                             .unit_of_measurement = unitOfMeasurement(configuration),
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -79,19 +79,34 @@ public:
   void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
 
 private:
-  std::optional<std::string> device_class(const Configuration &configuration) const {
+  const DeviceClass &deviceClass(const Configuration &configuration) const {
     switch (configuration.size) {
     case Size::pm1:
-      return Pm1::DEVICE_CLASS;
+      return _pm1;
     case Size::pm25:
-      return Pm25::DEVICE_CLASS;
+      return _pm25;
     case Size::pm10:
-      return Pm10::DEVICE_CLASS;
+      return _pm10;
+    }
+    return _pm10; // noop
+  }
+
+  const std::optional<UnitType> unitOfMeasurement(const Configuration &configuration) const {
+    switch (configuration.size) {
+    case Size::pm1:
+      return Pm1::Unit::ug_m3;
+    case Size::pm25:
+      return Pm25::Unit::ug_m3;
+    case Size::pm10:
+      return Pm10::Unit::ug_m3;
     }
     return std::nullopt;
   }
 
 private:
+  const Pm1 _pm1;
+  const Pm25 _pm25;
+  const Pm10 _pm10;
   HaEntitySensor _ha_entity_sensor;
 };
 

@@ -9,10 +9,10 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor::DeviceClass;
+using namespace homeassistantentities::Sensor;
 
 /**
- * @brief Represent a Temperature sensor (see homeassistantentities::Sensor::DeviceClass::Temperature:Unit).
+ * @brief Represent a Temperature sensor (see homeassistantentities::Sensor::Temperature:Unit in HaDeviceClasses.h).
  */
 class HaEntityTemperature : public HaEntity {
 public:
@@ -51,15 +51,14 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityTemperature(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityTemperature(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                       Configuration configuration = _default)
-      : _ha_entity_sensor(
-            HaEntitySensor(ha_bridge, name, child_object_id,
-                           HaEntitySensor::Configuration{
-                               .unit_of_measurement = Temperature::unit_of_measurement(configuration.unit),
-                               .device_class = Temperature::DEVICE_CLASS,
-                               .force_update = configuration.force_update,
-                           })) {}
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .device_class = _temperature,
+                                             .unit_of_measurement = configuration.unit,
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -73,6 +72,7 @@ public:
   void publishTemperature(double temperature) { _ha_entity_sensor.publishValue(temperature); }
 
 private:
+  const Temperature _temperature;
   HaEntitySensor _ha_entity_sensor;
 };
 

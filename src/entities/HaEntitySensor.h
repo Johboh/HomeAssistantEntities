@@ -2,11 +2,14 @@
 #define __HA_ENTITY_SENSOR_H__
 
 #include "AttributeVariants.h"
+#include "HaDeviceClasses.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
 #include <optional>
 #include <string>
+
+using namespace homeassistantentities;
 
 /**
  * @brief A generic sensor/binary sensor. Consider using any of the specific sensors first, like HaEntityTemperature,
@@ -14,27 +17,17 @@
  */
 class HaEntitySensor : public HaEntity {
 public:
-  enum class SensorType {
-    Sensor,       // A sensor with a numeric or string value
-    BinarySensor, // A sensor with a boolean value (ON/OFF)
-  };
-
   struct Configuration {
     /**
-     * @brief The type of sensor. See enum.
+     * @brief The Device class to use. One of the classes in HaDeviceClasses.h.
      */
-    SensorType sensor_type = SensorType::Sensor;
+    const DeviceClass &device_class;
 
     /**
-     * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
+     * @brief The unit of measurement to use from the sensor. Should be a unit provided by the Device class, or
+     * std::nullopt if no unit.
      */
-    std::optional<std::string> unit_of_measurement = std::nullopt;
-
-    /**
-     * @brief the device class to use for this sensor. See
-     * https://www.home-assistant.io/integrations/sensor/#device-class for valid values.
-     */
-    std::optional<std::string> device_class = std::nullopt;
+    std::optional<UnitType> unit_of_measurement = std::nullopt;
 
     /**
      * @brief The state class to use for this sensor. See
@@ -62,14 +55,6 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.sensor_type = SensorType::Sensor,
-                                          .unit_of_measurement = std::nullopt,
-                                          .device_class = std::nullopt,
-                                          .state_class = "measurement",
-                                          .with_attributes = false,
-                                          .icon = std::nullopt,
-                                          .force_update = false};
-
   /**
    * @brief Construct a new Ha Entity Sensor object
    *
@@ -89,8 +74,8 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable).
    * @param configuration the configuration for this entity.
    */
-  HaEntitySensor(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
-                 Configuration configuration = _default);
+  HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id,
+                 Configuration configuration);
 
 public:
   void publishConfiguration() override;
@@ -118,13 +103,6 @@ public:
    * @param attributes attributes to publish.
    */
   void publishAttributes(Attributes::Map attributes);
-
-  /**
-   * @brief Use with caution! In rare cases, there might be a need to override the object ID used for
-   * a sensor. This must be called before any configuration or values are published.
-   *
-   */
-  void overrideObjectId(std::string object_id) { _object_id = object_id; }
 
 private:
   std::string _name;

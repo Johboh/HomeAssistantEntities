@@ -1,1453 +1,1996 @@
 #pragma once
 
+#include "HaUtilities.h"
 #include <optional>
 #include <string>
 
 namespace homeassistantentities {
 
-namespace Sensor {
+using UnitType = int;
+
+class DeviceClass {
+public:
+  enum class SensorType {
+    Sensor,       // A sensor with a numeric or string value
+    BinarySensor, // A sensor with a boolean value (ON/OFF)
+  };
+
+public:
+  virtual ~DeviceClass() = default;
+  virtual SensorType sensorType() const = 0;
+  virtual std::optional<std::string> deviceClass() const = 0;
+  virtual std::optional<std::string> unitOfMeasurement(UnitType unit) const = 0;
+
+  virtual std::string objectId() const {
+    auto device_class_opt = deviceClass();
+    if (device_class_opt) {
+      auto device_class = trim(*device_class_opt);
+      if (!device_class.empty()) {
+        return device_class;
+      }
+    }
+    return "unknown_device_class";
+  }
+};
 
 /**
  * @brief Device classes and their units from https://www.home-assistant.io/integrations/sensor/#device-class
  */
-namespace DeviceClass {
-
-/**
- * @brief Apparent power in VA.
- */
-namespace ApparentPower {
-const std::string DEVICE_CLASS = "apparent_power";
-enum class Unit { VA };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::VA:
-    return "VA";
-  }
-  return std::nullopt;
-}
-}; // namespace ApparentPower
+namespace Sensor {
 
 /**
  * @brief Air Quality Index (unitless).
  */
-namespace Aqi {
-const std::string DEVICE_CLASS = "aqi";
+class Aqi : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-enum class Unit {};
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) { return std::nullopt; }
-}; // namespace Aqi
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "aqi";
+};
 
 /**
  * @brief Area in m², cm², etc.
  */
-namespace Area {
-const std::string DEVICE_CLASS = "area";
+class Area : public DeviceClass {
+public:
+  enum Unit : UnitType { m2 = 1, cm2, km2, mm2, in2, ft2, yd2, mi2, ac, ha };
 
-enum class Unit { m2, cm2, km2, mm2, in2, ft2, yd2, mi2, ac, ha };
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::m2:
-    return "m2";
-  case Unit::cm2:
-    return "cm2";
-  case Unit::km2:
-    return "km2";
-  case Unit::mm2:
-    return "mm2";
-  case Unit::in2:
-    return "in2";
-  case Unit::ft2:
-    return "ft2";
-  case Unit::yd2:
-    return "yd2";
-  case Unit::mi2:
-    return "mi2";
-  case Unit::ac:
-    return "ac";
-  case Unit::ha:
-    return "ha";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case m2:
+      return "m2";
+    case cm2:
+      return "cm2";
+    case km2:
+      return "km2";
+    case mm2:
+      return "mm2";
+    case in2:
+      return "in2";
+    case ft2:
+      return "ft2";
+    case yd2:
+      return "yd2";
+    case mi2:
+      return "mi2";
+    case ac:
+      return "ac";
+    case ha:
+      return "ha";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Area
+
+private:
+  static constexpr const char *DEVICE_CLASS = "area";
+};
+
+// Repeat this structure for other namespaces using their specific units and device classes
 
 /**
  * @brief Atmospheric pressure in cbar, bar, etc.
  */
-namespace AtmosphericPressure {
-const std::string DEVICE_CLASS = "atmospheric_pressure";
+class AtmosphericPressure : public DeviceClass {
+public:
+  enum Unit : UnitType { cbar = 1, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi };
 
-enum class Unit { cbar, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi };
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::cbar:
-    return "cbar";
-  case Unit::bar:
-    return "bar";
-  case Unit::hPa:
-    return "hPa";
-  case Unit::mmHg:
-    return "mmHg";
-  case Unit::inHg:
-    return "inHg";
-  case Unit::kPa:
-    return "kPa";
-  case Unit::mbar:
-    return "mbar";
-  case Unit::Pa:
-    return "Pa";
-  case Unit::psi:
-    return "psi";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case cbar:
+      return "cbar";
+    case bar:
+      return "bar";
+    case hPa:
+      return "hPa";
+    case mmHg:
+      return "mmHg";
+    case inHg:
+      return "inHg";
+    case kPa:
+      return "kPa";
+    case mbar:
+      return "mbar";
+    case Pa:
+      return "Pa";
+    case psi:
+      return "psi";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace AtmosphericPressure
+
+private:
+  static constexpr const char *DEVICE_CLASS = "atmospheric_pressure";
+};
 
 /**
  * @brief Battery percentage in %.
  */
-namespace Battery {
-const std::string DEVICE_CLASS = "battery";
+class Battery : public DeviceClass {
+public:
+  enum Unit : UnitType { Percent = 1 };
 
-enum class Unit { Percent };
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::Percent:
-    return "%";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Percent:
+      return "%";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Battery
+
+private:
+  static constexpr const char *DEVICE_CLASS = "battery";
+};
 
 /**
  * @brief Blood glucose concentration in mg/dL, mmol/L.
  */
-namespace BloodGlucoseConcentration {
-const std::string DEVICE_CLASS = "blood_glucose_concentration";
+class BloodGlucoseConcentration : public DeviceClass {
+public:
+  enum Unit : UnitType { mg_dL = 1, mmol_L };
 
-enum class Unit { mg_dL, mmol_L };
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::mg_dL:
-    return "mg/dL";
-  case Unit::mmol_L:
-    return "mmol/L";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case mg_dL:
+      return "mg/dL";
+    case mmol_L:
+      return "mmol/L";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace BloodGlucoseConcentration
+
+private:
+  static constexpr const char *DEVICE_CLASS = "blood_glucose_concentration";
+};
 
 /**
  * @brief Carbon Dioxide in ppm.
  */
-namespace CarbonDioxide {
-const std::string DEVICE_CLASS = "carbon_dioxide";
+class CarbonDioxide : public DeviceClass {
+public:
+  enum Unit : UnitType { ppm = 1 };
 
-enum class Unit { ppm };
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ppm:
-    return "ppm";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ppm:
+      return "ppm";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace CarbonDioxide
 
-/**
- * @brief Carbon Monoxide in ppm.
- */
-namespace CarbonMonoxide {
-const std::string DEVICE_CLASS = "carbon_monoxide";
-
-enum class Unit { ppm };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ppm:
-    return "ppm";
-  }
-  return std::nullopt;
-}
-}; // namespace CarbonMonoxide
-
-/**
- * @brief Current in A, mA.
- */
-namespace Current {
-const std::string DEVICE_CLASS = "current";
-
-enum class Unit { A, mA };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::A:
-    return "A";
-  case Unit::mA:
-    return "mA";
-  }
-  return std::nullopt;
-}
-}; // namespace Current
-
-/**
- * @brief Data rate in bit/s, kbit/s, etc.
- */
-namespace DataRate {
-const std::string DEVICE_CLASS = "data_rate";
-
-enum class Unit { bits, kbits, Mbits, Gbits, Bps, kBps, MBps, GBps, KiBps, MiBps, GiBps };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::bits:
-    return "bit/s";
-  case Unit::kbits:
-    return "kbit/s";
-  case Unit::Mbits:
-    return "Mbit/s";
-  case Unit::Gbits:
-    return "Gbit/s";
-  case Unit::Bps:
-    return "B/s";
-  case Unit::kBps:
-    return "kB/s";
-  case Unit::MBps:
-    return "MB/s";
-  case Unit::GBps:
-    return "GB/s";
-  case Unit::KiBps:
-    return "KiB/s";
-  case Unit::MiBps:
-    return "MiB/s";
-  case Unit::GiBps:
-    return "GiB/s";
-  }
-  return std::nullopt;
-}
-}; // namespace DataRate
-
-/**
- * @brief Data size in bit, kbit, etc.
- */
-namespace DataSize {
-const std::string DEVICE_CLASS = "data_size";
-
-enum class Unit {
-  bits,
-  kbits,
-  Mbits,
-  Gbits,
-  B,
-  kB,
-  MB,
-  GB,
-  TB,
-  PB,
-  EB,
-  ZB,
-  YB,
-  KiB,
-  MiB,
-  GiB,
-  TiB,
-  PiB,
-  EiB,
-  ZiB,
-  YiB
+private:
+  static constexpr const char *DEVICE_CLASS = "carbon_dioxide";
 };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::bits:
-    return "bit";
-  case Unit::kbits:
-    return "kbit";
-  case Unit::Mbits:
-    return "Mbit";
-  case Unit::Gbits:
-    return "Gbit";
-  case Unit::B:
-    return "B";
-  case Unit::kB:
-    return "kB";
-  case Unit::MB:
-    return "MB";
-  case Unit::GB:
-    return "GB";
-  case Unit::TB:
-    return "TB";
-  case Unit::PB:
-    return "PB";
-  case Unit::EB:
-    return "EB";
-  case Unit::ZB:
-    return "ZB";
-  case Unit::YB:
-    return "YB";
-  case Unit::KiB:
-    return "KiB";
-  case Unit::MiB:
-    return "MiB";
-  case Unit::GiB:
-    return "GiB";
-  case Unit::TiB:
-    return "TiB";
-  case Unit::PiB:
-    return "PiB";
-  case Unit::EiB:
-    return "EiB";
-  case Unit::ZiB:
-    return "ZiB";
-  case Unit::YiB:
-    return "YiB";
+// CarbonMonoxide
+class CarbonMonoxide : public DeviceClass {
+public:
+  enum Unit : UnitType { ppm = 1 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ppm:
+      return "ppm";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace DataSize
 
-/**
- * @brief Date string (ISO 8601).
- */
-namespace Date {
-const std::string DEVICE_CLASS = "date";
+private:
+  static constexpr const char *DEVICE_CLASS = "carbon_monoxide";
+};
 
-enum class Unit { ISO8601 };
+// Current
+class Current : public DeviceClass {
+public:
+  enum Unit : UnitType { A = 1, mA };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  // Since the date is typically represented as a string, there is no unit to return.
-  return std::nullopt;
-}
-}; // namespace Date
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-/**
- * @brief Distance in km, m, etc.
- */
-namespace Distance {
-const std::string DEVICE_CLASS = "distance";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-enum class Unit { km, m, cm, mm, mi, nmi, yd, in };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::km:
-    return "km";
-  case Unit::m:
-    return "m";
-  case Unit::cm:
-    return "cm";
-  case Unit::mm:
-    return "mm";
-  case Unit::mi:
-    return "mi";
-  case Unit::nmi:
-    return "nmi";
-  case Unit::yd:
-    return "yd";
-  case Unit::in:
-    return "in";
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case A:
+      return "A";
+    case mA:
+      return "mA";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Distance
 
-/**
- * @brief Duration in d, h, etc.
- */
-namespace Duration {
-const std::string DEVICE_CLASS = "duration";
+private:
+  static constexpr const char *DEVICE_CLASS = "current";
+};
 
-enum class Unit { d, h, min, s, ms };
+// DataRate
+class DataRate : public DeviceClass {
+public:
+  enum Unit : UnitType { bits = 1, kbits, Mbits, Gbits, Bps, kBps, MBps, GBps, KiBps, MiBps, GiBps };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::d:
-    return "d";
-  case Unit::h:
-    return "h";
-  case Unit::min:
-    return "min";
-  case Unit::s:
-    return "s";
-  case Unit::ms:
-    return "ms";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case bits:
+      return "bit/s";
+    case kbits:
+      return "kbit/s";
+    case Mbits:
+      return "Mbit/s";
+    case Gbits:
+      return "Gbit/s";
+    case Bps:
+      return "B/s";
+    case kBps:
+      return "kB/s";
+    case MBps:
+      return "MB/s";
+    case GBps:
+      return "GB/s";
+    case KiBps:
+      return "KiB/s";
+    case MiBps:
+      return "MiB/s";
+    case GiBps:
+      return "GiB/s";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Duration
 
-/**
- * @brief Energy in various units.
- */
-namespace Energy {
-const std::string DEVICE_CLASS = "energy";
+private:
+  static constexpr const char *DEVICE_CLASS = "data_rate";
+};
 
-enum class Unit { J, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal };
+// DataSize
+class DataSize : public DeviceClass {
+public:
+  enum Unit : UnitType {
+    bits = 1,
+    kbits,
+    Mbits,
+    Gbits,
+    B,
+    kB,
+    MB,
+    GB,
+    TB,
+    PB,
+    EB,
+    ZB,
+    YB,
+    KiB,
+    MiB,
+    GiB,
+    TiB,
+    PiB,
+    EiB,
+    ZiB,
+    YiB
+  };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::J:
-    return "J";
-  case Unit::kJ:
-    return "kJ";
-  case Unit::MJ:
-    return "MJ";
-  case Unit::GJ:
-    return "GJ";
-  case Unit::mWh:
-    return "mWh";
-  case Unit::Wh:
-    return "Wh";
-  case Unit::kWh:
-    return "kWh";
-  case Unit::MWh:
-    return "MWh";
-  case Unit::GWh:
-    return "GWh";
-  case Unit::TWh:
-    return "TWh";
-  case Unit::cal:
-    return "cal";
-  case Unit::kcal:
-    return "kcal";
-  case Unit::Mcal:
-    return "Mcal";
-  case Unit::Gcal:
-    return "Gcal";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case bits:
+      return "bit";
+    case kbits:
+      return "kbit";
+    case Mbits:
+      return "Mbit";
+    case Gbits:
+      return "Gbit";
+    case B:
+      return "B";
+    case kB:
+      return "kB";
+    case MB:
+      return "MB";
+    case GB:
+      return "GB";
+    case TB:
+      return "TB";
+    case PB:
+      return "PB";
+    case EB:
+      return "EB";
+    case ZB:
+      return "ZB";
+    case YB:
+      return "YB";
+    case KiB:
+      return "KiB";
+    case MiB:
+      return "MiB";
+    case GiB:
+      return "GiB";
+    case TiB:
+      return "TiB";
+    case PiB:
+      return "PiB";
+    case EiB:
+      return "EiB";
+    case ZiB:
+      return "ZiB";
+    case YiB:
+      return "YiB";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Energy
 
-/**
- * @brief Energy storage in various units.
- */
-namespace EnergyStorage {
-const std::string DEVICE_CLASS = "energy_storage";
+private:
+  static constexpr const char *DEVICE_CLASS = "data_size";
+};
 
-enum class Unit { J, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal };
+// Date
+class Date : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::J:
-    return "J";
-  case Unit::kJ:
-    return "kJ";
-  case Unit::MJ:
-    return "MJ";
-  case Unit::GJ:
-    return "GJ";
-  case Unit::mWh:
-    return "mWh";
-  case Unit::Wh:
-    return "Wh";
-  case Unit::kWh:
-    return "kWh";
-  case Unit::MWh:
-    return "MWh";
-  case Unit::GWh:
-    return "GWh";
-  case Unit::TWh:
-    return "TWh";
-  case Unit::cal:
-    return "cal";
-  case Unit::kcal:
-    return "kcal";
-  case Unit::Mcal:
-    return "Mcal";
-  case Unit::Gcal:
-    return "Gcal";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "date";
+};
+
+// Distance
+class Distance : public DeviceClass {
+public:
+  enum Unit : UnitType { km = 1, m, cm, mm, mi, nmi, yd, in };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case km:
+      return "km";
+    case m:
+      return "m";
+    case cm:
+      return "cm";
+    case mm:
+      return "mm";
+    case mi:
+      return "mi";
+    case nmi:
+      return "nmi";
+    case yd:
+      return "yd";
+    case in:
+      return "in";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace EnergyStorage
 
-/**
- * @brief Enum for a limited set of states.
- */
-namespace Enum {
-const std::string DEVICE_CLASS = "enum";
+private:
+  static constexpr const char *DEVICE_CLASS = "distance";
+};
 
-// This is typically application-specific, so no generic unit here.
-inline std::optional<std::string> unit_of_measurement() { return std::nullopt; }
-}; // namespace Enum
+// Duration
+class Duration : public DeviceClass {
+public:
+  enum Unit : UnitType { d = 1, h, min, s, ms };
 
-/**
- * @brief Frequency in Hz, kHz, etc.
- */
-namespace Frequency {
-const std::string DEVICE_CLASS = "frequency";
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-enum class Unit { Hz, kHz, MHz, GHz };
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::Hz:
-    return "Hz";
-  case Unit::kHz:
-    return "kHz";
-  case Unit::MHz:
-    return "MHz";
-  case Unit::GHz:
-    return "GHz";
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case d:
+      return "d";
+    case h:
+      return "h";
+    case min:
+      return "min";
+    case s:
+      return "s";
+    case ms:
+      return "ms";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Frequency
 
-/**
- * @brief Gas volume in m³, ft³, or CCF.
- */
-namespace Gas {
-const std::string DEVICE_CLASS = "gas";
+private:
+  static constexpr const char *DEVICE_CLASS = "duration";
+};
 
-enum class Unit { m3, ft3, CCF };
+// Energy
+class Energy : public DeviceClass {
+public:
+  enum Unit : UnitType { J = 1, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::m3:
-    return "m³";
-  case Unit::ft3:
-    return "ft³";
-  case Unit::CCF:
-    return "CCF";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case J:
+      return "J";
+    case kJ:
+      return "kJ";
+    case MJ:
+      return "MJ";
+    case GJ:
+      return "GJ";
+    case mWh:
+      return "mWh";
+    case Wh:
+      return "Wh";
+    case kWh:
+      return "kWh";
+    case MWh:
+      return "MWh";
+    case GWh:
+      return "GWh";
+    case TWh:
+      return "TWh";
+    case cal:
+      return "cal";
+    case kcal:
+      return "kcal";
+    case Mcal:
+      return "Mcal";
+    case Gcal:
+      return "Gcal";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Gas
 
-/**
- * @brief Humidity percentage in %.
- */
-namespace Humidity {
-const std::string DEVICE_CLASS = "humidity";
+private:
+  static constexpr const char *DEVICE_CLASS = "energy";
+};
 
-enum class Unit { Percent };
+// EnergyStorage
+class EnergyStorage : public DeviceClass {
+public:
+  enum Unit : UnitType { J = 1, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::Percent:
-    return "%";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case J:
+      return "J";
+    case kJ:
+      return "kJ";
+    case MJ:
+      return "MJ";
+    case GJ:
+      return "GJ";
+    case mWh:
+      return "mWh";
+    case Wh:
+      return "Wh";
+    case kWh:
+      return "kWh";
+    case MWh:
+      return "MWh";
+    case GWh:
+      return "GWh";
+    case TWh:
+      return "TWh";
+    case cal:
+      return "cal";
+    case kcal:
+      return "kcal";
+    case Mcal:
+      return "Mcal";
+    case Gcal:
+      return "Gcal";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Humidity
 
-/**
- * @brief Illuminance in lx.
- */
-namespace Illuminance {
-const std::string DEVICE_CLASS = "illuminance";
+private:
+  static constexpr const char *DEVICE_CLASS = "energy_storage";
+};
 
-enum class Unit { lx };
+// Enum
+class Enum : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::lx:
-    return "lx";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "enum";
+};
+
+// Frequency
+class Frequency : public DeviceClass {
+public:
+  enum Unit : UnitType { Hz = 1, kHz, MHz, GHz };
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Hz:
+      return "Hz";
+    case kHz:
+      return "kHz";
+    case MHz:
+      return "MHz";
+    case GHz:
+      return "GHz";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Illuminance
 
-/**
- * @brief Irradiance in W/m² or BTU/(h⋅ft²).
- */
-namespace Irradiance {
-const std::string DEVICE_CLASS = "irradiance";
+private:
+  static constexpr const char *DEVICE_CLASS = "frequency";
+};
 
-enum class Unit { W_m2, BTU_ft2_h };
+// Gas
+class Gas : public DeviceClass {
+public:
+  enum Unit : UnitType { m3 = 1, ft3, CCF };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::W_m2:
-    return "W/m²";
-  case Unit::BTU_ft2_h:
-    return "BTU/(h⋅ft²)";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case m3:
+      return "m³";
+    case ft3:
+      return "ft³";
+    case CCF:
+      return "CCF";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Irradiance
 
-/**
- * @brief Moisture percentage in %.
- */
-namespace Moisture {
-const std::string DEVICE_CLASS = "moisture";
+private:
+  static constexpr const char *DEVICE_CLASS = "gas";
+};
 
-enum class Unit { Percent };
+// Humidity
+class Humidity : public DeviceClass {
+public:
+  enum Unit : UnitType { Percent = 1 };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::Percent:
-    return "%";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Percent:
+      return "%";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Moisture
 
-/**
- * @brief Monetary value (ISO 4217).
- */
-namespace Monetary {
-const std::string DEVICE_CLASS = "monetary";
+private:
+  static constexpr const char *DEVICE_CLASS = "humidity";
+};
 
-// The currency code (ISO 4217) should be handled by the application context.
-// No specific unit to return here, as it varies depending on the specific currency.
-inline std::optional<std::string> unit_of_measurement() { return std::nullopt; }
-}; // namespace Monetary
+// Illuminance
+class Illuminance : public DeviceClass {
+public:
+  enum Unit : UnitType { lx = 1 };
 
-/**
- * @brief Nitrogen Dioxide concentration in µg/m³.
- */
-namespace NitrogenDioxide {
-const std::string DEVICE_CLASS = "nitrogen_dioxide";
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-enum class Unit { ug_m3 };
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case lx:
+      return "lx";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace NitrogenDioxide
 
-/**
- * @brief Nitrogen Monoxide concentration in µg/m³.
- */
-namespace NitrogenMonoxide {
-const std::string DEVICE_CLASS = "nitrogen_monoxide";
+private:
+  static constexpr const char *DEVICE_CLASS = "illuminance";
+};
 
-enum class Unit { ug_m3 };
+// Irradiance
+class Irradiance : public DeviceClass {
+public:
+  enum Unit : UnitType { W_m2 = 1, BTU_ft2_h };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case W_m2:
+      return "W/m²";
+    case BTU_ft2_h:
+      return "BTU/(h⋅ft²)";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace NitrogenMonoxide
 
-/**
- * @brief Nitrous Oxide concentration in µg/m³.
- */
-namespace NitrousOxide {
-const std::string DEVICE_CLASS = "nitrous_oxide";
+private:
+  static constexpr const char *DEVICE_CLASS = "irradiance";
+};
 
-enum class Unit { ug_m3 };
+// Moisture
+class Moisture : public DeviceClass {
+public:
+  enum Unit : UnitType { Percent = 1 };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Percent:
+      return "%";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace NitrousOxide
 
-/**
- * @brief Ozone concentration in µg/m³.
- */
-namespace Ozone {
-const std::string DEVICE_CLASS = "ozone";
+private:
+  static constexpr const char *DEVICE_CLASS = "moisture";
+};
 
-enum class Unit { ug_m3 };
+// Monetary
+class Monetary : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "monetary";
+};
+
+// NitrogenDioxide
+class NitrogenDioxide : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Ozone
 
-/**
- * @brief Potential hydrogen (pH) value of a water solution.
- */
-namespace Ph {
-const std::string DEVICE_CLASS = "ph";
+private:
+  static constexpr const char *DEVICE_CLASS = "nitrogen_dioxide";
+};
 
-// Typically, pH is a dimensionless unit and does not have a string representation for the unit.
-inline std::optional<std::string> unit_of_measurement() { return std::nullopt; }
-}; // namespace Ph
+// NitrogenMonoxide
+class NitrogenMonoxide : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
 
-/**
- * @brief Particulate matter less than 1 micrometer in µg/m³.
- */
-namespace Pm1 {
-const std::string DEVICE_CLASS = "pm1";
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-enum class Unit { ug_m3 };
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Pm1
 
-/**
- * @brief Particulate matter less than 2.5 micrometers in µg/m³.
- */
-namespace Pm25 {
-const std::string DEVICE_CLASS = "pm25";
+private:
+  static constexpr const char *DEVICE_CLASS = "nitrogen_monoxide";
+};
 
-enum class Unit { ug_m3 };
+// NitrousOxide
+class NitrousOxide : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Pm25
 
-/**
- * @brief Particulate matter less than 10 micrometers in µg/m³.
- */
-namespace Pm10 {
-const std::string DEVICE_CLASS = "pm10";
+private:
+  static constexpr const char *DEVICE_CLASS = "nitrous_oxide";
+};
 
-enum class Unit { ug_m3 };
+// Ozone
+class Ozone : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Pm10
 
-/**
- * @brief Power factor (unitless), unit may be None or %.
- */
-namespace PowerFactor {
-const std::string DEVICE_CLASS = "power_factor";
+private:
+  static constexpr const char *DEVICE_CLASS = "ozone";
+};
 
-enum class Unit { None, Percent };
+// Ph
+class Ph : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::None:
-    return std::nullopt;
-  case Unit::Percent:
-    return "%";
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "ph";
+};
+
+// Pm1
+class Pm1 : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace PowerFactor
 
-/**
- * @brief Power in mW, W, etc.
- */
-namespace Power {
-const std::string DEVICE_CLASS = "power";
+private:
+  static constexpr const char *DEVICE_CLASS = "pm1";
+};
 
-enum class Unit { mW, W, kW, MW, GW, TW };
+// Pm25
+class Pm25 : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::mW:
-    return "mW";
-  case Unit::W:
-    return "W";
-  case Unit::kW:
-    return "kW";
-  case Unit::MW:
-    return "MW";
-  case Unit::GW:
-    return "GW";
-  case Unit::TW:
-    return "TW";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Power
 
-/**
- * @brief Accumulated precipitation in cm, in or mm.
- */
-namespace Precipitation {
-const std::string DEVICE_CLASS = "precipitation";
+private:
+  static constexpr const char *DEVICE_CLASS = "pm25";
+};
 
-enum class Unit { cm, in, mm };
+// Pm10
+class Pm10 : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::cm:
-    return "cm";
-  case Unit::in:
-    return "in";
-  case Unit::mm:
-    return "mm";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Precipitation
 
-/**
- * @brief Precipitation intensity in in/d, in/h, etc.
- */
-namespace PrecipitationIntensity {
-const std::string DEVICE_CLASS = "precipitation_intensity";
+private:
+  static constexpr const char *DEVICE_CLASS = "pm10";
+};
 
-enum class Unit { in_d, in_h, mm_d, mm_h };
+// PowerFactor
+class PowerFactor : public DeviceClass {
+public:
+  enum Unit : UnitType { None = 1, Percent };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::in_d:
-    return "in/d";
-  case Unit::in_h:
-    return "in/h";
-  case Unit::mm_d:
-    return "mm/d";
-  case Unit::mm_h:
-    return "mm/h";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case None:
+      return std::nullopt;
+    case Percent:
+      return "%";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace PrecipitationIntensity
 
-/**
- * @brief Pressure in various units.
- */
-namespace Pressure {
-const std::string DEVICE_CLASS = "pressure";
+private:
+  static constexpr const char *DEVICE_CLASS = "power_factor";
+};
 
-enum class Unit { Pa, kPa, hPa, bar, cbar, mbar, mmHg, inHg, psi };
+// Power
+class Power : public DeviceClass {
+public:
+  enum Unit : UnitType { mW = 1, W, kW, MW, GW, TW };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::Pa:
-    return "Pa";
-  case Unit::kPa:
-    return "kPa";
-  case Unit::hPa:
-    return "hPa";
-  case Unit::bar:
-    return "bar";
-  case Unit::cbar:
-    return "cbar";
-  case Unit::mbar:
-    return "mbar";
-  case Unit::mmHg:
-    return "mmHg";
-  case Unit::inHg:
-    return "inHg";
-  case Unit::psi:
-    return "psi";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case mW:
+      return "mW";
+    case W:
+      return "W";
+    case kW:
+      return "kW";
+    case MW:
+      return "MW";
+    case GW:
+      return "GW";
+    case TW:
+      return "TW";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Pressure
 
-/**
- * @brief Reactive power in var.
- */
-namespace ReactivePower {
-const std::string DEVICE_CLASS = "reactive_power";
+private:
+  static constexpr const char *DEVICE_CLASS = "power";
+};
 
-enum class Unit { var };
+// Precipitation
+class Precipitation : public DeviceClass {
+public:
+  enum Unit : UnitType { cm = 1, in, mm };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::var:
-    return "var";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case cm:
+      return "cm";
+    case in:
+      return "in";
+    case mm:
+      return "mm";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace ReactivePower
 
-/**
- * @brief Signal strength in dB or dBm.
- */
-namespace SignalStrength {
-const std::string DEVICE_CLASS = "signal_strength";
+private:
+  static constexpr const char *DEVICE_CLASS = "precipitation";
+};
 
-enum class Unit { dB, dBm };
+// PrecipitationIntensity
+class PrecipitationIntensity : public DeviceClass {
+public:
+  enum Unit : UnitType { in_d = 1, in_h, mm_d, mm_h };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::dB:
-    return "dB";
-  case Unit::dBm:
-    return "dBm";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case in_d:
+      return "in/d";
+    case in_h:
+      return "in/h";
+    case mm_d:
+      return "mm/d";
+    case mm_h:
+      return "mm/h";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace SignalStrength
 
-/**
- * @brief Sound pressure in dB or dBA.
- */
-namespace SoundPressure {
-const std::string DEVICE_CLASS = "sound_pressure";
+private:
+  static constexpr const char *DEVICE_CLASS = "precipitation_intensity";
+};
 
-enum class Unit { dB, dBA };
+// Pressure
+class Pressure : public DeviceClass {
+public:
+  enum Unit : UnitType { Pa = 1, kPa, hPa, bar, cbar, mbar, mmHg, inHg, psi };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::dB:
-    return "dB";
-  case Unit::dBA:
-    return "dBA";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Pa:
+      return "Pa";
+    case kPa:
+      return "kPa";
+    case hPa:
+      return "hPa";
+    case bar:
+      return "bar";
+    case cbar:
+      return "cbar";
+    case mbar:
+      return "mbar";
+    case mmHg:
+      return "mmHg";
+    case inHg:
+      return "inHg";
+    case psi:
+      return "psi";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace SoundPressure
 
-/**
- * @brief Generic speed in various units.
- */
-namespace Speed {
-const std::string DEVICE_CLASS = "speed";
+private:
+  static constexpr const char *DEVICE_CLASS = "pressure";
+};
 
-enum class Unit { ft_s, in_d, in_h, in_s, km_h, kn, m_s, mph, mm_d, mm_s };
+// ReactivePower
+class ReactivePower : public DeviceClass {
+public:
+  enum Unit : UnitType { var = 1 };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ft_s:
-    return "ft/s";
-  case Unit::in_d:
-    return "in/d";
-  case Unit::in_h:
-    return "in/h";
-  case Unit::in_s:
-    return "in/s";
-  case Unit::km_h:
-    return "km/h";
-  case Unit::kn:
-    return "kn";
-  case Unit::m_s:
-    return "m/s";
-  case Unit::mph:
-    return "mph";
-  case Unit::mm_d:
-    return "mm/d";
-  case Unit::mm_s:
-    return "mm/s";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case var:
+      return "var";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Speed
 
-/**
- * @brief Concentration of sulphur dioxide in µg/m³.
- */
-namespace SulphurDioxide {
-const std::string DEVICE_CLASS = "sulphur_dioxide";
+private:
+  static constexpr const char *DEVICE_CLASS = "reactive_power";
+};
 
-enum class Unit { ug_m3 };
+// SignalStrength
+class SignalStrength : public DeviceClass {
+public:
+  enum Unit : UnitType { dB = 1, dBm };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case dB:
+      return "dB";
+    case dBm:
+      return "dBm";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace SulphurDioxide
 
-/**
- * @brief Temperature in °C, °F, or K.
- */
-namespace Temperature {
-const std::string DEVICE_CLASS = "temperature";
+private:
+  static constexpr const char *DEVICE_CLASS = "signal_strength";
+};
 
-enum class Unit { C, F, K };
+// SoundPressure
+class SoundPressure : public DeviceClass {
+public:
+  enum Unit : UnitType { dB = 1, dBA };
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::C:
-    return "°C";
-  case Unit::F:
-    return "°F";
-  case Unit::K:
-    return "K";
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case dB:
+      return "dB";
+    case dBA:
+      return "dBA";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace Temperature
 
-/**
- * @brief Timestamp string (ISO 8601).
- */
-namespace Timestamp {
-const std::string DEVICE_CLASS = "timestamp";
+private:
+  static constexpr const char *DEVICE_CLASS = "sound_pressure";
+};
 
-// Timestamps are generally represented as ISO 8601 strings.
-inline std::optional<std::string> unit_of_measurement() { return std::nullopt; }
-}; // namespace Timestamp
+// Speed
+class Speed : public DeviceClass {
+public:
+  enum Unit : UnitType { ft_s = 1, in_d, in_h, in_s, km_h, kn, m_s, mph, mm_d, mm_s };
 
-/**
- * @brief Concentration of volatile organic compounds in µg/m³.
- */
-namespace VolatileOrganicCompounds {
-const std::string DEVICE_CLASS = "volatile_organic_compounds";
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-enum class Unit { ug_m3 };
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ug_m3:
-    return "µg/m³";
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ft_s:
+      return "ft/s";
+    case in_d:
+      return "in/d";
+    case in_h:
+      return "in/h";
+    case in_s:
+      return "in/s";
+    case km_h:
+      return "km/h";
+    case kn:
+      return "kn";
+    case m_s:
+      return "m/s";
+    case mph:
+      return "mph";
+    case mm_d:
+      return "mm/d";
+    case mm_s:
+      return "mm/s";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace VolatileOrganicCompounds
+
+private:
+  static constexpr const char *DEVICE_CLASS = "speed";
+};
+
+// SulphurDioxide
+class SulphurDioxide : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "sulphur_dioxide";
+};
+
+// Temperature
+class Temperature : public DeviceClass {
+public:
+  enum Unit : UnitType { C = 1, F, K };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case C:
+      return "°C";
+    case F:
+      return "°F";
+    case K:
+      return "K";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "temperature";
+};
+
+// Timestamp
+class Timestamp : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "timestamp";
+};
+
+// VolatileOrganicCompounds
+class VolatileOrganicCompounds : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "volatile_organic_compounds";
+};
+
+// VolatileOrganicCompoundsParts
+class VolatileOrganicCompoundsParts : public DeviceClass {
+public:
+  enum Unit : UnitType { ppm = 1, ppb };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ppm:
+      return "ppm";
+    case ppb:
+      return "ppb";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "volatile_organic_compounds_parts";
+};
+
+// Voltage
+class Voltage : public DeviceClass {
+public:
+  enum Unit : UnitType { V = 1, mV, uV };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case V:
+      return "V";
+    case mV:
+      return "mV";
+    case uV:
+      return "µV";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "voltage";
+};
+
+// Volume
+class Volume : public DeviceClass {
+public:
+  enum Unit : UnitType { L = 1, mL, gal, fl_oz, m3, ft3, CCF };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case L:
+      return "L";
+    case mL:
+      return "mL";
+    case gal:
+      return "gal";
+    case fl_oz:
+      return "fl. oz.";
+    case m3:
+      return "m³";
+    case ft3:
+      return "ft³";
+    case CCF:
+      return "CCF";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "volume";
+};
+
+// VolumeFlowRate
+class VolumeFlowRate : public DeviceClass {
+public:
+  enum Unit : UnitType { m3_h = 1, ft3_min, L_min, gal_min, mL_s };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case m3_h:
+      return "m³/h";
+    case ft3_min:
+      return "ft³/min";
+    case L_min:
+      return "L/min";
+    case gal_min:
+      return "gal/min";
+    case mL_s:
+      return "mL/s";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "volume_flow_rate";
+};
+
+// VolumeStorage
+class VolumeStorage : public DeviceClass {
+public:
+  enum Unit : UnitType { L = 1, mL, gal, fl_oz, m3, ft3, CCF };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case L:
+      return "L";
+    case mL:
+      return "mL";
+    case gal:
+      return "gal";
+    case fl_oz:
+      return "fl. oz.";
+    case m3:
+      return "m³";
+    case ft3:
+      return "ft³";
+    case CCF:
+      return "CCF";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "volume_storage";
+};
+
+// Water
+class Water : public DeviceClass {
+public:
+  enum Unit : UnitType { L = 1, gal, m3, ft3, CCF };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case L:
+      return "L";
+    case gal:
+      return "gal";
+    case m3:
+      return "m³";
+    case ft3:
+      return "ft³";
+    case CCF:
+      return "CCF";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "water";
+};
+
+// Weight
+class Weight : public DeviceClass {
+public:
+  enum Unit : UnitType { kg = 1, g, mg, ug, oz, lb, st };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case kg:
+      return "kg";
+    case g:
+      return "g";
+    case mg:
+      return "mg";
+    case ug:
+      return "µg";
+    case oz:
+      return "oz";
+    case lb:
+      return "lb";
+    case st:
+      return "st";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "weight";
+};
+
+// WindSpeed
+class WindSpeed : public DeviceClass {
+public:
+  enum Unit : UnitType { Beaufort = 1, ft_s, km_h, kn, m_s, mph };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Beaufort:
+      return "Beaufort";
+    case ft_s:
+      return "ft/s";
+    case km_h:
+      return "km/h";
+    case kn:
+      return "kn";
+    case m_s:
+      return "m/s";
+    case mph:
+      return "mph";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "wind_speed";
+};
 
 /**
- * @brief VOCs ratio in ppm or ppb.
+ * @brief These are unofficial or non existing device classes, used for convenience or for default.
+ *
  */
-namespace VolatileOrganicCompoundsParts {
-const std::string DEVICE_CLASS = "volatile_organic_compounds_parts";
+namespace Undefined {
 
-enum class Unit { ppm, ppb };
+class Empty : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::ppm:
-    return "ppm";
-  case Unit::ppb:
-    return "ppb";
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+};
+
+class Brightness : public DeviceClass {
+public:
+  enum Unit : UnitType { Percent = 1 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return std::nullopt; } // No brightness device class exists.
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Percent:
+      return "%";
+    default:
+      return std::nullopt;
+    }
   }
-  return std::nullopt;
-}
-}; // namespace VolatileOrganicCompoundsParts
 
-/**
- * @brief Voltage in V, mV, µV.
- */
-namespace Voltage {
-const std::string DEVICE_CLASS = "voltage";
+  std::string objectId() const override { return "brightness"; }
+};
 
-enum class Unit { V, mV, uV };
+class Json : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::V:
-    return "V";
-  case Unit::mV:
-    return "mV";
-  case Unit::uV:
-    return "µV";
-  }
-  return std::nullopt;
-}
-}; // namespace Voltage
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
 
-/**
- * @brief Generic volume in L, mL, etc.
- */
-namespace Volume {
-const std::string DEVICE_CLASS = "volume";
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
 
-enum class Unit { L, mL, gal, fl_oz, m3, ft3, CCF };
+  std::string objectId() const override { return "json"; }
+};
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::L:
-    return "L";
-  case Unit::mL:
-    return "mL";
-  case Unit::gal:
-    return "gal";
-  case Unit::fl_oz:
-    return "fl. oz.";
-  case Unit::m3:
-    return "m³";
-  case Unit::ft3:
-    return "ft³";
-  case Unit::CCF:
-    return "CCF";
-  }
-  return std::nullopt;
-}
-}; // namespace Volume
+class String : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
 
-/**
- * @brief Volume flow rate in m³/h, ft³/min, etc.
- */
-namespace VolumeFlowRate {
-const std::string DEVICE_CLASS = "volume_flow_rate";
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
 
-enum class Unit { m3_h, ft3_min, L_min, gal_min, mL_s };
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
 
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::m3_h:
-    return "m³/h";
-  case Unit::ft3_min:
-    return "ft³/min";
-  case Unit::L_min:
-    return "L/min";
-  case Unit::gal_min:
-    return "gal/min";
-  case Unit::mL_s:
-    return "mL/s";
-  }
-  return std::nullopt;
-}
-}; // namespace VolumeFlowRate
+  std::string objectId() const override { return "string"; }
+};
 
-/**
- * @brief Generic stored volume in L, mL, etc.
- */
-namespace VolumeStorage {
-const std::string DEVICE_CLASS = "volume_storage";
+}; // namespace Undefined
 
-enum class Unit { L, mL, gal, fl_oz, m3, ft3, CCF };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::L:
-    return "L";
-  case Unit::mL:
-    return "mL";
-  case Unit::gal:
-    return "gal";
-  case Unit::fl_oz:
-    return "fl. oz.";
-  case Unit::m3:
-    return "m³";
-  case Unit::ft3:
-    return "ft³";
-  case Unit::CCF:
-    return "CCF";
-  }
-  return std::nullopt;
-}
-}; // namespace VolumeStorage
-
-/**
- * @brief Water consumption in L, gal, etc.
- */
-namespace Water {
-const std::string DEVICE_CLASS = "water";
-
-enum class Unit { L, gal, m3, ft3, CCF };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::L:
-    return "L";
-  case Unit::gal:
-    return "gal";
-  case Unit::m3:
-    return "m³";
-  case Unit::ft3:
-    return "ft³";
-  case Unit::CCF:
-    return "CCF";
-  }
-  return std::nullopt;
-}
-}; // namespace Water
-
-/**
- * @brief Generic mass in kg, g, etc.
- */
-namespace Weight {
-const std::string DEVICE_CLASS = "weight";
-
-enum class Unit { kg, g, mg, ug, oz, lb, st };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::kg:
-    return "kg";
-  case Unit::g:
-    return "g";
-  case Unit::mg:
-    return "mg";
-  case Unit::ug:
-    return "µg";
-  case Unit::oz:
-    return "oz";
-  case Unit::lb:
-    return "lb";
-  case Unit::st:
-    return "st";
-  }
-  return std::nullopt;
-}
-}; // namespace Weight
-
-/**
- * @brief Wind speed in Beaufort, ft/s, etc.
- */
-namespace WindSpeed {
-const std::string DEVICE_CLASS = "wind_speed";
-
-enum class Unit { Beaufort, ft_s, km_h, kn, m_s, mph };
-
-inline std::optional<std::string> unit_of_measurement(const Unit &unit) {
-  switch (unit) {
-  case Unit::Beaufort:
-    return "Beaufort";
-  case Unit::ft_s:
-    return "ft/s";
-  case Unit::km_h:
-    return "km/h";
-  case Unit::kn:
-    return "kn";
-  case Unit::m_s:
-    return "m/s";
-  case Unit::mph:
-    return "mph";
-  }
-  return std::nullopt;
-}
-}; // namespace WindSpeed
-
-}; // namespace DeviceClass
 }; // namespace Sensor
-
-namespace BinarySensor {
 
 /**
  * @brief Device classes and their units from https://www.home-assistant.io/integrations/binary_sensor/#device-class
  */
-namespace DeviceClass {
+namespace BinarySensor {
 
 /**
  * @brief on means low, off means normal
  */
-namespace Battery {
-const std::string DEVICE_CLASS = "battery";
-}; // namespace Battery
+class Battery : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "battery";
+};
 
 /**
  * @brief on means charging, off means not charging
  */
-namespace BatteryCharging {
-const std::string DEVICE_CLASS = "battery_charging";
-}; // namespace BatteryCharging
+class BatteryCharging : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "battery_charging";
+};
 
 /**
  * @brief on means carbon monoxide detected, off means clear
  */
-namespace CarbonMonoxide {
-const std::string DEVICE_CLASS = "carbon_monoxide";
-}; // namespace CarbonMonoxide
+class CarbonMonoxide : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "carbon_monoxide";
+};
 
 /**
  * @brief on means cold, off means normal
  */
-namespace Cold {
-const std::string DEVICE_CLASS = "cold";
-}; // namespace Cold
+class Cold : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "cold";
+};
 
 /**
  * @brief on means connected, off means disconnected
  */
-namespace Connectivity {
-const std::string DEVICE_CLASS = "connectivity";
-}; // namespace Connectivity
+class Connectivity : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "connectivity";
+};
 
 /**
  * @brief on means open, off means closed
  */
-namespace Door {
-const std::string DEVICE_CLASS = "door";
-}; // namespace Door
+class Door : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "door";
+};
 
 /**
  * @brief on means open, off means closed
  */
-namespace GarageDoor {
-const std::string DEVICE_CLASS = "garage_door";
-}; // namespace GarageDoor
+class GarageDoor : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "garage_door";
+};
 
 /**
  * @brief on means gas detected, off means clear
  */
-namespace Gas {
-const std::string DEVICE_CLASS = "gas";
-}; // namespace Gas
+class Gas : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "gas";
+};
 
 /**
  * @brief on means hot, off means normal
  */
-namespace Heat {
-const std::string DEVICE_CLASS = "heat";
-}; // namespace Heat
+class Heat : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "heat";
+};
 
 /**
  * @brief on means light detected, off means no light
  */
-namespace Light {
-const std::string DEVICE_CLASS = "light";
-}; // namespace Light
+class Light : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "light";
+};
 
 /**
  * @brief on means open (unlocked), off means closed (locked)
  */
-namespace Lock {
-const std::string DEVICE_CLASS = "lock";
-}; // namespace Lock
+class Lock : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "lock";
+};
 
 /**
  * @brief on means moisture detected (wet), off means no moisture (dry)
  */
-namespace Moisture {
-const std::string DEVICE_CLASS = "moisture";
-}; // namespace Moisture
+class Moisture : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "moisture";
+};
 
 /**
  * @brief on means motion detected, off means clear
  */
-namespace Motion {
-const std::string DEVICE_CLASS = "motion";
-}; // namespace Motion
+class Motion : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "motion";
+};
 
 /**
  * @brief on means moving, off means stopped
  */
-namespace Moving {
-const std::string DEVICE_CLASS = "moving";
-}; // namespace Moving
+class Moving : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "moving";
+};
 
 /**
  * @brief on means occupied (detected), off means clear
  */
-namespace Occupancy {
-const std::string DEVICE_CLASS = "occupancy";
-}; // namespace Occupancy
+class Occupancy : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "occupancy";
+};
 
 /**
  * @brief on means open, off means closed
  */
-namespace Opening {
-const std::string DEVICE_CLASS = "opening";
-}; // namespace Opening
+class Opening : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "opening";
+};
 
 /**
  * @brief on means device is plugged in, off means device is unplugged
  */
-namespace Plug {
-const std::string DEVICE_CLASS = "plug";
-}; // namespace Plug
+class Plug : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "plug";
+};
 
 /**
  * @brief on means power detected, off means no power
  */
-namespace Power {
-const std::string DEVICE_CLASS = "power";
-}; // namespace Power
+class Power : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "power";
+};
 
 /**
  * @brief on means home, off means away
  */
-namespace Presence {
-const std::string DEVICE_CLASS = "presence";
-}; // namespace Presence
+class Presence : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "presence";
+};
 
 /**
  * @brief on means problem detected, off means OK
  */
-namespace Problem {
-const std::string DEVICE_CLASS = "problem";
-}; // namespace Problem
+class Problem : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "problem";
+};
 
 /**
  * @brief on means running, off means not running
  */
-namespace Running {
-const std::string DEVICE_CLASS = "running";
-}; // namespace Running
+class Running : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "running";
+};
 
 /**
  * @brief on means unsafe, off means safe
  */
-namespace Safety {
-const std::string DEVICE_CLASS = "safety";
-}; // namespace Safety
+class Safety : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "safety";
+};
 
 /**
  * @brief on means smoke detected, off means clear
  */
-namespace Smoke {
-const std::string DEVICE_CLASS = "smoke";
-}; // namespace Smoke
+class Smoke : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "smoke";
+};
 
 /**
  * @brief on means sound detected, off means clear
  */
-namespace Sound {
-const std::string DEVICE_CLASS = "sound";
-}; // namespace Sound
+class Sound : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "sound";
+};
 
 /**
  * @brief on means tampering detected, off means clear
  */
-namespace Tamper {
-const std::string DEVICE_CLASS = "tamper";
-}; // namespace Tamper
+class Tamper : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "tamper";
+};
 
 /**
  * @brief on means update available, off means up-to-date
  */
-namespace Update {
-const std::string DEVICE_CLASS = "update";
-}; // namespace Update
+class Update : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "update";
+};
 
 /**
  * @brief on means vibration detected, off means clear
  */
-namespace Vibration {
-const std::string DEVICE_CLASS = "vibration";
-}; // namespace Vibration
+class Vibration : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "vibration";
+};
 
 /**
  * @brief on means open, off means closed
  */
-namespace Window {
-const std::string DEVICE_CLASS = "window";
-}; // namespace Window
+class Window : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
 
-}; // namespace DeviceClass
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "window";
+};
+
+/**
+ * @brief These are unofficial or non existing device classes, used for convenience or for default.
+ *
+ */
+namespace Undefined {
+
+class Empty : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+};
+
+class Boolean : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+
+  std::string objectId() const override { return "boolean"; }
+};
+
+}; // namespace Undefined
+
 }; // namespace BinarySensor
-
-namespace Event {
-namespace DeviceClass {
-
-/**
- * @brief For remote control buttons.
- */
-namespace Button {
-const std::string DEVICE_CLASS = "button";
-}; // namespace Button
-
-/**
- * @brief Specifically for buttons that are used as a doorbell.
- */
-namespace Doorbell {
-const std::string DEVICE_CLASS = "doorbell";
-}; // namespace Doorbell
-
-/**
- * @brief For motion events detected by a motion sensor.
- */
-namespace Motion {
-const std::string DEVICE_CLASS = "motion";
-}; // namespace Motion
-
-}; // namespace DeviceClass
-}; // namespace Event
-
 }; // namespace homeassistantentities

@@ -2,17 +2,18 @@
 #include <HaUtilities.h>
 #include <IJson.h>
 
-HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id,
                                Configuration configuration)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
+    : _name(trim(name)), _ha_bridge(ha_bridge), _object_id(configuration.device_class.objectId()),
       _configuration(configuration) {
-  if (_configuration.device_class) {
-    auto device_class = homeassistantentities::trim(*_configuration.device_class);
-    _object_id = device_class.empty() ? "unknown_device_class" : device_class;
+  _component = configuration.device_class.sensorType() == DeviceClass::SensorType::Sensor ? "sensor" : "binary_sensor";
+
+  if (child_object_id) {
+    auto coid = trim(*child_object_id);
+    _child_object_id = coid.empty() ? "" : coid;
   } else {
-    _object_id = "unknown_device_class";
+    _child_object_id = "";
   }
-  _component = configuration.sensor_type == SensorType::Sensor ? "sensor" : "binary_sensor";
 }
 
 void HaEntitySensor::publishConfiguration() {
@@ -26,24 +27,30 @@ void HaEntitySensor::publishConfiguration() {
   doc["platform"] = _component; // we have validated this to be either sensor or binary_sensor
 
   if (_configuration.state_class) {
-    auto state_class = homeassistantentities::trim(*_configuration.state_class);
+    auto state_class = trim(*_configuration.state_class);
     if (!state_class.empty()) {
       doc["state_class"] = state_class;
     }
   }
-  if (_configuration.device_class) {
-    auto device_class = homeassistantentities::trim(*_configuration.device_class);
-    if (!device_class.empty()) {
-      doc["device_class"] = device_class;
+  auto device_class = _configuration.device_class.deviceClass();
+  if (device_class) {
+    auto trimmed_device_class = trim(*device_class);
+    if (!trimmed_device_class.empty()) {
+      doc["device_class"] = trimmed_device_class;
     }
   }
   if (_configuration.icon) {
     doc["icon"] = *_configuration.icon;
   }
   doc["force_update"] = _configuration.force_update;
+
   if (_configuration.unit_of_measurement) {
-    doc["unit_of_measurement"] = *_configuration.unit_of_measurement;
+    auto unit_of_measurement = _configuration.device_class.unitOfMeasurement(*_configuration.unit_of_measurement);
+    if (unit_of_measurement) {
+      doc["unit_of_measurement"] = *unit_of_measurement;
+    }
   }
+
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id);
   _ha_bridge.publishConfiguration(_component, _object_id, _child_object_id, doc);
 

@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::BinarySensor::DeviceClass;
+using namespace homeassistantentities::BinarySensor;
 
 /**
  * @brief Represent a Lock binary sensor (if a lock is locked or unlocked).
@@ -34,11 +34,10 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityLock(HaBridge &ha_bridge, std::string name, std::string child_object_id = "")
+  HaEntityLock(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .sensor_type = HaEntitySensor::SensorType::BinarySensor,
-                                             .device_class = Lock::DEVICE_CLASS,
+                                             .device_class = _lock,
                                              .state_class = std::nullopt,
                                          })) {}
 
@@ -54,6 +53,7 @@ public:
   void publishLock(bool locked) { _ha_entity_sensor.publishValue(locked ? "OFF" : "ON"); } // locked == OFF
 
 private:
+  const Lock _lock;
   HaEntitySensor _ha_entity_sensor;
 };
 

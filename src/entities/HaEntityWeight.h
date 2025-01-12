@@ -9,10 +9,10 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor::DeviceClass;
+using namespace homeassistantentities::Sensor;
 
 /**
- * @brief Represent a Weight sensor (see homeassistantentities::Sensor::DeviceClass::Weight:Unit).
+ * @brief Represent a Weight sensor (see homeassistantentities::Sensor::Weight:Unit in HaDeviceClasses.h).
  */
 class HaEntityWeight : public HaEntity {
 public:
@@ -51,12 +51,12 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityWeight(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityWeight(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                  Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .unit_of_measurement = Weight::unit_of_measurement(configuration.unit),
-                                             .device_class = Weight::DEVICE_CLASS,
+                                             .device_class = _weight,
+                                             .unit_of_measurement = configuration.unit,
                                              .force_update = configuration.force_update,
                                          })) {}
 
@@ -72,6 +72,7 @@ public:
   void publishWeight(double weight) { _ha_entity_sensor.publishValue(weight); }
 
 private:
+  const Weight _weight;
   HaEntitySensor _ha_entity_sensor;
 };
 

@@ -20,7 +20,7 @@ public:
     None,
     Button,
     Motion,
-    Dorrbell,
+    Doorbell,
   };
 
   struct Configuration {

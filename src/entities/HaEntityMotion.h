@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::BinarySensor::DeviceClass;
+using namespace homeassistantentities::BinarySensor;
 
 /**
  * @brief Represent a Motion binary sensor.
@@ -34,11 +34,10 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityMotion(HaBridge &ha_bridge, std::string name, std::string child_object_id = "")
+  HaEntityMotion(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .sensor_type = HaEntitySensor::SensorType::BinarySensor,
-                                             .device_class = Motion::DEVICE_CLASS,
+                                             .device_class = _motion,
                                              .state_class = std::nullopt,
                                          })) {}
 
@@ -54,6 +53,7 @@ public:
   void publishMotion(bool detected) { _ha_entity_sensor.publishValue(detected ? "ON" : "OFF"); }
 
 private:
+  const Motion _motion;
   HaEntitySensor _ha_entity_sensor;
 };
 

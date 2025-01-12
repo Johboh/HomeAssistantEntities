@@ -19,7 +19,7 @@
 nlohmann::json _json_this_device_doc;
 void setupJsonForThisDevice() {
   _json_this_device_doc["identifiers"] = "my_hardware_" + std::string(mqtt_client_id);
-  _json_this_device_doc["name"] = "Kitchen";
+  _json_this_device_doc["name"] = "Livingroom";
   _json_this_device_doc["sw_version"] = "1.0.0";
   _json_this_device_doc["model"] = "my_hardware";
   _json_this_device_doc["manufacturer"] = "custom inc.";
@@ -29,23 +29,25 @@ void setupJsonForThisDevice() {
 MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_password, 2048, 10);
 
 // Create the Home Assistant bridge. This is shared across all entities.
-// We only have one per device/hardware. In our example, the name of our device is "kitchen".
+// We only have one per device/hardware. In our example, the name of our device is "livingroom".
 // See constructor of HaBridge for more documentation.
-HaBridge ha_bridge(_mqtt_remote, "kitchen", _json_this_device_doc);
+HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc);
 
 // Create the three sensors with the "Human readable" strings. This what will show up in Home Assistant.
 HaEntityBrightness _ha_entity_brightness(ha_bridge, "brightness");
+
 // For multiple sensors with the same time for the same device, we need to add a child object id to separate them (third
 // parameter).
-HaEntityTemperature _ha_entity_temperature_inside(ha_bridge, "temperature inside", "kitchen_temperature_inside");
-HaEntityTemperature _ha_entity_temperature_outside(ha_bridge, "temperature outside", "kitchen_temperature_outside");
-// Generic sensor when any other sensor does not fit.
-using namespace homeassistantentities::Sensor::DeviceClass;
+HaEntityTemperature _ha_entity_temperature_inside(ha_bridge, "temperature inside", "inside");
+HaEntityTemperature _ha_entity_temperature_outside(ha_bridge, "temperature outside", "outside");
+
+// Precipitation sensor using the generic sensor, as there is no specific class for precipitation (yet).
+homeassistantentities::Sensor::Precipitation _precipitation;
 HaEntitySensor::Configuration _generic_sensor_cfg = {
-    .unit_of_measurement = Precipitation::unit_of_measurement(Precipitation::Unit::mm),
-    .device_class = Precipitation::DEVICE_CLASS,
+    .device_class = _precipitation,
+    .unit_of_measurement = Precipitation::Unit::mm,
 };
-HaEntitySensor _ha_entity_generic_sensor(ha_bridge, "Precipitation", "", _generic_sensor_cfg);
+HaEntitySensor _ha_entity_generic_sensor(ha_bridge, "precipitation", std::nullopt, _generic_sensor_cfg);
 
 void haStateTask(void *pvParameters) {
   while (1) {

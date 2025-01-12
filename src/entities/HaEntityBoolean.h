@@ -9,6 +9,8 @@
 #include <optional>
 #include <string>
 
+using namespace homeassistantentities::BinarySensor::Undefined;
+
 /**
  * @brief Represent a boolean binary sensor.
  */
@@ -50,17 +52,15 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                   Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .sensor_type = HaEntitySensor::SensorType::BinarySensor,
+                                             .device_class = _boolean,
                                              .state_class = std::nullopt,
                                              .with_attributes = configuration.with_attributes,
                                              .force_update = configuration.force_update,
-                                         })) {
-    _ha_entity_sensor.overrideObjectId("boolean");
-  }
+                                         })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -85,6 +85,7 @@ public:
   void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
 private:
+  const Boolean _boolean;
   HaEntitySensor _ha_entity_sensor;
 };
 

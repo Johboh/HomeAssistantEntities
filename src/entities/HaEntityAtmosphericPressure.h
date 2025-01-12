@@ -9,11 +9,11 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor::DeviceClass;
+using namespace homeassistantentities::Sensor;
 
 /**
  * @brief Represent a Atmospheric pressure sensor (see
- * homeassistantentities::Sensor::DeviceClass::AtmosphericPressure:Unit).
+ * homeassistantentities::Sensor::AtmosphericPressure:Unit in HaDeviceClasses.h).
  */
 class HaEntityAtmosphericPressure : public HaEntity {
 public:
@@ -52,15 +52,15 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityAtmosphericPressure(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityAtmosphericPressure(HaBridge &ha_bridge, std::string name,
+                              std::optional<std::string> child_object_id = std::nullopt,
                               Configuration configuration = _default)
-      : _ha_entity_sensor(
-            HaEntitySensor(ha_bridge, name, child_object_id,
-                           HaEntitySensor::Configuration{
-                               .unit_of_measurement = AtmosphericPressure::unit_of_measurement(configuration.unit),
-                               .device_class = AtmosphericPressure::DEVICE_CLASS,
-                               .force_update = configuration.force_update,
-                           })) {}
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .device_class = _atmospheric_pressure,
+                                             .unit_of_measurement = configuration.unit,
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -74,6 +74,7 @@ public:
   void publishAtmosphericPressure(double pressure) { _ha_entity_sensor.publishValue(pressure); }
 
 private:
+  const AtmosphericPressure _atmospheric_pressure;
   HaEntitySensor _ha_entity_sensor;
 };
 

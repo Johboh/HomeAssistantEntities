@@ -9,11 +9,11 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor::DeviceClass;
+using namespace homeassistantentities::Sensor;
 
 /**
  * @brief Represent a Carbon Dioxide sensor (e.g. SGP30) (see
- * homeassistantentities::Sensor::DeviceClass::CarbonDioxide:Unit).
+ * homeassistantentities::Sensor::CarbonDioxide:Unit  in HaDeviceClasses.h).
  */
 class HaEntityCarbonDioxide : public HaEntity {
 public:
@@ -47,15 +47,15 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityCarbonDioxide(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityCarbonDioxide(HaBridge &ha_bridge, std::string name,
+                        std::optional<std::string> child_object_id = std::nullopt,
                         Configuration configuration = _default)
-      : _ha_entity_sensor(
-            HaEntitySensor(ha_bridge, name, child_object_id,
-                           HaEntitySensor::Configuration{
-                               .unit_of_measurement = CarbonDioxide::unit_of_measurement(CarbonDioxide::Unit::ppm),
-                               .device_class = CarbonDioxide::DEVICE_CLASS,
-                               .force_update = configuration.force_update,
-                           })) {}
+      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
+                                         HaEntitySensor::Configuration{
+                                             .device_class = _carbon_dioxide,
+                                             .unit_of_measurement = CarbonDioxide::Unit::ppm,
+                                             .force_update = configuration.force_update,
+                                         })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -69,6 +69,7 @@ public:
   void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
 
 private:
+  const CarbonDioxide _carbon_dioxide;
   HaEntitySensor _ha_entity_sensor;
 };
 

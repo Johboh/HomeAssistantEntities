@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor::DeviceClass;
+using namespace homeassistantentities::Sensor;
 
 /**
  * @brief Represent a volatile organic compounds sensor, concentration in μg/m³ or parts in ppb/parts per billion.
@@ -57,12 +57,13 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityVolatileOrganicCompounds(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityVolatileOrganicCompounds(HaBridge &ha_bridge, std::string name,
+                                   std::optional<std::string> child_object_id = std::nullopt,
                                    Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .unit_of_measurement = unit_of_measurement(configuration),
-                                             .device_class = device_class(configuration),
+                                             .device_class = deviceClass(configuration),
+                                             .unit_of_measurement = unitOfMeasurement(configuration),
                                              .force_update = configuration.force_update,
                                          })) {}
 
@@ -78,26 +79,29 @@ public:
   void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
 
 private:
-  std::optional<std::string> unit_of_measurement(const Configuration &configuration) const {
+  const DeviceClass &deviceClass(const Configuration &configuration) const {
     switch (configuration.unit) {
     case Unit::Concentration:
-      return VolatileOrganicCompounds::unit_of_measurement(VolatileOrganicCompounds::Unit::ug_m3);
+      return _volatile_organic_compounds;
     case Unit::Parts:
-      return VolatileOrganicCompoundsParts::unit_of_measurement(VolatileOrganicCompoundsParts::Unit::ppb);
+      return _volatile_organic_compounds_parts;
     }
-    return std::nullopt;
+    return _volatile_organic_compounds_parts; // noop
   }
-  std::optional<std::string> device_class(const Configuration &configuration) const {
+
+  std::optional<UnitType> unitOfMeasurement(const Configuration &configuration) const {
     switch (configuration.unit) {
     case Unit::Concentration:
-      return VolatileOrganicCompounds::DEVICE_CLASS;
+      return VolatileOrganicCompounds::Unit::ug_m3;
     case Unit::Parts:
-      return VolatileOrganicCompoundsParts::DEVICE_CLASS;
+      return VolatileOrganicCompoundsParts::Unit::ppb;
     }
     return std::nullopt;
   }
 
 private:
+  const VolatileOrganicCompounds _volatile_organic_compounds;
+  const VolatileOrganicCompoundsParts _volatile_organic_compounds_parts;
   HaEntitySensor _ha_entity_sensor;
 };
 

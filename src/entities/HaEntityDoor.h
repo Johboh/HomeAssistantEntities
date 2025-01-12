@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::BinarySensor::DeviceClass;
+using namespace homeassistantentities::BinarySensor;
 
 /**
  * @brief Represent a Door binary sensor (if a door is open or closed).
@@ -34,11 +34,10 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityDoor(HaBridge &ha_bridge, std::string name, std::string child_object_id = "")
+  HaEntityDoor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .sensor_type = HaEntitySensor::SensorType::BinarySensor,
-                                             .device_class = Door::DEVICE_CLASS,
+                                             .device_class = _door,
                                              .state_class = std::nullopt,
                                          })) {}
 
@@ -54,6 +53,7 @@ public:
   void publishDoor(bool open) { _ha_entity_sensor.publishValue(open ? "ON" : "OFF"); }
 
 private:
+  const Door _door;
   HaEntitySensor _ha_entity_sensor;
 };
 

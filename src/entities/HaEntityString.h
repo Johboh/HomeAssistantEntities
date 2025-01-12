@@ -57,17 +57,15 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityString(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
+  HaEntityString(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                  Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
-                                             .device_class = configuration.device_class,
+                                             .device_class = _string,
                                              .state_class = std::nullopt,
                                              .with_attributes = configuration.with_attributes,
                                              .force_update = configuration.force_update,
-                                         })) {
-    _ha_entity_sensor.overrideObjectId("string");
-  }
+                                         })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -92,6 +90,7 @@ public:
   void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
 private:
+  const String _string;
   HaEntitySensor _ha_entity_sensor;
 };
 

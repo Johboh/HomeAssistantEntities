@@ -1,11 +1,8 @@
 #include "HaEntityEvent.h"
-#include "HaDeviceClasses.h"
 #include <HaUtilities.h>
 #include <IJson.h>
 
 #define COMPONENT "event"
-
-using namespace homeassistantentities::Event::DeviceClass;
 
 HaEntityEvent::HaEntityEvent(HaBridge &ha_bridge, std::string name, std::string object_id, Configuration configuration)
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id),
@@ -21,13 +18,13 @@ void HaEntityEvent::publishConfiguration() {
   }
   switch (_configuration.device_class) {
   case DeviceClass::Button:
-    doc["device_class"] = Button::DEVICE_CLASS;
+    doc["device_class"] = "button";
     break;
   case DeviceClass::Motion:
-    doc["device_class"] = Motion::DEVICE_CLASS;
+    doc["device_class"] = "motion";
     break;
-  case DeviceClass::Dorrbell:
-    doc["device_class"] = Doorbell::DEVICE_CLASS;
+  case DeviceClass::Doorbell:
+    doc["device_class"] = "doorbell";
     break;
   case DeviceClass::None:
     break;
