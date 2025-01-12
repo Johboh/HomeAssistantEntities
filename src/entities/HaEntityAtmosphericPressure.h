@@ -17,11 +17,13 @@ using namespace homeassistantentities::Sensor;
  */
 class HaEntityAtmosphericPressure : public HaEntity {
 public:
+  using Unit = AtmosphericPressure::Unit;
+
   struct Configuration {
     /**
      * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
      */
-    AtmosphericPressure::Unit unit = AtmosphericPressure::Unit::hPa;
+    Unit unit = Unit::hPa;
 
     /**
      * @brief In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
@@ -31,7 +33,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.unit = AtmosphericPressure::Unit::hPa, .force_update = false};
+  inline static Configuration _default = {.unit = Unit::hPa, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity AtmosphericPressure object

@@ -16,11 +16,13 @@ using namespace homeassistantentities::Sensor;
  */
 class HaEntityVoltage : public HaEntity {
 public:
+  using Unit = Voltage::Unit;
+
   struct Configuration {
     /**
      * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
      */
-    Voltage::Unit unit = Voltage::Unit::V;
+    Unit unit = Unit::V;
 
     /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
@@ -30,7 +32,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.unit = Voltage::Unit::V, .force_update = false};
+  inline static Configuration _default = {.unit = Unit::V, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Voltage object

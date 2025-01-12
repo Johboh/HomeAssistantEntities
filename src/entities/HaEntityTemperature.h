@@ -16,11 +16,13 @@ using namespace homeassistantentities::Sensor;
  */
 class HaEntityTemperature : public HaEntity {
 public:
+  using Unit = Temperature::Unit;
+
   struct Configuration {
     /**
      * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
      */
-    Temperature::Unit unit = Temperature::Unit::C;
+    Unit unit = Unit::C;
 
     /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
@@ -30,7 +32,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.unit = Temperature::Unit::C, .force_update = false};
+  inline static Configuration _default = {.unit = Unit::C, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Temperature object

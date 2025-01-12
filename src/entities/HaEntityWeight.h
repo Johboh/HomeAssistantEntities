@@ -16,11 +16,13 @@ using namespace homeassistantentities::Sensor;
  */
 class HaEntityWeight : public HaEntity {
 public:
+  using Unit = Weight::Unit;
+
   struct Configuration {
     /**
      * @brief the unit of measurement reported for this sensor. Make sure that the value you publish is of this unit.
      */
-    Weight::Unit unit = Weight::Unit::kg;
+    Unit unit = Unit::kg;
 
     /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
@@ -30,7 +32,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.unit = Weight::Unit::kg, .force_update = false};
+  inline static Configuration _default = {.unit = Unit::kg, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity Weight object
