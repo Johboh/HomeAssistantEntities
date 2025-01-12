@@ -29,6 +29,7 @@
 #include <entities/HaEntitySwitch.h>
 #include <entities/HaEntityTemperature.h>
 #include <entities/HaEntityText.h>
+#include <entities/HaEntityUnitConcentration.h>
 #include <entities/HaEntityVolatileOrganicCompounds.h>
 #include <entities/HaEntityVoltage.h>
 #include <entities/HaEntityWeight.h>
@@ -108,6 +109,9 @@ HaEntityText _ha_entity_text(ha_bridge, "text", "billboard",
                                                          .is_password = false,
                                                          .force_update = false,
                                                          .retain = false});
+HaEntityUnitConcentration _ha_entity_unit_concentration(ha_bridge, "concentration", std::nullopt,
+                                                        HaEntityUnitConcentration::Configuration{
+                                                            .unit = HaEntityUnitConcentration::Unit::mL});
 HaEntityVolatileOrganicCompounds _ha_entity_volatile_organic_compounds(
     ha_bridge, "volatile organic compounds", std::nullopt,
     HaEntityVolatileOrganicCompounds::Configuration{.unit = HaEntityVolatileOrganicCompounds::Unit::Concentration,
@@ -147,6 +151,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_switch.publishSwitch(true);
     _ha_entity_temperature.publishTemperature(55.0);
     _ha_entity_text.publishText("text");
+    _ha_entity_unit_concentration.publishConcentration(55.0);
     _ha_entity_volatile_organic_compounds.publishConcentration(55.0);
     _ha_entity_voltage.publishVoltage(55.0);
     _ha_entity_weight.publishWeight(55.0);
@@ -193,6 +198,7 @@ void app_main(void) {
       _ha_entity_switch.publishConfiguration();
       _ha_entity_temperature.publishConfiguration();
       _ha_entity_text.publishConfiguration();
+      _ha_entity_unit_concentration.publishConfiguration();
       _ha_entity_volatile_organic_compounds.publishConfiguration();
       _ha_entity_voltage.publishConfiguration();
       _ha_entity_weight.publishConfiguration();

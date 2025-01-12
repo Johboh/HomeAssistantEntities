@@ -25,6 +25,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - String (raw "String"-sensor)
 - Temperature (°C/°F)
 - Text
+- Unit Concentration (parts per volume)
 - Volatile organic compounds (µg/m³ or ppb)
 - Voltage (mV/V)
 - Weight (g/kg)

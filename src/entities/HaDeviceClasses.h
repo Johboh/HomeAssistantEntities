@@ -1513,6 +1513,34 @@ public:
   std::string objectId() const override { return "brightness"; }
 };
 
+/**
+ * @brief Particles/Units/things per volume.
+ */
+class UnitConcentration : public DeviceClass {
+public:
+  enum Unit : UnitType { mL = 1, dL, L };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  // No unit concentration device class exists.
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case mL:
+      return "/mL";
+    case dL:
+      return "/dL";
+    case L:
+      return "/L";
+    default:
+      return std::nullopt;
+    }
+  }
+
+  std::string objectId() const override { return "unit_concentration"; }
+};
+
 class Json : public DeviceClass {
 public:
   SensorType sensorType() const override { return SensorType::Sensor; }
