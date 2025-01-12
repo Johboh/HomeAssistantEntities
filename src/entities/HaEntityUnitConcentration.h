@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
+using namespace homeassistantentities::Sensor::Undefined;
 
 /**
  * @brief Represent a Particles/Units/things per volume sensor (see
