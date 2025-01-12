@@ -9,9 +9,9 @@ Arduino (using Arduino IDE or PlatformIO) and ESP-IDF (using Espressif IoT Devel
 Home Assistant has a well defined way of defining sensors and actuators using MQTT. This library register a device with one or mulitple sensors and provide a way to publish new values for them, as well as listen for commands from Home Assistant.
 
 ### Currently supported sensors*
-- Atmospheric Preassure (hPa)
+- Atmospheric Preassure (cbar, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi)
 - Boolean
-- Binary sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class))
+- Binary sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class) using a device class from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
 - Brightness (%)
 - Carbon Dioxide (ppm)
 - Door (open/closed)
@@ -23,13 +23,13 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Particulate matter (μg/m³)
 - Sound (detected/not detected)
 - String (raw "String"-sensor)
-- Temperature (°C/°F)
+- Temperature (°C, °F, K)
 - Text
 - Unit Concentration (parts per volume)
-- Volatile organic compounds (µg/m³ or ppb)
-- Voltage (mV/V)
-- Weight (g/kg)
-- Sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement)
+- Volatile organic compounds (µg/m³, ppb)
+- Voltage (V = 1, mV, µV)
+- Weight (kg, g, mg, ug, oz, lb, st)
+- Sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement using a device class from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
 
 ### Currently supported actuators (and sensors)*
 - Curtain (open/opening, close/closing, position)
