@@ -83,10 +83,11 @@ HaEntitySelect _ha_entity_select(ha_bridge, "select", "playlist", {.options = {"
 HaEntitySound _ha_entity_sound(ha_bridge, "sound", "");
 homeassistantentities::Sensor::Precipitation _precipitation;
 HaEntitySensor _ha_entity_sensor(ha_bridge, "sensor", std::nullopt,
-                                 HaEntitySensor::Configuration{.device_class = _precipitation,
-                                                               .unit_of_measurement = Precipitation::Unit::mm,
-                                                               .with_attributes = false,
-                                                               .force_update = false});
+                                 HaEntitySensor::Configuration{
+                                     .device_class = _precipitation,
+                                     .unit_of_measurement = homeassistantentities::Sensor::Precipitation::Unit::mm,
+                                     .with_attributes = false,
+                                     .force_update = false});
 HaEntityString _ha_entity_string(ha_bridge, "string", std::nullopt,
                                  {.device_class = "enum", .with_attributes = false, .force_update = false});
 HaEntitySwitch _ha_entity_switch(ha_bridge, "switch", "party", {.retain = false});
