@@ -92,7 +92,7 @@ HaEntityString _ha_entity_string(ha_bridge, "string", std::nullopt,
                                  {.device_class = "enum", .with_attributes = false, .force_update = false});
 HaEntitySwitch _ha_entity_switch(ha_bridge, "switch", "party", {.retain = false});
 HaEntityTemperature _ha_entity_temperature(ha_bridge, "temperature", std::nullopt,
-                                           {.unit = Temperature::Unit::C, .force_update = false});
+                                           {.unit = HaEntityTemperature::Unit::C, .force_update = false});
 HaEntityText _ha_entity_text(ha_bridge, "text", "billboard",
                              {.min_text_length = 0,
                               .max_text_length = 255,
@@ -106,8 +106,9 @@ HaEntityVolatileOrganicCompounds _ha_entity_volatile_organic_compounds(
     ha_bridge, "volatile organic compounds", std::nullopt,
     {.unit = HaEntityVolatileOrganicCompounds::Unit::Concentration, .force_update = false});
 HaEntityVoltage _ha_entity_voltage(ha_bridge, "voltage", std::nullopt,
-                                   {.unit = Voltage::Unit::mV, .force_update = false});
-HaEntityWeight _ha_entity_weight(ha_bridge, "weight", std::nullopt, {.unit = Weight::Unit::kg, .force_update = false});
+                                   {.unit = HaEntityVoltage::Unit::mV, .force_update = false});
+HaEntityWeight _ha_entity_weight(ha_bridge, "weight", std::nullopt,
+                                 {.unit = HaEntityWeight::Unit::kg, .force_update = false});
 
 void haStateTask(void *pvParameters) {
   nlohmann::json jsn;
