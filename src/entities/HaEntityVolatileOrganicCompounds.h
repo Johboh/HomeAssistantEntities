@@ -90,16 +90,16 @@ private:
   std::optional<UnitType> unitOfMeasurement(const Configuration &configuration) const {
     switch (configuration.unit) {
     case Unit::Concentration:
-      return VolatileOrganicCompounds::Unit::ug_m3;
+      return homeassistantentities::Sensor::VolatileOrganicCompounds::Unit::ug_m3;
     case Unit::Parts:
-      return VolatileOrganicCompoundsParts::Unit::ppb;
+      return homeassistantentities::Sensor::VolatileOrganicCompoundsParts::Unit::ppb;
     }
     return std::nullopt;
   }
 
 private:
-  const VolatileOrganicCompounds _volatile_organic_compounds;
-  const VolatileOrganicCompoundsParts _volatile_organic_compounds_parts;
+  const homeassistantentities::Sensor::VolatileOrganicCompounds _volatile_organic_compounds;
+  const homeassistantentities::Sensor::VolatileOrganicCompoundsParts _volatile_organic_compounds_parts;
   HaEntitySensor _ha_entity_sensor;
 };
 
