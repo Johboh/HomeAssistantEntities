@@ -83,7 +83,7 @@ public:
   void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
 private:
-  const namespace homeassistantentities::BinarySensor::Undefined::Boolean _boolean;
+  const homeassistantentities::BinarySensor::Undefined::Boolean _boolean;
   HaEntitySensor _ha_entity_sensor;
 };
 
