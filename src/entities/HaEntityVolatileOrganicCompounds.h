@@ -77,7 +77,7 @@ public:
   void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
 
 private:
-  const DeviceClass &deviceClass(const Configuration &configuration) const {
+  const homeassistantentities::DeviceClass &deviceClass(const Configuration &configuration) const {
     switch (configuration.unit) {
     case Unit::Concentration:
       return _volatile_organic_compounds;
