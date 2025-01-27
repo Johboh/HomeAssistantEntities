@@ -15,7 +15,7 @@
  */
 class HaEntityUnitConcentration : public HaEntity {
 public:
-  using Unit = UnitConcentration::Unit;
+  using Unit = homeassistantentities::Sensor::UnitConcentration::Unit;
 
   struct Configuration {
     /**
