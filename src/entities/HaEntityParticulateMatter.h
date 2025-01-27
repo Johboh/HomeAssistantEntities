@@ -89,7 +89,7 @@ private:
     return _pm10; // noop
   }
 
-  const std::optional<UnitType> unitOfMeasurement(const Configuration &configuration) const {
+  const std::optional<homeassistantentities::UnitType> unitOfMeasurement(const Configuration &configuration) const {
     switch (configuration.size) {
     case Size::pm1:
       return homeassistantentities::Sensor::Pm1::Unit::ug_m3;

@@ -90,7 +90,7 @@ public:
   void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
 private:
-  const String _string;
+  const homeassistantentities::Sensor::Undefined::String _string;
   HaEntitySensor _ha_entity_sensor;
 };
 

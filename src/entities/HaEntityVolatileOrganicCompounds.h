@@ -87,7 +87,7 @@ private:
     return _volatile_organic_compounds_parts; // noop
   }
 
-  std::optional<UnitType> unitOfMeasurement(const Configuration &configuration) const {
+  std::optional<homeassistantentities::UnitType> unitOfMeasurement(const Configuration &configuration) const {
     switch (configuration.unit) {
     case Unit::Concentration:
       return homeassistantentities::Sensor::VolatileOrganicCompounds::Unit::ug_m3;

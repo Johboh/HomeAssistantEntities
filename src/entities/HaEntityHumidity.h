@@ -46,12 +46,13 @@ public:
    */
   HaEntityHumidity(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                    Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .device_class = _humiditiy,
-                                             .unit_of_measurement = Humidity::Unit::Percent,
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(
+            HaEntitySensor(ha_bridge, name, child_object_id,
+                           HaEntitySensor::Configuration{
+                               .device_class = _humiditiy,
+                               .unit_of_measurement = homeassistantentities::Sensor::Humidity::Unit::Percent,
+                               .force_update = configuration.force_update,
+                           })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
