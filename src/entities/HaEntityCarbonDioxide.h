@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
-
 /**
  * @brief Represent a Carbon Dioxide sensor (e.g. SGP30) (see
  * homeassistantentities::Sensor::CarbonDioxide:Unit  in HaDeviceClasses.h).
@@ -69,7 +67,7 @@ public:
   void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
 
 private:
-  const CarbonDioxide _carbon_dioxide;
+  const homeassistantentities::Sensor::CarbonDioxide _carbon_dioxide;
   HaEntitySensor _ha_entity_sensor;
 };
 

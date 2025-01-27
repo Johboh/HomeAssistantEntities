@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
-
 /**
  * @brief Represent a volatile organic compounds sensor, concentration in μg/m³ or parts in ppb/parts per billion.
  */

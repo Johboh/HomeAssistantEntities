@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities;
-
 /**
  * @brief A generic sensor/binary sensor. Consider using any of the specific sensors first, like HaEntityTemperature,
  * HaEntityVoltage etc.
@@ -21,13 +19,13 @@ public:
     /**
      * @brief The Device class to use. One of the classes in HaDeviceClasses.h.
      */
-    const DeviceClass &device_class;
+    const homeassistantentities::DeviceClass &device_class;
 
     /**
      * @brief The unit of measurement to use from the sensor. Should be a unit provided by the Device class, or
      * std::nullopt if no unit.
      */
-    std::optional<UnitType> unit_of_measurement = std::nullopt;
+    std::optional<homeassistantentities::UnitType> unit_of_measurement = std::nullopt;
 
     /**
      * @brief The state class to use for this sensor. See

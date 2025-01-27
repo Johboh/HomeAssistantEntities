@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
-
 /**
  * @brief Represent a patriculate matter sensor (e.g. PMS5003), μg/m³.
  */

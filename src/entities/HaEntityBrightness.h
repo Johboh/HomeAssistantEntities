@@ -8,8 +8,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor::Undefined;
-
 /**
  * @brief Represent a Brightness sensor (%).
  */
@@ -47,13 +45,14 @@ public:
    */
   HaEntityBrightness(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                      Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .device_class = _brightness,
-                                             .unit_of_measurement = Brightness::Unit::Percent,
-                                             .icon = "mdi:brightness-percent",
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(HaEntitySensor(
+            ha_bridge, name, child_object_id,
+            HaEntitySensor::Configuration{
+                .device_class = _brightness,
+                .unit_of_measurement = homeassistantentities::Sensor::Undefined::Brightness::Unit::Percent,
+                .icon = "mdi:brightness-percent",
+                .force_update = configuration.force_update,
+            })) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -70,7 +69,7 @@ private:
   std::string stateTopic();
 
 private:
-  const Brightness _brightness;
+  const homeassistantentities::Sensor::Undefined::Brightness _brightness;
   HaEntitySensor _ha_entity_sensor;
 };
 

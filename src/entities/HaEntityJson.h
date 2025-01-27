@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor::Undefined;
-
 /**
  * @brief Represent a raw JSON sensor with a state topic on which you post your JSON.
  * Also see [HaEntitystd::string] which is very similar. TODO(johboh): merge?
@@ -70,7 +68,7 @@ public:
   }
 
 private:
-  const Json _json;
+  const homeassistantentities::Sensor::Undefined::Json _json;
   HaEntitySensor _ha_entity_sensor;
 };
 

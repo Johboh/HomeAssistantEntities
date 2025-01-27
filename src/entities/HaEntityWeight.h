@@ -9,14 +9,12 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
-
 /**
  * @brief Represent a Weight sensor (see homeassistantentities::Sensor::Weight:Unit in HaDeviceClasses.h).
  */
 class HaEntityWeight : public HaEntity {
 public:
-  using Unit = Weight::Unit;
+  using Unit = homeassistantentities::Sensor::Weight::Unit;
 
   struct Configuration {
     /**
@@ -74,7 +72,7 @@ public:
   void publishWeight(double weight) { _ha_entity_sensor.publishValue(weight); }
 
 private:
-  const Weight _weight;
+  const homeassistantentities::Sensor::Weight _weight;
   HaEntitySensor _ha_entity_sensor;
 };
 

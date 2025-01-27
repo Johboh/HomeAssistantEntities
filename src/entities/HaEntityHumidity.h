@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
-
 /**
  * @brief Represent a Air humidity sensor (%).
  */
@@ -67,7 +65,7 @@ public:
   void publishHumidity(double humidity) { _ha_entity_sensor.publishValue(humidity); }
 
 private:
-  const Humidity _humiditiy;
+  const homeassistantentities::Sensor::Humidity _humiditiy;
   HaEntitySensor _ha_entity_sensor;
 };
 

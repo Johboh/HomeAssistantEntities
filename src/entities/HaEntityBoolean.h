@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::BinarySensor::Undefined;
-
 /**
  * @brief Represent a boolean binary sensor.
  */
@@ -85,7 +83,7 @@ public:
   void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
 private:
-  const Boolean _boolean;
+  const namespace homeassistantentities::BinarySensor::Undefined::Boolean _boolean;
   HaEntitySensor _ha_entity_sensor;
 };
 

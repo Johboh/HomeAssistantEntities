@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::BinarySensor;
-
 /**
  * @brief Represent a Motion binary sensor.
  */
@@ -53,7 +51,7 @@ public:
   void publishMotion(bool detected) { _ha_entity_sensor.publishValue(detected ? "ON" : "OFF"); }
 
 private:
-  const Motion _motion;
+  const homeassistantentities::BinarySensor::Motion _motion;
   HaEntitySensor _ha_entity_sensor;
 };
 

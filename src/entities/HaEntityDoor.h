@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::BinarySensor;
-
 /**
  * @brief Represent a Door binary sensor (if a door is open or closed).
  */
@@ -53,7 +51,7 @@ public:
   void publishDoor(bool open) { _ha_entity_sensor.publishValue(open ? "ON" : "OFF"); }
 
 private:
-  const Door _door;
+  const homeassistantentities::BinarySensor::Door _door;
   HaEntitySensor _ha_entity_sensor;
 };
 

@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::BinarySensor;
-
 /**
  * @brief Represent a Sound binary sensor (if a sound is detected or not).
  */
@@ -53,7 +51,7 @@ public:
   void publishSound(bool detected) { _ha_entity_sensor.publishValue(detected ? "ON" : "OFF"); }
 
 private:
-  const Sound _sound;
+  const homeassistantentities::BinarySensor::Sound _sound;
   HaEntitySensor _ha_entity_sensor;
 };
 

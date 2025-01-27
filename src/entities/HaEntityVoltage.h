@@ -9,14 +9,12 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
-
 /**
  * @brief Represent a Voltage sensor (see homeassistantentities::Sensor::Voltage:Unit in HaDeviceClasses.h).
  */
 class HaEntityVoltage : public HaEntity {
 public:
-  using Unit = Voltage::Unit;
+  using Unit = homeassistantentities::Sensor::Voltage::Unit;
 
   struct Configuration {
     /**
@@ -74,7 +72,7 @@ public:
   void publishVoltage(double voltage) { _ha_entity_sensor.publishValue(voltage); }
 
 private:
-  const Voltage _voltage;
+  const homeassistantentities::Sensor::Voltage _voltage;
   HaEntitySensor _ha_entity_sensor;
 };
 

@@ -9,14 +9,12 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
-
 /**
  * @brief Represent a Temperature sensor (see homeassistantentities::Sensor::Temperature:Unit in HaDeviceClasses.h).
  */
 class HaEntityTemperature : public HaEntity {
 public:
-  using Unit = Temperature::Unit;
+  using Unit = homeassistantentities::Sensor::Temperature::Unit;
 
   struct Configuration {
     /**
@@ -74,7 +72,7 @@ public:
   void publishTemperature(double temperature) { _ha_entity_sensor.publishValue(temperature); }
 
 private:
-  const Temperature _temperature;
+  const homeassistantentities::Sensor::Temperature _temperature;
   HaEntitySensor _ha_entity_sensor;
 };
 

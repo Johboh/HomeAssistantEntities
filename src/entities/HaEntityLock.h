@@ -9,8 +9,6 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::BinarySensor;
-
 /**
  * @brief Represent a Lock binary sensor (if a lock is locked or unlocked).
  */
@@ -53,7 +51,7 @@ public:
   void publishLock(bool locked) { _ha_entity_sensor.publishValue(locked ? "OFF" : "ON"); } // locked == OFF
 
 private:
-  const Lock _lock;
+  const homeassistantentities::BinarySensor::Lock _lock;
   HaEntitySensor _ha_entity_sensor;
 };
 

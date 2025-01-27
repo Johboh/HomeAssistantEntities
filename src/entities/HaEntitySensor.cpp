@@ -2,6 +2,8 @@
 #include <HaUtilities.h>
 #include <IJson.h>
 
+using namespace homeassistantentities;
+
 HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id,
                                Configuration configuration)
     : _name(trim(name)), _ha_bridge(ha_bridge), _object_id(configuration.device_class.objectId()),

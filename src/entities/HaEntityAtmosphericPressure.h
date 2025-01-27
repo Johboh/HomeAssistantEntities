@@ -9,15 +9,13 @@
 #include <optional>
 #include <string>
 
-using namespace homeassistantentities::Sensor;
-
 /**
  * @brief Represent a Atmospheric pressure sensor (see
  * homeassistantentities::Sensor::AtmosphericPressure:Unit in HaDeviceClasses.h).
  */
 class HaEntityAtmosphericPressure : public HaEntity {
 public:
-  using Unit = AtmosphericPressure::Unit;
+  using Unit = homeassistantentities::Sensor::AtmosphericPressure::Unit;
 
   struct Configuration {
     /**
@@ -76,7 +74,7 @@ public:
   void publishAtmosphericPressure(double pressure) { _ha_entity_sensor.publishValue(pressure); }
 
 private:
-  const AtmosphericPressure _atmospheric_pressure;
+  const homeassistantentities::Sensor::AtmosphericPressure _atmospheric_pressure;
   HaEntitySensor _ha_entity_sensor;
 };
 
