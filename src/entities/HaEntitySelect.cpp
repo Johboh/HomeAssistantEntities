@@ -27,6 +27,7 @@ void HaEntitySelect::publishConfiguration() {
   for (const std::string &option : _configuration.options) {
     addToJsonArray(options_array, option);
   }
+
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
 }
 

@@ -54,12 +54,13 @@ void HaEntitySensor::publishConfiguration() {
   }
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id);
-  _ha_bridge.publishConfiguration(_component, _object_id, _child_object_id, doc);
 
   if (_configuration.with_attributes) {
     doc["json_attributes_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Attributes, _component, _object_id, _child_object_id);
   }
+
+  _ha_bridge.publishConfiguration(_component, _object_id, _child_object_id, doc);
 }
 
 void HaEntitySensor::republishState() {

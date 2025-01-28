@@ -27,6 +27,7 @@ void HaEntityNumber::publishConfiguration() {
   // TODO (johboh): Allow setting doc["device_class"]?
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
+
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
 }
 

@@ -27,6 +27,7 @@ void HaEntitySwitch::publishConfiguration() {
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
   doc["command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
+
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }
 

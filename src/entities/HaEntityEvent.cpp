@@ -36,6 +36,7 @@ void HaEntityEvent::publishConfiguration() {
   for (const std::string &event_type : _configuration.event_types) {
     addToJsonArray(event_types_array, event_type);
   }
+
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
 }
 

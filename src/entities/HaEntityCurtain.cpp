@@ -28,6 +28,7 @@ void HaEntityCurtain::publishConfiguration() {
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
   doc["set_position_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
+
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }
 

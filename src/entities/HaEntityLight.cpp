@@ -72,6 +72,7 @@ void HaEntityLight::publishConfiguration() {
       addToJsonArray(effect_list_array, effect);
     }
   }
+
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }
 
