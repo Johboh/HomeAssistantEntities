@@ -17,12 +17,6 @@ class HaEntityString : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief if set, will set to this device class. Must be one of
-     * https://www.home-assistant.io/integrations/sensor/#device-class
-     */
-    std::string device_class = "";
-
-    /**
      * @brief if true, setup an attribute topic attributes will be published to. With this set, attributes
      * can be published when the message is published, or using a separate call.
      */
@@ -36,7 +30,7 @@ public:
     bool force_update = false;
   };
 
-  inline static Configuration _default = {.device_class = "", .with_attributes = false, .force_update = false};
+  inline static Configuration _default = {.with_attributes = false, .force_update = false};
 
   /**
    * @brief Construct a new Ha Entity String object
