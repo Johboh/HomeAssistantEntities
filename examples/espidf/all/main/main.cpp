@@ -163,7 +163,7 @@ void app_main(void) {
     // Connected to WIFI.
 
     // Start MQTT
-    _mqtt_remote.start([]() {
+    _mqtt_remote.start([](bool connected) {
       // Publish Home Assistant Configuration once connected to MQTT.
       _ha_entity_atm.publishConfiguration();
       _ha_entity_bool.publishConfiguration();
