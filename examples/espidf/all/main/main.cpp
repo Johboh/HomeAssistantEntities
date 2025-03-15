@@ -50,7 +50,8 @@ void setupJsonForThisDevice() {
 }
 
 // Setup MQTT
-MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_password, 2048, 10);
+MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_password,
+                        {.rx_buffer_size = 256, .tx_buffer_size = 1024, .keep_alive_s = 10});
 
 // Create the Home Assistant bridge. This is shared across all entities.
 // We only have one per device/hardware. In our example, the name of our device is "livingroom".
