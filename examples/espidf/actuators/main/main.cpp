@@ -70,7 +70,7 @@ void app_main(void) {
     // Connected to WIFI.
 
     // Start MQTT
-    _mqtt_remote.start([]() {
+    _mqtt_remote.start([](bool connected) {
       // Publish Home Assistant Configuration for both lights once connected to MQTT.
       _ha_entity_light_left_bench.publishConfiguration();
       _ha_entity_light_right_bench.publishConfiguration();
