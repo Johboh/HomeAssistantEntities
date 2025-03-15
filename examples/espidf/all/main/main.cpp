@@ -88,8 +88,7 @@ HaEntitySensor _ha_entity_sensor(ha_bridge, "sensor", std::nullopt,
                                      .unit_of_measurement = homeassistantentities::Sensor::Precipitation::Unit::mm,
                                      .with_attributes = false,
                                      .force_update = false});
-HaEntityString _ha_entity_string(ha_bridge, "string", std::nullopt,
-                                 {.device_class = "enum", .with_attributes = false, .force_update = false});
+HaEntityString _ha_entity_string(ha_bridge, "string", std::nullopt, {.with_attributes = true, .force_update = false});
 HaEntitySwitch _ha_entity_switch(ha_bridge, "switch", "party", {.retain = false});
 HaEntityTemperature _ha_entity_temperature(ha_bridge, "temperature", std::nullopt,
                                            {.unit = HaEntityTemperature::Unit::C, .force_update = false});
