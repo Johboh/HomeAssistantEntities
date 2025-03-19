@@ -71,9 +71,12 @@ HaEntityEvent _ha_entity_event(ha_bridge, "event", "party",
                                {.event_types = {"button_press"}, .device_class = HaEntityEvent::DeviceClass::Button});
 HaEntityHumidity _ha_entity_humidity(ha_bridge, "humidity", std::nullopt, {.force_update = false});
 HaEntityJson _ha_entity_json(ha_bridge, "json", std::nullopt, {.force_update = false});
-HaEntityLight
-    _ha_entity_light(ha_bridge, "light", "roof",
-                     {.with_brightness = false, .with_rgb_color = false, .effects = {"colorloop"}, .retain = false});
+HaEntityLight _ha_entity_light(ha_bridge, "light", "roof",
+                               {.with_brightness = false,
+                                .with_color_temperature = HaEntityLight::Configuration::ColorTemperature::Kelvin,
+                                .with_rgb_color = false,
+                                .effects = {"colorloop"},
+                                .retain = false});
 HaEntityLock _ha_entity_lock(ha_bridge, "lock");
 HaEntityMotion _ha_entity_motion(ha_bridge, "motion");
 HaEntityNumber _ha_entity_number(ha_bridge, "number", "danceability",

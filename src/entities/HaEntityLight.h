@@ -22,11 +22,6 @@ public:
      */
     bool with_brightness = false;
 
-    /**
-     * @brief if True, the light supports RGB color.
-     */
-    bool with_rgb_color = false;
-
     enum class ColorTemperature {
       None,
       Mireds, // Color temperature is defined as mireds, value between 153 to 500.
@@ -37,6 +32,11 @@ public:
      * @brief if set, the light supports color temperature.
      */
     ColorTemperature with_color_temperature = ColorTemperature::None;
+
+    /**
+     * @brief if True, the light supports RGB color.
+     */
+    bool with_rgb_color = false;
 
     /**
      * @brief if non empty, the supported effects.
