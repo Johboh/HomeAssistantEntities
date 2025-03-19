@@ -35,7 +35,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Curtain (open/opening, close/closing, position)
 - Button
 - Event
-- Light (brightness, rgb, effect)
+- Light (brightness, color temperature, rgb, effect)
 - Select
 - Switch (on/off)
 
