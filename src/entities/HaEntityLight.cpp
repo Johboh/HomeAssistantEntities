@@ -61,6 +61,9 @@ void HaEntityLight::publishConfiguration() {
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE);
     doc["color_temp_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE);
+    if (_configuration.with_color_temperature == Configuration::ColorTemperature::Kelvin) {
+      doc["color_temp_kelvin"] = true;
+    }
   }
   if (_configuration.with_rgb_color) {
     doc["rgb_state_topic"] =
