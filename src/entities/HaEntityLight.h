@@ -27,6 +27,17 @@ public:
      */
     bool with_rgb_color = false;
 
+    enum class ColorTemperature {
+      None,
+      Mireds, // Color temperature is defined as mireds, value between 153 to 500.
+      Kelvin, // Color temperature is defined as Kelvin, value between 2000 to 6535.
+    };
+
+    /**
+     * @brief if set, the light supports color temperature.
+     */
+    ColorTemperature with_color_temperature = ColorTemperature::None;
+
     /**
      * @brief if non empty, the supported effects.
      */
@@ -55,7 +66,7 @@ public:
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param capabilities what this light supports.
+   * @param configuration what this light supports.
    */
   HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id, Configuration configuration);
 
@@ -74,15 +85,23 @@ public:
    * @brief Publish the current brightness.
    *
    * @param brightness of the light, between 0 and 255. Will only be published if the light is setup with this
-   * capability in the constructor.
+   * capability in the Configuration.
    */
   void publishBrightness(uint8_t brightness);
+
+  /**
+   * @brief Publish the current color temperature.
+   *
+   * @param temperature mireds or Kelvin, depending on what was specified in the Configuration. Will only be published
+   * if the light is setup with this capability in the Configuration.
+   */
+  void publishColorTemperature(uint16_t temperature);
 
   /**
    * @brief Publish the current selected effect.
    *
    * @param effect currently selected. Should be any of the effects from the Capabilities. Will only be published if the
-   * light is setup with this capability in the constructor.
+   * light is setup with this capability in the Configuration.
    */
   void publishEffect(std::string effect);
 
@@ -100,7 +119,7 @@ public:
    * @brief Publish the current RGB value.
    *
    * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
-   * constructor.
+   * Configuration.
    */
   void publishRgb(uint8_t r, uint8_t g, uint8_t b) { publishRgb({r, g, b}); }
 
@@ -108,7 +127,7 @@ public:
    * @brief Publish the current RGB value.
    *
    * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
-   * constructor.
+   * Configuration.
    */
   void publishRgb(RGB rgb);
 
@@ -122,6 +141,13 @@ public:
    * respected if the light is setup with this capability.
    */
   bool setOnBrightness(std::function<void(uint8_t)> brightness_callback);
+
+  /**
+   * @brief Set callback for receving callbacks when there is a new color temperature that should be set. Will only be
+   * respected if the light is setup with this capability. In mireds or Kelvin, depending on what was selected in the
+   * Configuration.
+   */
+  bool setOnColorTemperature(std::function<void(uint16_t)> color_temperature_callback);
 
   /**
    * @brief Set callback for receving callbacks when there is a new effect that should be set. Will only be
@@ -146,6 +172,7 @@ private:
   std::optional<RGB> _rgb;
   std::optional<std::string> _effect;
   std::optional<uint8_t> _brightness;
+  std::optional<uint16_t> _color_temperature;
 };
 
 #endif // __HA_ENTITY_LIGHT_H__
