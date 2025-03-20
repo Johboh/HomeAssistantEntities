@@ -80,7 +80,12 @@ HaEntityLight _ha_entity_light(ha_bridge, "light", "roof",
 HaEntityLock _ha_entity_lock(ha_bridge, "lock");
 HaEntityMotion _ha_entity_motion(ha_bridge, "motion");
 HaEntityNumber _ha_entity_number(ha_bridge, "number", "danceability",
-                                 {.min_value = 0, .max_value = 100, .force_update = false, .retain = false});
+                                 {.min_value = 0,
+                                  .max_value = 100,
+                                  .unit = "ms",
+                                  .device_class = "duration",
+                                  .force_update = false,
+                                  .retain = false});
 HaEntityParticulateMatter _ha_entity_particulate_matter(ha_bridge, "Particulate matter", std::nullopt,
                                                         {.size = HaEntityParticulateMatter::Size::pm25});
 HaEntitySelect _ha_entity_select(ha_bridge, "select", "playlist", {.options = {"option1", "option2"}, .retain = false});
