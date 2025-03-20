@@ -24,7 +24,14 @@ void HaEntityNumber::publishConfiguration() {
   doc["force_update"] = _configuration.force_update;
   doc["retain"] = _configuration.retain;
 
-  // TODO (johboh): Allow setting doc["device_class"]?
+  if (!_configuration.unit.empty()) {
+    doc["unit_of_measurement"] = _configuration.unit;
+  }
+
+  if (!_configuration.device_class.empty()) {
+    doc["device_class"] = _configuration.device_class;
+  }
+
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
 

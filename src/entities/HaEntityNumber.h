@@ -25,6 +25,18 @@ public:
     float max_value = 100.0;
 
     /**
+     * @brief the unit of measurement reported for this number. Make sure that the value you publish is of this unit.
+     */
+    std::string unit = "";
+
+    /**
+     * @brief the device class for this number. Should be any of
+     * https://www.home-assistant.io/integrations/number/#device-class
+     * Will eventually be replaced by a typed device class.
+     */
+    std::string device_class = "";
+
+    /**
      * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
      * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
      * message (not only when the sensor’s new state is different to the current one).
@@ -37,7 +49,8 @@ public:
     bool retain = false;
   };
 
-  inline static Configuration _default = {.min_value = 1.0, .max_value = 100.0, .force_update = false, .retain = false};
+  inline static Configuration _default = {
+      .min_value = 1.0, .max_value = 100.0, .unit = "", .device_class = "", .force_update = false, .retain = false};
 
   /**
    * @brief Construct a new Ha Entity Number object

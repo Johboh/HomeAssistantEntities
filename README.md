@@ -19,7 +19,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Json (raw "json"-sensor)
 - Lock (locked/unlocked)
 - Motion (detected/not detected)
-- Number
+- Number (with any unit and device class)
 - Particulate matter (μg/m³)
 - Sound (detected/not detected)
 - String (raw "String"-sensor)
@@ -45,7 +45,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 #### PlatformIO (Arduino or ESP-IDF):
 Add the following to `libs_deps`:
 ```
-   Johboh/HomeAssistantEntities@^8.0.4
+   Johboh/HomeAssistantEntities@^8.0.5
 ```
 You also need a MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
@@ -61,7 +61,7 @@ In your existing `idf_component.yml` or in a new `idf_component.yml` next to you
 ```
 dependencies:
   johboh/homeassistantentities:
-    version: ">=8.0.4"
+    version: ">=8.0.5"
 ```
 
 You also need a MQTT library. See Dependencies section. Suggestion:
