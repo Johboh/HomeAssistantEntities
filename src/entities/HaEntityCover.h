@@ -1,5 +1,5 @@
-#ifndef __HA_ENTITY_CURTAIN_H__
-#define __HA_ENTITY_CURTAIN_H__
+#ifndef __HA_ENTITY_COVER_H__
+#define __HA_ENTITY_COVER_H__
 
 #include <HaBridge.h>
 #include <HaEntity.h>
@@ -9,19 +9,19 @@
 #include <string>
 
 /**
- * @brief Represent a Curtain that can be controlled from Home Assistant. It goes two ways, as the curtain can be
+ * @brief Represent a Cover that can be controlled from Home Assistant. It goes two ways, as the cover can be
  * changed independently and will report back state to Home Assistant. See
  * https://www.home-assistant.io/integrations/cover.mqtt/
  */
-class HaEntityCurtain : public HaEntity {
+class HaEntityCover : public HaEntity {
 public:
   /**
-   * @brief Construct a new Ha Entity Curtain object
+   * @brief Construct a new Ha Entity Cover object
    *
    * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
    * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "curtain", friendly name will be "Bathroom curtain". If no
-   * device, friendly name will be just "curtain". If a device is set, this name can be left empty if this entity is the
+   * Example: if device name is "Bathroom" and entity name "cover", friendly name will be "Bathroom cover". If no
+   * device, friendly name will be just "cover". If a device is set, this name can be left empty if this entity is the
    * one main entity (or only) entity of this device. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
@@ -33,7 +33,7 @@ public:
    * all state/command topics and so on. Leave as empty string for no child object ID.  Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  HaEntityCurtain(HaBridge &ha_bridge, std::string name, std::string child_object_id);
+  HaEntityCover(HaBridge &ha_bridge, std::string name, std::string child_object_id);
 
 public:
   void publishConfiguration() override;
@@ -49,12 +49,13 @@ public:
   };
 
   /**
-   * @brief Publish the curtain.
+   * @brief Publish the cover values.
    *
-   * @param state the curtain state. Or absent (std::nullopt) if state is unknown.
-   * @param position of the curtain, between 0 and 100. Or absent (std::nullopt) if position is unknown.
+   * @param state the cover state. Or absent (std::nullopt) if state is unknown.
+   * @param position of the cover, between 0 (fully closed) and 100 (fully open). Or absent (std::nullopt) if position
+   * is unknown.
    */
-  void publishCurtain(std::optional<State> state, std::optional<uint8_t> position = std::nullopt);
+  void publish(std::optional<State> state, std::optional<uint8_t> position = std::nullopt);
 
   enum class Action {
     Open,
@@ -69,7 +70,8 @@ public:
   bool setOnState(std::function<void(Action)> state_callback);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new position that should be set.
+   * @brief Set callback for receving callbacks when there is a new position that should be set, value between 0 (fully
+   * closed) and 100 (fully open).
    */
   bool setOnPosition(std::function<void(uint8_t)> position_callback);
 
@@ -83,4 +85,4 @@ private:
   std::optional<uint8_t> _position;
 };
 
-#endif // __HA_ENTITY_CURTAIN_H__
+#endif // __HA_ENTITY_COVER_H__

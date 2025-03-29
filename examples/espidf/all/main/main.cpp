@@ -12,7 +12,7 @@
 #include <entities/HaEntityBrightness.h>
 #include <entities/HaEntityButton.h>
 #include <entities/HaEntityCarbonDioxide.h>
-#include <entities/HaEntityCurtain.h>
+#include <entities/HaEntityCover.h>
 #include <entities/HaEntityDoor.h>
 #include <entities/HaEntityEvent.h>
 #include <entities/HaEntityHumidity.h>
@@ -65,7 +65,7 @@ HaEntityBoolean _ha_entity_bool(ha_bridge, "bool", std::nullopt, {.with_attribut
 HaEntityBrightness _ha_entity_bright(ha_bridge, "brightness", std::nullopt, {.force_update = false});
 HaEntityButton _ha_entity_button(ha_bridge, "button", "");
 HaEntityCarbonDioxide _ha_entity_carbon_dioxide(ha_bridge, "Carbon dioxide");
-HaEntityCurtain _ha_entity_curtain(ha_bridge, "curtain", "left_window");
+HaEntityCover _ha_entity_cover(ha_bridge, "cover", "left_window");
 HaEntityDoor _ha_entity_door(ha_bridge, "door", "");
 HaEntityEvent _ha_entity_event(ha_bridge, "event", "party",
                                {.event_types = {"button_press"}, .device_class = HaEntityEvent::DeviceClass::Button});
@@ -128,7 +128,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_bool.publishAttributes({{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_bright.publishBrightness(55.0);
     _ha_entity_carbon_dioxide.publishConcentration(55.0);
-    _ha_entity_curtain.publishCurtain(HaEntityCurtain::State::Opening, 50);
+    _ha_entity_cover.publish(HaEntityCover::State::Opening, 50);
     _ha_entity_door.publishDoor(true);
     _ha_entity_event.publishEvent("button_press", {{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_humidity.publishHumidity(55.0);
@@ -178,7 +178,7 @@ void app_main(void) {
       _ha_entity_bright.publishConfiguration();
       _ha_entity_button.publishConfiguration();
       _ha_entity_carbon_dioxide.publishConfiguration();
-      _ha_entity_curtain.publishConfiguration();
+      _ha_entity_cover.publishConfiguration();
       _ha_entity_door.publishConfiguration();
       _ha_entity_event.publishConfiguration();
       _ha_entity_humidity.publishConfiguration();
@@ -203,8 +203,8 @@ void app_main(void) {
 
     // Register for callbacks.
     _ha_entity_button.setOnPressed([]() {});
-    _ha_entity_curtain.setOnState([](HaEntityCurtain::Action action) {});
-    _ha_entity_curtain.setOnPosition([](uint8_t postition) {});
+    _ha_entity_cover.setOnState([](HaEntityCover::Action action) {});
+    _ha_entity_cover.setOnPosition([](uint8_t postition) {});
     _ha_entity_light.setOnOn([](bool on) {});
     _ha_entity_light.setOnBrightness([](uint8_t brightness) {});
     _ha_entity_light.setOnRgb([](HaEntityLight::RGB rgb) {});

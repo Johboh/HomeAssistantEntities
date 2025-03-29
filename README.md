@@ -32,7 +32,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement using a device class from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
 
 ### Currently supported actuators (and sensors)*
-- Curtain (open/opening, close/closing, position)
+- Cover (open/opening, close/closing, position)
 - Button
 - Event
 - Light (brightness, color temperature, rgb, effect)
