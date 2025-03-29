@@ -2,15 +2,18 @@
 #include <HaUtilities.h>
 #include <IJson.h>
 
+// NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 #define COMPONENT "cover"
 #define OBJECT_ID "curtain"
 #define OBJECT_ID_STATE "state"
 #define OBJECT_ID_POSITION "position"
 
-// NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
+using namespace homeassistantentities;
 
-HaEntityCover::HaEntityCover(HaBridge &ha_bridge, std::string name, std::string child_object_id)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
+HaEntityCover::HaEntityCover(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                             Configuration configuration)
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
+      _configuration(configuration) {}
 
 void HaEntityCover::publishConfiguration() {
   IJsonDocument doc;
@@ -20,7 +23,13 @@ void HaEntityCover::publishConfiguration() {
   } else {
     doc["name"] = nullptr;
   }
-  doc["device_class"] = "curtain";
+
+  auto device_class = _configuration.device_class;
+  auto trimmed_device_class = trim(device_class);
+  if (!trimmed_device_class.empty()) {
+    doc["device_class"] = trimmed_device_class;
+  }
+
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_STATE);
   doc["command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_STATE);

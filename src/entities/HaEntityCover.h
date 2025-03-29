@@ -15,6 +15,17 @@
  */
 class HaEntityCover : public HaEntity {
 public:
+  struct Configuration {
+    /**
+     * @brief the device class for this cover. Should be any of
+     * https://www.home-assistant.io/integrations/cover/#device_class
+     * Will eventually be replaced by a typed device class.
+     */
+    std::string device_class = "curtain";
+  };
+
+  inline static Configuration _default = {.device_class = "curtain"};
+
   /**
    * @brief Construct a new Ha Entity Cover object
    *
@@ -32,8 +43,10 @@ public:
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID.  Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * @param configuration the configuration for this entity.
    */
-  HaEntityCover(HaBridge &ha_bridge, std::string name, std::string child_object_id);
+  HaEntityCover(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                Configuration configuration = _default);
 
 public:
   void publishConfiguration() override;
@@ -79,6 +92,7 @@ private:
   std::string _name;
   HaBridge &_ha_bridge;
   std::string _child_object_id;
+  Configuration _configuration;
 
 private:
   std::optional<State> _state;

@@ -65,7 +65,7 @@ HaEntityBoolean _ha_entity_bool(ha_bridge, "bool", std::nullopt, {.with_attribut
 HaEntityBrightness _ha_entity_bright(ha_bridge, "brightness", std::nullopt, {.force_update = false});
 HaEntityButton _ha_entity_button(ha_bridge, "button", "");
 HaEntityCarbonDioxide _ha_entity_carbon_dioxide(ha_bridge, "Carbon dioxide");
-HaEntityCover _ha_entity_cover(ha_bridge, "cover", "left_window");
+HaEntityCover _ha_entity_cover(ha_bridge, "cover", "left_window", {.device_class = "shade"});
 HaEntityDoor _ha_entity_door(ha_bridge, "door", "");
 HaEntityEvent _ha_entity_event(ha_bridge, "event", "party",
                                {.event_types = {"button_press"}, .device_class = HaEntityEvent::DeviceClass::Button});
