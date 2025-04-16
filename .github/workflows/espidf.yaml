@@ -9,6 +9,9 @@ jobs:
           - name: v44_build
             version_number: release-v4.4
             target: esp32c3
+          - name: v50_build
+            version_number: release-v5.0
+            target: esp32c3
           - name: v51_build
             version_number: release-v5.1
             target: esp32c6
