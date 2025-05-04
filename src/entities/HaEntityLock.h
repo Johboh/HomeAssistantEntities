@@ -44,11 +44,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the lock.
+   * @brief Publish the lock. This will publish to MQTT regardless if the value has changed. Also see
+   * updateLock().
    *
    * @param locked true if lock is locked, or false if unlocked.
    */
   void publishLock(bool locked) { _ha_entity_sensor.publishValue(locked ? "OFF" : "ON"); } // locked == OFF
+
+  /**
+   * @brief Publish the lock, but only if the value has changed. Also see publishLock().
+   *
+   * @param locked true if lock is locked, or false if unlocked.
+   */
+  void updateLock(bool locked) { _ha_entity_sensor.updateValue(locked ? "OFF" : "ON"); } // locked == OFF
 
 private:
   const homeassistantentities::BinarySensor::Lock _lock;

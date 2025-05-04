@@ -73,9 +73,15 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the number.
+   * @brief Publish the number. This will publish to MQTT regardless if the value has changed. Also see
+   * updateNumber().
    */
   void publishNumber(float number);
+
+  /**
+   * @brief Publish the number, but only if the value has changed. Also see publishNumber().
+   */
+  void updateNumber(float number);
 
   /**
    * @brief Set callback for receving callbacks when there is a new number.

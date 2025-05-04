@@ -44,11 +44,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the motion.
+   * @brief Publish the motion. This will publish to MQTT regardless if the value has changed. Also see
+   * updateMotion().
    *
    * @param detected true or false if motion is detected.
    */
   void publishMotion(bool detected) { _ha_entity_sensor.publishValue(detected ? "ON" : "OFF"); }
+
+  /**
+   * @brief Publish the motion, but only if the value has changed. Also see publishMotion().
+   *
+   * @param detected true or false if motion is detected.
+   */
+  void updateMotion(bool detected) { _ha_entity_sensor.updateValue(detected ? "ON" : "OFF"); }
 
 private:
   const homeassistantentities::BinarySensor::Motion _motion;

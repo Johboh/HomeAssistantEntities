@@ -67,11 +67,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish concentration.
+   * @brief Publish concentration. This will publish to MQTT regardless if the value has changed. Also see
+   * updateConcentration().
    *
    * @param concentration concentration in the unit specified in the configuration.
    */
   void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
+
+  /**
+   * @brief Publish concentration, but only if the value has changed. Also see publishConcentration().
+   *
+   * @param concentration concentration in the unit specified in the configuration.
+   */
+  void updateConcentration(double concentration) { _ha_entity_sensor.updateValue(concentration); }
 
 private:
   const homeassistantentities::Sensor::Undefined::UnitConcentration _unit_concentration;

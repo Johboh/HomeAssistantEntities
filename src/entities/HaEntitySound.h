@@ -44,11 +44,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the sound.
+   * @brief Publish the sound. This will publish to MQTT regardless if the value has changed. Also see
+   * updateSound().
    *
    * @param detected true if sound was detected, false if not.
    */
   void publishSound(bool detected) { _ha_entity_sensor.publishValue(detected ? "ON" : "OFF"); }
+
+  /**
+   * @brief Publish the sound, but only if the value has changed. Also see publishSound().
+   *
+   * @param detected true if sound was detected, false if not.
+   */
+  void updateSound(bool detected) { _ha_entity_sensor.updateValue(detected ? "ON" : "OFF"); }
 
 private:
   const homeassistantentities::BinarySensor::Sound _sound;

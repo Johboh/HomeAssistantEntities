@@ -55,6 +55,12 @@ void HaEntityText::publishText(std::string str) {
                             str);
 }
 
+void HaEntityText::updateText(std::string str) {
+  if (!_str || *_str != str) {
+    publishText(str);
+  }
+}
+
 bool HaEntityText::setOnText(std::function<void(std::string)> callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_TEXT),

@@ -59,11 +59,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the humidity.
+   * @brief Publish the humidity. This will publish to MQTT regardless if the value has changed. Also see
+   * updateHumidity().
    *
    * @param humidity humidity in %.
    */
   void publishHumidity(double humidity) { _ha_entity_sensor.publishValue(humidity); }
+
+  /**
+   * @brief Publish the humidity, but only if the value has changed. Also see publishHumidity().
+   *
+   * @param humidity humidity in %.
+   */
+  void updateHumidity(double humidity) { _ha_entity_sensor.updateValue(humidity); }
 
 private:
   const homeassistantentities::Sensor::Humidity _humiditiy;

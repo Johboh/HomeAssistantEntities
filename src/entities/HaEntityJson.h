@@ -58,13 +58,24 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the JSON.
+   * @brief Publish the JSON. This will publish to MQTT regardless if the value has changed. Also see
+   * updateJson().
    *
    * @param json_doc the JSON document to publish.
    */
   void publishJson(IJsonDocument &json_doc) {
     auto message = toJsonString(json_doc);
     _ha_entity_sensor.publishValue(message);
+  }
+
+  /**
+   * @brief Publish the JSON, but only if the value has changed. Also see publishJson().
+   *
+   * @param json_doc the JSON document to publish.
+   */
+  void updateJson(IJsonDocument &json_doc) {
+    auto message = toJsonString(json_doc);
+    _ha_entity_sensor.updateValue(message);
   }
 
 private:

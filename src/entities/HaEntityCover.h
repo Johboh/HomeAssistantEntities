@@ -62,13 +62,23 @@ public:
   };
 
   /**
-   * @brief Publish the cover values.
+   * @brief Publish the cover values. This will publish to MQTT regardless if the values has changed. Also see
+   * update().
    *
    * @param state the cover state. Or absent (std::nullopt) if state is unknown.
    * @param position of the cover, between 0 (fully closed) and 100 (fully open). Or absent (std::nullopt) if position
    * is unknown.
    */
   void publish(std::optional<State> state, std::optional<uint8_t> position = std::nullopt);
+
+  /**
+   * @brief Publish the cover values, but only if the values has changed. Also see publish().
+   *
+   * @param state the cover state. Or absent (std::nullopt) if state is unknown.
+   * @param position of the cover, between 0 (fully closed) and 100 (fully open). Or absent (std::nullopt) if position
+   * is unknown.
+   */
+  void update(std::optional<State> state, std::optional<uint8_t> position = std::nullopt);
 
   enum class Action {
     Open,
@@ -87,6 +97,10 @@ public:
    * closed) and 100 (fully open).
    */
   bool setOnPosition(std::function<void(uint8_t)> position_callback);
+
+private:
+  void publishState(std::optional<State> state);
+  void publishPosition(std::optional<uint8_t> position);
 
 private:
   std::string _name;

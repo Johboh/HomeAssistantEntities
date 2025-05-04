@@ -67,11 +67,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the pressure.
+   * @brief Publish the pressure. This will publish to MQTT regardless if the value has changed. Also see
+   * updateAtmosphericPressure().
    *
    * @param pressure pressure in the unit specified in the configuration.
    */
   void publishAtmosphericPressure(double pressure) { _ha_entity_sensor.publishValue(pressure); }
+
+  /**
+   * @brief Publish the pressure, but only if the value has changed. Also see publishAtmosphericPressure().
+   *
+   * @param pressure pressure in the unit specified in the configuration.
+   */
+  void updateAtmosphericPressure(double pressure) { _ha_entity_sensor.updateValue(pressure); }
 
 private:
   const homeassistantentities::Sensor::AtmosphericPressure _atmospheric_pressure;

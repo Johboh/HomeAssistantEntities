@@ -65,11 +65,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the voltage.
+   * @brief Publish the voltage. This will publish to MQTT regardless if the value has changed. Also see
+   * updateWeight().
    *
    * @param voltage voltage in the unit specified in the configuration.
    */
   void publishVoltage(double voltage) { _ha_entity_sensor.publishValue(voltage); }
+
+  /**
+   * @brief Publish the voltage, but only if the value has changed. Also see publishVoltage().
+   *
+   * @param voltage voltage in the unit specified in the configuration.
+   */
+  void updateWeight(double voltage) { _ha_entity_sensor.updateValue(voltage); }
 
 private:
   const homeassistantentities::Sensor::Voltage _voltage;

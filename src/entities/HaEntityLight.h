@@ -75,14 +75,23 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the current on state.
+   * @brief Publish the current on state. This will publish to MQTT regardless if the value has changed. Also see
+   * updateIsOn().
    *
    * @param on if light is on or off.
    */
   void publishIsOn(bool on);
 
   /**
-   * @brief Publish the current brightness.
+   * @brief Publish the current on state, but only if the value has changed. Also see publishIsOn().
+   *
+   * @param on if light is on or off.
+   */
+  void updateIsOn(bool on);
+
+  /**
+   * @brief Publish the current brightness. This will publish to MQTT regardless if the value has changed. Also see
+   * updateBrightness().
    *
    * @param brightness of the light, between 0 and 255. Will only be published if the light is setup with this
    * capability in the Configuration.
@@ -90,7 +99,16 @@ public:
   void publishBrightness(uint8_t brightness);
 
   /**
-   * @brief Publish the current color temperature.
+   * @brief Publish the current brightness, but only if the value has changed. Also see publishBrightness().
+   *
+   * @param brightness of the light, between 0 and 255. Will only be published if the light is setup with this
+   * capability in the Configuration.
+   */
+  void updateBrightness(uint8_t brightness);
+
+  /**
+   * @brief Publish the current color temperature. This will publish to MQTT regardless if the value has changed. Also
+   * see updateColorTemperature().
    *
    * @param temperature mireds or Kelvin, depending on what was specified in the Configuration. Will only be published
    * if the light is setup with this capability in the Configuration.
@@ -98,12 +116,30 @@ public:
   void publishColorTemperature(uint16_t temperature);
 
   /**
-   * @brief Publish the current selected effect.
+   * @brief Publish the current color temperature, but only if the value has changed. Also see
+   * publishColorTemperature().
+   *
+   * @param temperature mireds or Kelvin, depending on what was specified in the Configuration. Will only be published
+   * if the light is setup with this capability in the Configuration.
+   */
+  void updateColorTemperature(uint16_t temperature);
+
+  /**
+   * @brief Publish the current selected effect. This will publish to MQTT regardless if the value has changed. Also see
+   * updateEffect().
    *
    * @param effect currently selected. Should be any of the effects from the Capabilities. Will only be published if the
    * light is setup with this capability in the Configuration.
    */
   void publishEffect(std::string effect);
+
+  /**
+   * @brief Publish the current selected effect, but only if the value has changed. Also see publishEffect().
+   *
+   * @param effect currently selected. Should be any of the effects from the Capabilities. Will only be published if the
+   * light is setup with this capability in the Configuration.
+   */
+  void updateEffect(std::string effect);
 
   struct RGB {
     uint8_t r;
@@ -116,7 +152,8 @@ public:
   };
 
   /**
-   * @brief Publish the current RGB value.
+   * @brief Publish the current RGB value. This will publish to MQTT regardless if the value has changed. Also see
+   * updateRgb().
    *
    * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
    * Configuration.
@@ -124,12 +161,29 @@ public:
   void publishRgb(uint8_t r, uint8_t g, uint8_t b) { publishRgb({r, g, b}); }
 
   /**
-   * @brief Publish the current RGB value.
+   * @brief Publish the current RGB value, but only if the value has changed. Also see publishRgb().
+   *
+   * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
+   * Configuration.
+   */
+  void updateRgb(uint8_t r, uint8_t g, uint8_t b) { updateRgb({r, g, b}); }
+
+  /**
+   * @brief Publish the current RGB value. This will publish to MQTT regardless if the value has changed. Also see
+   * updateRgb().
    *
    * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
    * Configuration.
    */
   void publishRgb(RGB rgb);
+
+  /**
+   * @brief Publish the current RGB value, but only if the value has changed. Also see publishRgb().
+   *
+   * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
+   * Configuration.
+   */
+  void updateRgb(RGB rgb);
 
   /**
    * @brief Set callback for receving callbacks when there is a new on state that should be set.

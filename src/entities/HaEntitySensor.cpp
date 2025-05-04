@@ -100,3 +100,22 @@ void HaEntitySensor::publishAttributes(Attributes::Map attributes) {
         _ha_bridge.getTopic(HaBridge::TopicType::Attributes, _component, _object_id, _child_object_id), message);
   }
 }
+
+void HaEntitySensor::updateValue(double value, Attributes::Map attributes) {
+  auto value_str = std::to_string(value);
+  updateValue(value_str, attributes);
+}
+
+void HaEntitySensor::updateValue(std::string value, Attributes::Map attributes) {
+  if (!_value || *_value != value) {
+    publishValue(value, {});
+  }
+
+  updateAttributes(attributes);
+}
+
+void HaEntitySensor::updateAttributes(Attributes::Map attributes) {
+  if (!_attributes || *_attributes != attributes) {
+    publishAttributes(attributes);
+  }
+}

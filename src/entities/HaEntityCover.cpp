@@ -44,6 +44,11 @@ void HaEntityCover::publishConfiguration() {
 void HaEntityCover::republishState() { publish(_state, _position); }
 
 void HaEntityCover::publish(std::optional<State> state, std::optional<uint8_t> position) {
+  publishState(state);
+  publishPosition(position);
+}
+
+void HaEntityCover::publishState(std::optional<State> state) {
   if (state) {
     std::string str = "";
     switch (*state) {
@@ -71,11 +76,22 @@ void HaEntityCover::publish(std::optional<State> state, std::optional<uint8_t> p
       _state = state;
     }
   }
+}
+void HaEntityCover::publishPosition(std::optional<uint8_t> position) {
   if (position) {
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_POSITION),
         std::to_string(std::min((uint8_t)100, *position)));
     _position = position;
+  }
+}
+
+void HaEntityCover::update(std::optional<State> state, std::optional<uint8_t> position) {
+  if (state != _state) {
+    publishState(state);
+  }
+  if (position != _position) {
+    publishPosition(position);
   }
 }
 

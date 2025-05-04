@@ -44,11 +44,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the door.
+   * @brief Publish the door. This will publish to MQTT regardless if the value has changed. Also see
+   * updateDoor().
    *
    * @param open true or false if door is open or not.
    */
   void publishDoor(bool open) { _ha_entity_sensor.publishValue(open ? "ON" : "OFF"); }
+
+  /**
+   * @brief Publish the door, but only if the value has changed. Also see publishDoor().
+   *
+   * @param open true or false if door is open or not.
+   */
+  void updateDoor(bool open) { _ha_entity_sensor.updateValue(open ? "ON" : "OFF"); }
 
 private:
   const homeassistantentities::BinarySensor::Door _door;

@@ -71,10 +71,19 @@ public:
 
   /**
    * @brief Publish the volatile organic compounds concentration or parts, depending on Unit selected in configuration.
+   * This will publish to MQTT regardless if the value has changed. Also see updateConcentration().
    *
    * @param concentration concentration/parts in µg/m³ or ppb, depending on what was selected in the configuration.
    */
   void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
+
+  /**
+   * @brief Publish the volatile organic compounds concentration or parts, depending on Unit selected in configuration,
+   * but only if the value has changed. Also see publishConcentration().
+   *
+   * @param concentration concentration/parts in µg/m³ or ppb, depending on what was selected in the configuration.
+   */
+  void updateConcentration(double concentration) { _ha_entity_sensor.updateValue(concentration); }
 
 private:
   const homeassistantentities::DeviceClass &deviceClass(const Configuration &configuration) const {

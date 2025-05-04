@@ -65,11 +65,19 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the temperature.
+   * @brief Publish the temperature. This will publish to MQTT regardless if the value has changed. Also see
+   * updateTemperature().
    *
    * @param temperature temperature in the unit specified in the configuration.
    */
   void publishTemperature(double temperature) { _ha_entity_sensor.publishValue(temperature); }
+
+  /**
+   * @brief Publish the temperature, but only if the value has changed. Also see publishTemperature().
+   *
+   * @param temperature temperature in the unit specified in the configuration.
+   */
+  void updateTemperature(double temperature) { _ha_entity_sensor.updateValue(temperature); }
 
 private:
   const homeassistantentities::Sensor::Temperature _temperature;

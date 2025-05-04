@@ -50,11 +50,19 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the switch state.
+   * @brief Publish the switch state This will publish to MQTT regardless if the state has changed. Also see
+   * updateSwitch().
    *
    * @param on if switch is on or off.
    */
   void publishSwitch(bool on);
+
+  /**
+   * @brief Publish the switch state, but only if the state has changed. Also see publishSwitch().
+   *
+   * @param on if switch is on or off.
+   */
+  void updateSwitch(bool on);
 
   /**
    * @brief Set callback for receving callbacks when there is a new state that should be set.

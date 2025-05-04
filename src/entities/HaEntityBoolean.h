@@ -65,22 +65,42 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the boolean value for the binary sensor.
-   * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
+   * @brief Publish the boolean value for the binary sensor. This will publish to MQTT regardless if the value has
+   * changed. Also see updateBoolean().
    *
    * @param value the value to publish.
-   * @param attributes optional attributes to publish.
+   * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
    */
   void publishBoolean(bool value, Attributes::Map attributes = {}) {
     _ha_entity_sensor.publishValue(value ? "ON" : "OFF", attributes);
   }
 
   /**
-   * @brief Publish attributes only. with_attributes in constructor must be set.
+   * @brief Publish the boolean value for the binary sensor, but only if the value has changed. Also see
+   * publishBoolean().
+   *
+   * @param value the value to publish.
+   * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
+   */
+  void updateBoolean(bool value, Attributes::Map attributes = {}) {
+    _ha_entity_sensor.updateValue(value ? "ON" : "OFF", attributes);
+  }
+
+  /**
+   * @brief Publish attributes only. with_attributes in constructor must be set. This will publish to MQTT regardless if
+   * the value has changed. Also see updateAttributes().
    *
    * @param attributes attributes to publish.
    */
   void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
+
+  /**
+   * @brief Publish attributes only, but only if the value has changed. Also see
+   * publishAttributes(). with_attributes in constructor must be set.
+   *
+   * @param attributes attributes to publish.
+   */
+  void updateAttributes(Attributes::Map attributes) { _ha_entity_sensor.updateAttributes(attributes); }
 
 private:
   const homeassistantentities::BinarySensor::Undefined::Boolean _boolean;

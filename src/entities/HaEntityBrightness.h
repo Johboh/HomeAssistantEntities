@@ -59,11 +59,20 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the brightness.
+   * @brief Publish the brightness. This will publish to MQTT regardless if the value has changed.
+   * Also see updateBrightness().
    *
    * @param brightness brightness in %.
    */
   void publishBrightness(double brightness) { _ha_entity_sensor.publishValue(brightness); }
+
+  /**
+   * @brief Publish the brightness, but only if the value has changed. Also see
+   * publishBrightness().
+   *
+   * @param brightness brightness in %.
+   */
+  void updateBrightness(double brightness) { _ha_entity_sensor.updateValue(brightness); }
 
 private:
   std::string stateTopic();

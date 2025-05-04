@@ -146,6 +146,36 @@ void HaEntityLight::publishEffect(std::string effect) {
   }
 }
 
+void HaEntityLight::updateIsOn(bool on) {
+  if (!_on || *_on != on) {
+    publishIsOn(on);
+  }
+}
+
+void HaEntityLight::updateBrightness(uint8_t brightness) {
+  if (!_brightness || *_brightness != brightness) {
+    publishBrightness(brightness);
+  }
+}
+
+void HaEntityLight::updateColorTemperature(uint16_t temperature) {
+  if (!_color_temperature || *_color_temperature != temperature) {
+    publishColorTemperature(temperature);
+  }
+}
+
+void HaEntityLight::updateRgb(RGB rgb) {
+  if (!_rgb || *_rgb != rgb) {
+    publishRgb(rgb);
+  }
+}
+
+void HaEntityLight::updateEffect(std::string effect) {
+  if (!_effect || *_effect != effect) {
+    publishEffect(effect);
+  }
+}
+
 bool HaEntityLight::setOnOn(std::function<void(bool)> state_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),

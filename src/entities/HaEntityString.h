@@ -66,14 +66,24 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the string.
-   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
+   * @brief Publish the string. This will publish to MQTT regardless if the string has changed. Also see
+   * updateString().
    *
    * @param str the string to publish.
-   * @param attributes optional attributes to publish.
+   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
    */
   void publishString(std::string str, Attributes::Map attributes = {}) {
     _ha_entity_sensor.publishValue(str, attributes);
+  }
+
+  /**
+   * @brief Publish the string, but only if the string has changed. Also see publishString().
+   *
+   * @param str the string to publish.
+   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
+   */
+  void updateString(std::string str, Attributes::Map attributes = {}) {
+    _ha_entity_sensor.updateValue(str, attributes);
   }
 
   /**

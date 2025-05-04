@@ -81,12 +81,23 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the text.
+   * @brief Publish the text. This will publish to MQTT regardless if the test has changed. Also see
+   * updateText().
+   *
    * with_state in constructor must be set.
    *
    * @param str the text to publish.
    */
   void publishText(std::string str);
+
+  /**
+   * @brief Publish the text, but only if the test has changed. Also see publishText().
+   *
+   * with_state in constructor must be set.
+   *
+   * @param str the text to publish.
+   */
+  void updateText(std::string str);
 
   /**
    * @brief Set callback for receving callbacks when there is a new text that should be set.

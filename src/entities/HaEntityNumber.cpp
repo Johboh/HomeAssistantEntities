@@ -51,6 +51,12 @@ void HaEntityNumber::publishNumber(float number) {
   _number = number;
 }
 
+void HaEntityNumber::updateNumber(float number) {
+  if (!_number || *_number != number) {
+    publishNumber(number);
+  }
+}
+
 bool HaEntityNumber::setOnNumber(std::function<void(float)> callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
