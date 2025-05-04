@@ -44,7 +44,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 
 ### Installation
 #### PlatformIO (Arduino or ESP-IDF):
-Add the following to `libs_deps`:
+Add the following to `lib_deps`:
 ```
    Johboh/HomeAssistantEntities@^8.0.7
 ```
