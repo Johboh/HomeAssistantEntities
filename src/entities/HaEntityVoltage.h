@@ -66,7 +66,7 @@ public:
 
   /**
    * @brief Publish the voltage. This will publish to MQTT regardless if the value has changed. Also see
-   * updateWeight().
+   * updateVoltage().
    *
    * @param voltage voltage in the unit specified in the configuration.
    */
@@ -77,7 +77,7 @@ public:
    *
    * @param voltage voltage in the unit specified in the configuration.
    */
-  void updateWeight(double voltage) { _ha_entity_sensor.updateValue(voltage); }
+  void updateVoltage(double voltage) { _ha_entity_sensor.updateValue(voltage); }
 
 private:
   const homeassistantentities::Sensor::Voltage _voltage;
