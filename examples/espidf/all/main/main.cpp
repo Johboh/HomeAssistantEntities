@@ -153,7 +153,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_number.publishNumber(55.0);
     _ha_entity_particulate_matter.publishConcentration(55.0);
     _ha_entity_power.publishPower(10);
-    _ha_entity_select.publishSelection("option");
+    _ha_entity_select.publishSelection("option1");
     _ha_entity_sensor.publishValue(55.0);
     _ha_entity_sound.publishSound(true);
     _ha_entity_string.publishString("string", {{"attr1", "value1"}, {"attr2", "value2"}});
@@ -187,7 +187,7 @@ void app_main(void) {
   auto connected = _wifi_helper.connectToAp(wifi_ssid, wifi_password, initialize_nvs, timeout_ms);
   if (connected) {
     // Connected to WIFI.
-
+    setupJsonForThisDevice();
     // Start MQTT
     _mqtt_remote.start([](bool connected) {
       // Publish Home Assistant Configuration once connected to MQTT.
