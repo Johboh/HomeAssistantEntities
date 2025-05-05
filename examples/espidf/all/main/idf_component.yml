@@ -5,3 +5,5 @@ dependencies:
     path: ../../../../
   johboh/mqttremote:
     version: ">=4.0.6"
+  johboh/connectionhelper:
+    version: ">=3.0.11"

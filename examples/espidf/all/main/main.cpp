@@ -1,6 +1,7 @@
 #include "credentials.h"
 #include <HaBridge.h>
 #include <MQTTRemote.h>
+#include <WiFiHelper.h>
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -176,13 +177,14 @@ extern "C" {
 void app_main();
 }
 
-void app_main(void) {
-  // TODO (you): You need to connect to WiFi here first.
-  // For a simple one line utility, see https://github.com/johboh/ConnectionHelper
-  // Once connected to wifi, continue with below.
+WiFiHelper _wifi_helper(
+    hostname, []() { ESP_LOGI(TAG, "on connected callback"); }, []() { ESP_LOGI(TAG, "on disconnected callback"); });
 
+void app_main(void) {
   // Connect to WIFI
-  auto connected = true; // TODO (you): You need to connect to WiFi here first.
+  bool initialize_nvs = true;
+  int timeout_ms = 10000;
+  auto connected = _wifi_helper.connectToAp(wifi_ssid, wifi_password, initialize_nvs, timeout_ms);
   if (connected) {
     // Connected to WIFI.
 
