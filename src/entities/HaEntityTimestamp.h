@@ -51,9 +51,9 @@ public:
    * @param configuration the configuration for this entity.
    */
 
-  tityTimestamp(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
+  HaEntityTimestamp(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
 
-                iguration configuration = _default)
+                    Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
                                              .device_class = _timestamp,

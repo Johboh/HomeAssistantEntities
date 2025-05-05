@@ -80,7 +80,7 @@ public:
   void updateCurrent(double current) { _ha_entity_sensor.updateValue(current); }
 
 private:
-  const homeassistantentities::Sensor::current _current;
+  const homeassistantentities::Sensor::Current _current;
   HaEntitySensor _ha_entity_sensor;
 };
 
