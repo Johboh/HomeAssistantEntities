@@ -234,7 +234,7 @@ void app_main(void) {
     _ha_entity_switch.setOnState([](bool on) {});
 
     // Start task for periodically publishing state.
-    xTaskCreate(haStateTask, "haStateTask", 2048, NULL, 15, NULL);
+    xTaskCreate(haStateTask, "haStateTask", 4096, NULL, 15, NULL);
 
   } else {
     ESP_LOGE(TAG, "Failed to connect");
