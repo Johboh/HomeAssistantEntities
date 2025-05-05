@@ -15,6 +15,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Binary sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class) using a device class from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
 - Brightness (%)
 - Carbon Dioxide (ppm)
+- Current (a, mA)
 - Door (open/closed)
 - Humidity (%)
 - Json (raw "json"-sensor)
@@ -22,9 +23,11 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Motion (detected/not detected)
 - Number (with any unit and device class)
 - Particulate matter (μg/m³)
+- Power (mW, W, kW, MW, GW, TW)
 - Sound (detected/not detected)
 - String (raw "String"-sensor)
 - Temperature (°C, °F, K)
+- Timestamp
 - Text
 - Unit Concentration (parts per volume)
 - Volatile organic compounds (µg/m³, ppb)
