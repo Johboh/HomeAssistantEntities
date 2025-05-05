@@ -15,27 +15,29 @@ void HaEntityText::publishConfiguration() {
   IJsonDocument doc;
 
   if (!_name.empty()) {
-    doc["name"] = _name;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = _name;
   } else {
-    doc["name"] = nullptr;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = nullptr;
   }
 
-  doc["min"] = _configuration.min_text_length;
-  doc["max"] = _configuration.max_text_length;
-  doc["force_update"] = _configuration.force_update;
-  doc["retain"] = _configuration.retain;
+  doc[_ha_bridge.useAbbreviations() ? "min" : "min"] = _configuration.min_text_length;
+  doc[_ha_bridge.useAbbreviations() ? "max" : "max"] = _configuration.max_text_length;
+  doc[_ha_bridge.useAbbreviations() ? "frc_upd" : "force_update"] = _configuration.force_update;
+  doc[_ha_bridge.useAbbreviations() ? "ret" : "retain"] = _configuration.retain;
 
   if (_configuration.is_password) {
-    doc["mode"] = "password";
+    doc[_ha_bridge.useAbbreviations() ? "mode" : "mode"] = "password";
   } else {
-    doc["mode"] = "text";
+    doc[_ha_bridge.useAbbreviations() ? "mode" : "mode"] = "text";
   }
 
   if (_configuration.with_state_topic) {
-    doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);
+    doc[_ha_bridge.useAbbreviations() ? "stat_t" : "state_topic"] =
+        _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, OBJECT_ID, _child_object_id);
   }
 
-  doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_TEXT);
+  doc[_ha_bridge.useAbbreviations() ? "cmd_t" : "command_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_TEXT);
 
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }

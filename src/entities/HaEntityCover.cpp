@@ -19,23 +19,24 @@ void HaEntityCover::publishConfiguration() {
   IJsonDocument doc;
 
   if (!_name.empty()) {
-    doc["name"] = _name;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = _name;
   } else {
-    doc["name"] = nullptr;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = nullptr;
   }
 
   auto device_class = _configuration.device_class;
   auto trimmed_device_class = trim(device_class);
   if (!trimmed_device_class.empty()) {
-    doc["device_class"] = trimmed_device_class;
+    doc[_ha_bridge.useAbbreviations() ? "dev_cla" : "device_class"] = trimmed_device_class;
   }
 
-  doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_STATE);
-  doc["command_topic"] =
+  doc[_ha_bridge.useAbbreviations() ? "stat_t" : "state_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_STATE);
+  doc[_ha_bridge.useAbbreviations() ? "cmd_t" : "command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_STATE);
-  doc["position_topic"] =
+  doc[_ha_bridge.useAbbreviations() ? "pos_t" : "position_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
-  doc["set_position_topic"] =
+  doc[_ha_bridge.useAbbreviations() ? "set_pos_t" : "set_position_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
 
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
