@@ -22,41 +22,43 @@ void HaEntitySensor::publishConfiguration() {
   IJsonDocument doc;
 
   if (!_name.empty()) {
-    doc["name"] = _name;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = _name;
   } else {
-    doc["name"] = nullptr;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = nullptr;
   }
-  doc["platform"] = _component; // we have validated this to be either sensor or binary_sensor
+  doc[_ha_bridge.useAbbreviations() ? "p" : "platform"] =
+      _component; // we have validated this to be either sensor or binary_sensor
 
   if (_configuration.state_class) {
     auto state_class = trim(*_configuration.state_class);
     if (!state_class.empty()) {
-      doc["state_class"] = state_class;
+      doc[_ha_bridge.useAbbreviations() ? "stat_cla" : "state_class"] = state_class;
     }
   }
   auto device_class = _configuration.device_class.deviceClass();
   if (device_class) {
     auto trimmed_device_class = trim(*device_class);
     if (!trimmed_device_class.empty()) {
-      doc["device_class"] = trimmed_device_class;
+      doc[_ha_bridge.useAbbreviations() ? "dev_cla" : "device_class"] = trimmed_device_class;
     }
   }
   if (_configuration.icon) {
-    doc["icon"] = *_configuration.icon;
+    doc[_ha_bridge.useAbbreviations() ? "ic" : "icon"] = *_configuration.icon;
   }
-  doc["force_update"] = _configuration.force_update;
+  doc[_ha_bridge.useAbbreviations() ? "frc_upd" : "force_update"] = _configuration.force_update;
 
   if (_configuration.unit_of_measurement) {
     auto unit_of_measurement = _configuration.device_class.unitOfMeasurement(*_configuration.unit_of_measurement);
     if (unit_of_measurement) {
-      doc["unit_of_measurement"] = *unit_of_measurement;
+      doc[_ha_bridge.useAbbreviations() ? "unit_of_meas" : "unit_of_measurement"] = *unit_of_measurement;
     }
   }
 
-  doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id);
+  doc[_ha_bridge.useAbbreviations() ? "stat_t" : "state_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id);
 
   if (_configuration.with_attributes) {
-    doc["json_attributes_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "json_attr_t" : "json_attributes_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Attributes, _component, _object_id, _child_object_id);
   }
 

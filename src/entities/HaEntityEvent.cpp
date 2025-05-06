@@ -12,27 +12,28 @@ void HaEntityEvent::publishConfiguration() {
   IJsonDocument doc;
 
   if (!_name.empty()) {
-    doc["name"] = _name;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = _name;
   } else {
-    doc["name"] = nullptr;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = nullptr;
   }
   switch (_configuration.device_class) {
   case DeviceClass::Button:
-    doc["device_class"] = "button";
+    doc[_ha_bridge.useAbbreviations() ? "dev_cla" : "device_class"] = "button";
     break;
   case DeviceClass::Motion:
-    doc["device_class"] = "motion";
+    doc[_ha_bridge.useAbbreviations() ? "dev_cla" : "device_class"] = "motion";
     break;
   case DeviceClass::Doorbell:
-    doc["device_class"] = "doorbell";
+    doc[_ha_bridge.useAbbreviations() ? "dev_cla" : "device_class"] = "doorbell";
     break;
   case DeviceClass::None:
     break;
   }
 
-  doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
+  doc[_ha_bridge.useAbbreviations() ? "stat_t" : "state_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
 
-  JsonArrayType event_types_array = createJsonArray(doc, "event_types");
+  JsonArrayType event_types_array = createJsonArray(doc, _ha_bridge.useAbbreviations() ? "evt_typ" : "event_types");
   for (const std::string &event_type : _configuration.event_types) {
     addToJsonArray(event_types_array, event_type);
   }
@@ -46,7 +47,7 @@ void HaEntityEvent::republishState() {
 
 void HaEntityEvent::publishEvent(std::string event, Attributes::Map attributes) {
   IJsonDocument doc;
-  doc["event_type"] = event;
+  doc[_ha_bridge.useAbbreviations() ? "evt_typ" : "event_type"] = event;
 
   Attributes::toJson(doc, attributes, {"event_type"});
 
