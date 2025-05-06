@@ -49,7 +49,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 #### PlatformIO (Arduino or ESP-IDF):
 Add the following to `lib_deps`:
 ```
-   Johboh/HomeAssistantEntities@^8.0.8
+   Johboh/HomeAssistantEntities@^8.0.9
 ```
 You also need a MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
@@ -65,7 +65,7 @@ In your existing `idf_component.yml` or in a new `idf_component.yml` next to you
 ```
 dependencies:
   johboh/homeassistantentities:
-    version: ">=8.0.8"
+    version: ">=8.0.9"
 ```
 
 You also need a MQTT library. See Dependencies section. Suggestion:
