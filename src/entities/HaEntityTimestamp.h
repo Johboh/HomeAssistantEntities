@@ -51,9 +51,8 @@ public:
    * @param configuration the configuration for this entity.
    */
 
-  tityTimestamp(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
-
-                iguration configuration = _default)
+  HaEntityTimestamp(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
+                    Configuration configuration = _default)
       : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
                                          HaEntitySensor::Configuration{
                                              .device_class = _timestamp,
@@ -75,7 +74,18 @@ public:
   void publishTimestamp(const struct tm *time, Attributes::Map attributes = {}) {
     char buf[27];
     strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S%z", time);
-    _ha_entity_sensor.publishValue(std::string(buf), attributes);
+    publishTimestamp(std::string(buf), attributes);
+  }
+
+  /**
+   * @brief Publish the timestamp. This will publish to MQTT regardless if the string has changed. Also see
+   * updateTimestamp().
+   *
+   * @param time the timestamp to publish, ISO 8601 UTC
+   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
+   */
+  void publishTimestamp(std::string time, Attributes::Map attributes = {}) {
+    _ha_entity_sensor.publishValue(time, attributes);
   }
 
   /**
@@ -89,6 +99,17 @@ public:
     char buf[27];
     strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S%z", time);
     _ha_entity_sensor.updateValue(std::string(buf), attributes);
+  }
+
+  /**
+   * @brief Publish the timestamp, but only if the timestamp has changed. Also see publishTimestamp().
+   *
+   * @param time the timestamp to publish, ISO 8601 UTC
+   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
+   */
+
+  void updateTimestamp(std::string time, Attributes::Map attributes = {}) {
+    _ha_entity_sensor.updateValue(time, attributes);
   }
 
   /**

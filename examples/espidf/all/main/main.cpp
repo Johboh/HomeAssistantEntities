@@ -13,6 +13,7 @@
 #include <entities/HaEntityButton.h>
 #include <entities/HaEntityCarbonDioxide.h>
 #include <entities/HaEntityCover.h>
+#include <entities/HaEntityCurrent.h>
 #include <entities/HaEntityDoor.h>
 #include <entities/HaEntityEvent.h>
 #include <entities/HaEntityHumidity.h>
@@ -22,6 +23,7 @@
 #include <entities/HaEntityMotion.h>
 #include <entities/HaEntityNumber.h>
 #include <entities/HaEntityParticulateMatter.h>
+#include <entities/HaEntityPower.h>
 #include <entities/HaEntitySelect.h>
 #include <entities/HaEntitySensor.h>
 #include <entities/HaEntitySound.h>
@@ -29,6 +31,7 @@
 #include <entities/HaEntitySwitch.h>
 #include <entities/HaEntityTemperature.h>
 #include <entities/HaEntityText.h>
+#include <entities/HaEntityTimestamp.h>
 #include <entities/HaEntityUnitConcentration.h>
 #include <entities/HaEntityVolatileOrganicCompounds.h>
 #include <entities/HaEntityVoltage.h>
@@ -66,6 +69,8 @@ HaEntityBrightness _ha_entity_bright(ha_bridge, "brightness", std::nullopt, {.fo
 HaEntityButton _ha_entity_button(ha_bridge, "button", "");
 HaEntityCarbonDioxide _ha_entity_carbon_dioxide(ha_bridge, "Carbon dioxide");
 HaEntityCover _ha_entity_cover(ha_bridge, "cover", "left_window", {.device_class = "shade"});
+HaEntityCurrent _ha_entity_current(ha_bridge, "current", std::nullopt,
+                                   {.unit = HaEntityCurrent::Unit::mA, .force_update = false});
 HaEntityDoor _ha_entity_door(ha_bridge, "door", "");
 HaEntityEvent _ha_entity_event(ha_bridge, "event", "party",
                                {.event_types = {"button_press"}, .device_class = HaEntityEvent::DeviceClass::Button});
@@ -88,6 +93,8 @@ HaEntityNumber _ha_entity_number(ha_bridge, "number", "danceability",
                                   .retain = false});
 HaEntityParticulateMatter _ha_entity_particulate_matter(ha_bridge, "Particulate matter", std::nullopt,
                                                         {.size = HaEntityParticulateMatter::Size::pm25});
+HaEntityPower _ha_entity_power(ha_bridge, "power", std::nullopt,
+                               {.unit = HaEntityPower::Unit::W, .force_update = false});
 HaEntitySelect _ha_entity_select(ha_bridge, "select", "playlist", {.options = {"option1", "option2"}, .retain = false});
 HaEntitySound _ha_entity_sound(ha_bridge, "sound", "");
 homeassistantentities::Sensor::Precipitation _precipitation;
@@ -108,6 +115,8 @@ HaEntityText _ha_entity_text(ha_bridge, "text", "billboard",
                               .is_password = false,
                               .force_update = false,
                               .retain = false});
+HaEntityTimestamp _ha_entity_timestamp(ha_bridge, "timestamp", std::nullopt,
+                                       {.with_attributes = false, .force_update = false});
 HaEntityUnitConcentration _ha_entity_unit_concentration(ha_bridge, "concentration", std::nullopt,
                                                         {.unit = HaEntityUnitConcentration::Unit::mL});
 HaEntityVolatileOrganicCompounds _ha_entity_volatile_organic_compounds(
@@ -129,6 +138,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_bright.publishBrightness(55.0);
     _ha_entity_carbon_dioxide.publishConcentration(55.0);
     _ha_entity_cover.publish(HaEntityCover::State::Opening, 50);
+    _ha_entity_current.publishCurrent(10);
     _ha_entity_door.publishDoor(true);
     _ha_entity_event.publishEvent("button_press", {{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_humidity.publishHumidity(55.0);
@@ -141,6 +151,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_motion.publishMotion(true);
     _ha_entity_number.publishNumber(55.0);
     _ha_entity_particulate_matter.publishConcentration(55.0);
+    _ha_entity_power.publishPower(10);
     _ha_entity_select.publishSelection("option");
     _ha_entity_sensor.publishValue(55.0);
     _ha_entity_sound.publishSound(true);
@@ -148,6 +159,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_switch.publishSwitch(true);
     _ha_entity_temperature.publishTemperature(55.0);
     _ha_entity_text.publishText("text");
+    _ha_entity_timestamp.publishTimestamp("2025-05-06T15:43:00Z");
     _ha_entity_unit_concentration.publishConcentration(55.0);
     _ha_entity_volatile_organic_compounds.publishConcentration(55.0);
     _ha_entity_voltage.publishVoltage(55.0);
@@ -179,6 +191,7 @@ void app_main(void) {
       _ha_entity_button.publishConfiguration();
       _ha_entity_carbon_dioxide.publishConfiguration();
       _ha_entity_cover.publishConfiguration();
+      _ha_entity_current.publishConfiguration();
       _ha_entity_door.publishConfiguration();
       _ha_entity_event.publishConfiguration();
       _ha_entity_humidity.publishConfiguration();
@@ -188,6 +201,7 @@ void app_main(void) {
       _ha_entity_motion.publishConfiguration();
       _ha_entity_number.publishConfiguration();
       _ha_entity_particulate_matter.publishConfiguration();
+      _ha_entity_power.publishConfiguration();
       _ha_entity_select.publishConfiguration();
       _ha_entity_sensor.publishConfiguration();
       _ha_entity_sound.publishConfiguration();
@@ -195,6 +209,7 @@ void app_main(void) {
       _ha_entity_switch.publishConfiguration();
       _ha_entity_temperature.publishConfiguration();
       _ha_entity_text.publishConfiguration();
+      _ha_entity_timestamp.publishConfiguration();
       _ha_entity_unit_concentration.publishConfiguration();
       _ha_entity_volatile_organic_compounds.publishConfiguration();
       _ha_entity_voltage.publishConfiguration();
