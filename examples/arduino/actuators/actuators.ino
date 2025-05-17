@@ -83,7 +83,7 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // When using Platform IO with ESP32
-#ifdef defined(ESP32) && defined(PLATFORMIO)
+#if defined(ESP32) && defined(PLATFORMIO)
   _mqtt_remote.start([](bool connected) {
     if (connected) {
       // Publish Home Assistant Configuration for both lights once connected to MQTT.
