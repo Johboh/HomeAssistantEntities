@@ -82,6 +82,21 @@ void setup() {
   Serial.print("IP number: ");
   Serial.println(WiFi.localIP());
 
+  // When using Platform IO with ESP32
+#ifdef defined(ESP32) && defined(PLATFORMIO)
+  _mqtt_remote.start([](bool connected) {
+    if (connected) {
+      // Publish Home Assistant Configuration for both lights once connected to MQTT.
+      _ha_entity_light_left_bench.publishConfiguration();
+      _ha_entity_light_right_bench.publishConfiguration();
+
+      // Subscribe to new light "on" state pushed by Home Assistant.
+      _ha_entity_light_left_bench.setOnOn([&](bool on) { gpio_set_level(LED_PIN, on); });
+      _ha_entity_light_right_bench.setOnBrightness(
+          [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for left light", brightness); });
+    }
+  });
+#else // Not PlatformIO (Arduino IDE)
   _mqtt_remote.setOnConnectionChange([](bool connected) {
     // Publish Home Assistant Configuration for both lights once connected to MQTT.
     if (connected) {
@@ -94,10 +109,13 @@ void setup() {
           [&](uint8_t brightness) { Serial.println("Got brightness " + String(brightness) + " for right light"); });
     }
   });
+#endif
 }
 
 void loop() {
+#if !defined(ESP32) && !defined(PLATFORMIO)
   _mqtt_remote.handle();
+#endif
 
   // Publish current light status every 10 seconds.
   auto now = millis();

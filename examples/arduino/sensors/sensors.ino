@@ -86,6 +86,16 @@ void setup() {
   Serial.print("IP number: ");
   Serial.println(WiFi.localIP());
 
+  // When using Platform IO with ESP32
+#ifdef defined(ESP32) && defined(PLATFORMIO)
+  _mqtt_remote.start([](bool connected) {
+    // Publish Home Assistant Configuration for the sensors once connected to MQTT.
+    _ha_entity_brightness.publishConfiguration();
+    _ha_entity_generic_sensor.publishConfiguration();
+    _ha_entity_temperature_inside.publishConfiguration();
+    _ha_entity_temperature_outside.publishConfiguration();
+  });
+#else // Not PlatformIO (Arduino IDE)
   _mqtt_remote.setOnConnectionChange([](bool connected) {
     // Publish Home Assistant Configuration for the sensors once connected to MQTT.
     if (connected) {
@@ -95,10 +105,13 @@ void setup() {
       _ha_entity_temperature_outside.publishConfiguration();
     }
   });
+#endif
 }
 
 void loop() {
+#if !defined(ESP32) && !defined(PLATFORMIO)
   _mqtt_remote.handle();
+#endif
 
   // Publish temperature and brightness status every 10 seconds.
   auto now = millis();
