@@ -8,16 +8,16 @@ jobs:
         target:
           - variant: actuators_arduino_json
             example: examples/arduino/actuators
-            extra_dependencies: "johboh/MQTTRemote@^4.0.6, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote@^6.0.2, bblanchon/ArduinoJson@^7.1.0"
           - variant: actuators_nlohmann_json
             example: examples/arduino/actuators
-            extra_dependencies: "johboh/MQTTRemote@^4.0.6, johboh/nlohmann-json@^3.11.3"
+            extra_dependencies: "johboh/MQTTRemote@^6.0.2, johboh/nlohmann-json@^3.12.0"
           - variant: sensors_arduino_json
             example: examples/arduino/sensors
-            extra_dependencies: "johboh/MQTTRemote@^4.0.6, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote@^6.0.2, bblanchon/ArduinoJson@^7.1.0"
           - variant: sensors_nlohmann_json
             example: examples/arduino/sensors
-            extra_dependencies: "johboh/MQTTRemote@^4.0.6, johboh/nlohmann-json@^3.11.3"
+            extra_dependencies: "johboh/MQTTRemote@^6.0.2, johboh/nlohmann-json@^3.12.0"
 
     steps:
       - uses: actions/checkout@v3
@@ -29,7 +29,7 @@ jobs:
           key: ${{ runner.os }}-pio
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.12'
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 

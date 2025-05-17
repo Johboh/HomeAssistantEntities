@@ -82,15 +82,17 @@ void setup() {
   Serial.print("IP number: ");
   Serial.println(WiFi.localIP());
 
-  _mqtt_remote.setOnConnected([]() {
+  _mqtt_remote.setOnConnectionChange([](bool connected) {
     // Publish Home Assistant Configuration for both lights once connected to MQTT.
-    _ha_entity_light_left_bench.publishConfiguration();
-    _ha_entity_light_right_bench.publishConfiguration();
+    if (connected) {
+      _ha_entity_light_left_bench.publishConfiguration();
+      _ha_entity_light_right_bench.publishConfiguration();
 
-    // Subscribe to new light "on" state pushed by Home Assistant.
-    _ha_entity_light_left_bench.setOnOn([&](bool on) { digitalWrite(LED_PIN, on); });
-    _ha_entity_light_right_bench.setOnBrightness(
-        [&](uint8_t brightness) { Serial.println("Got brightness " + String(brightness) + " for right light"); });
+      // Subscribe to new light "on" state pushed by Home Assistant.
+      _ha_entity_light_left_bench.setOnOn([&](bool on) { digitalWrite(LED_PIN, on); });
+      _ha_entity_light_right_bench.setOnBrightness(
+          [&](uint8_t brightness) { Serial.println("Got brightness " + String(brightness) + " for right light"); });
+    }
   });
 }
 

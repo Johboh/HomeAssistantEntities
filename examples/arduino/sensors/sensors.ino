@@ -86,12 +86,14 @@ void setup() {
   Serial.print("IP number: ");
   Serial.println(WiFi.localIP());
 
-  _mqtt_remote.setOnConnected([]() {
+  _mqtt_remote.setOnConnectionChange([](bool connected) {
     // Publish Home Assistant Configuration for the sensors once connected to MQTT.
-    _ha_entity_brightness.publishConfiguration();
-    _ha_entity_generic_sensor.publishConfiguration();
-    _ha_entity_temperature_inside.publishConfiguration();
-    _ha_entity_temperature_outside.publishConfiguration();
+    if (connected) {
+      _ha_entity_brightness.publishConfiguration();
+      _ha_entity_generic_sensor.publishConfiguration();
+      _ha_entity_temperature_inside.publishConfiguration();
+      _ha_entity_temperature_outside.publishConfiguration();
+    }
   });
 }
 
