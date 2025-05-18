@@ -3,13 +3,15 @@
 
 using namespace homeassistantentities;
 
-HaBridge::HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose)
-    : _verbose(verbose), _node_id(node_id), _remote(remote), _this_device_json_doc(this_device_json_doc) {}
+HaBridge::HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose,
+                   bool abbreviations)
+    : _verbose(verbose), _node_id(node_id), _remote(remote), _this_device_json_doc(this_device_json_doc),
+      _abbreviations(abbreviations) {}
 
 void HaBridge::publishConfiguration(std::string component, std::string object_id, std::string child_object_id,
                                     const IJsonDocument &specific_doc) {
   IJsonDocument doc;
-  doc["availability_topic"] = santitizePath(_remote.clientId()) + "/status";
+  doc[_abbreviations ? "avty_t" : "availability_topic"] = santitizePath(_remote.clientId()) + "/status";
 
   std::string unique_id = _remote.clientId() + "_" + _node_id;
 
@@ -18,11 +20,11 @@ void HaBridge::publishConfiguration(std::string component, std::string object_id
     unique_id += "_" + coid;
   }
   unique_id += "_" + object_id;
-  doc["unique_id"] = unique_id;
+  doc[_abbreviations ? "uniq_id" : "unique_id"] = unique_id;
 
   // Set optional device keys.
   for (auto kv : IJsonIteratorBegin(_this_device_json_doc)) {
-    doc["device"][kv.key()] = kv.value();
+    doc[_abbreviations ? "dev" : "device"][kv.key()] = kv.value();
   }
 
   for (auto kv : IJsonConstIteratorBegin(specific_doc)) {

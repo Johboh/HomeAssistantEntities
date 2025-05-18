@@ -13,17 +13,19 @@ void HaEntitySelect::publishConfiguration() {
   IJsonDocument doc;
 
   if (!_name.empty()) {
-    doc["name"] = _name;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = _name;
   } else {
-    doc["name"] = nullptr;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = nullptr;
   }
 
-  doc["retain"] = _configuration.retain;
+  doc[_ha_bridge.useAbbreviations() ? "ret" : "retain"] = _configuration.retain;
 
-  doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
-  doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
+  doc[_ha_bridge.useAbbreviations() ? "stat_t" : "state_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
+  doc[_ha_bridge.useAbbreviations() ? "cmd_t" : "command_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
 
-  JsonArrayType options_array = createJsonArray(doc, "options");
+  JsonArrayType options_array = createJsonArray(doc, _ha_bridge.useAbbreviations() ? "ops" : "options");
   for (const std::string &option : _configuration.options) {
     addToJsonArray(options_array, option);
   }

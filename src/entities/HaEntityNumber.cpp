@@ -13,27 +13,29 @@ void HaEntityNumber::publishConfiguration() {
   IJsonDocument doc;
 
   if (!_name.empty()) {
-    doc["name"] = _name;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = _name;
   } else {
-    doc["name"] = nullptr;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = nullptr;
   }
 
-  doc["platform"] = "number";
-  doc["min"] = _configuration.min_value;
-  doc["max"] = _configuration.max_value;
-  doc["force_update"] = _configuration.force_update;
-  doc["retain"] = _configuration.retain;
+  doc[_ha_bridge.useAbbreviations() ? "p" : "platform"] = "number";
+  doc[_ha_bridge.useAbbreviations() ? "min" : "min"] = _configuration.min_value;
+  doc[_ha_bridge.useAbbreviations() ? "max" : "max"] = _configuration.max_value;
+  doc[_ha_bridge.useAbbreviations() ? "frc_upd" : "force_update"] = _configuration.force_update;
+  doc[_ha_bridge.useAbbreviations() ? "ret" : "retain"] = _configuration.retain;
 
   if (!_configuration.unit.empty()) {
-    doc["unit_of_measurement"] = _configuration.unit;
+    doc[_ha_bridge.useAbbreviations() ? "unit_of_meas" : "unit_of_measurement"] = _configuration.unit;
   }
 
   if (!_configuration.device_class.empty()) {
-    doc["device_class"] = _configuration.device_class;
+    doc[_ha_bridge.useAbbreviations() ? "dev_cla" : "device_class"] = _configuration.device_class;
   }
 
-  doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
-  doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
+  doc[_ha_bridge.useAbbreviations() ? "stat_t" : "state_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
+  doc[_ha_bridge.useAbbreviations() ? "cmd_t" : "command_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
 
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
 }

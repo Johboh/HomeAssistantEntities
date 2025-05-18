@@ -40,44 +40,45 @@ void HaEntityLight::publishConfiguration() {
   IJsonDocument doc;
 
   if (!_name.empty()) {
-    doc["name"] = _name;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = _name;
   } else {
-    doc["name"] = nullptr;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = nullptr;
   }
 
-  doc["retain"] = _configuration.retain;
+  doc[_ha_bridge.useAbbreviations() ? "ret" : "retain"] = _configuration.retain;
 
-  doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
-  doc["command_topic"] =
+  doc[_ha_bridge.useAbbreviations() ? "stat_t" : "state_topic"] =
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
+  doc[_ha_bridge.useAbbreviations() ? "cmd_t" : "command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF);
   if (_configuration.with_brightness) {
-    doc["brightness_state_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "bri_stat_t" : "brightness_state_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS);
-    doc["brightness_command_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "bri_cmd_t" : "brightness_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS);
   }
   if (_configuration.with_color_temperature != Configuration::ColorTemperature::None) {
-    doc["color_temp_state_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "clr_temp_stat_t" : "color_temp_state_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE);
-    doc["color_temp_command_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "clr_temp_cmd_t" : "color_temp_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE);
     if (_configuration.with_color_temperature == Configuration::ColorTemperature::Kelvin) {
-      doc["color_temp_kelvin"] = true;
+      doc[_ha_bridge.useAbbreviations() ? "clr_temp_k" : "color_temp_kelvin"] = true;
     }
   }
   if (_configuration.with_rgb_color) {
-    doc["rgb_state_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "rgb_stat_t" : "rgb_state_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_RGB);
-    doc["rgb_command_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "rgb_cmd_t" : "rgb_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_RGB);
   }
   if (!_configuration.effects.empty()) {
-    doc["effect_state_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "fx_stat_t" : "effect_state_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
-    doc["effect_command_topic"] =
+    doc[_ha_bridge.useAbbreviations() ? "fx_cmd_t" : "effect_command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_EFFECT);
 
-    JsonArrayType effect_list_array = createJsonArray(doc, "effect_list");
+    JsonArrayType effect_list_array = createJsonArray(doc, _ha_bridge.useAbbreviations() ? "fx_list" : "effect_list");
     for (const std::string &effect : _configuration.effects) {
       addToJsonArray(effect_list_array, effect);
     }
