@@ -70,7 +70,7 @@ dependencies:
 
 You also need a MQTT library. See Dependencies section. Suggestion:
 ```
-  johboh/mqttrmote:
+  johboh/mqttremote:
     version: ">=6.0.2"
 ```
 
