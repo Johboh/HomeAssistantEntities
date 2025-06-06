@@ -16,12 +16,12 @@ void HaEntityButton::publishConfiguration() {
   IJsonDocument doc;
 
   if (!_name.empty()) {
-    doc["name"] = _name;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = _name;
   } else {
-    doc["name"] = nullptr;
+    doc[_ha_bridge.useAbbreviations() ? "name" : "name"] = nullptr;
   }
-  doc["payload_press"] = PAYLOAD_PRESS;
-  doc["command_topic"] =
+  doc[_ha_bridge.useAbbreviations() ? "pl_prs" : "payload_press"] = PAYLOAD_PRESS;
+  doc[_ha_bridge.useAbbreviations() ? "cmd_t" : "command_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COMMAND);
 
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);

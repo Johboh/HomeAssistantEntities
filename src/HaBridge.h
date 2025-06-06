@@ -31,8 +31,11 @@ public:
    * Only a flat layout structure is supported, no nesting. This is called from the setup function below before we setup
    * the remote. set to empty document if no device information should be set.
    * @param verbose True to do extra debug logging and printouts.
+   * @package abbreviations True to use abbreviations for the MQTT payload. This will make payload smaller, but less
+   * readable.
    */
-  HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose = false);
+  HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose = false,
+           bool abbreviations = false);
 
 public:
   /**
@@ -104,6 +107,11 @@ public:
    */
   IMQTTRemote &remote() { return _remote; }
 
+  /**
+   * @brief if abbreviations are used
+   */
+  bool useAbbreviations() { return _abbreviations; }
+
 private:
   std::string topicType(TopicType topic_type);
 
@@ -112,6 +120,7 @@ private:
   std::string _node_id;
   IMQTTRemote &_remote;
   IJsonDocument &_this_device_json_doc;
+  bool _abbreviations;
 };
 
 #endif // __HA_BRIDGE_H__
