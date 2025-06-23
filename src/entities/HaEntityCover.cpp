@@ -31,14 +31,14 @@ void HaEntityCover::publishConfiguration() {
   }
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_STATE);
-  if (!_configuration.readOnly) {
+  if (!_configuration.read_only) {
     doc["command_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_STATE);
   }
 
   doc["position_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
-  if (!_configuration.readOnly) {
+  if (!_configuration.read_only) {
     doc["set_position_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
   }

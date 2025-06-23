@@ -28,7 +28,7 @@ public:
      * Usually, Home Assitant can open and close a cover/curtain/awning by posting the position to the position topic.
      * If this set to false, the position topic will be created and Home Assistant can post the position.
      */
-    bool readOnly = false;
+    bool read_only = false;
 
     /**
      * From Home Assistant perspective:
@@ -50,7 +50,7 @@ public:
   };
 
   inline static Configuration _default = {
-      .device_class = "curtain", .readOnly = false, .position_closed = std::nullopt, .position_open = std::nullopt};
+      .device_class = "curtain", .read_only = false, .position_closed = std::nullopt, .position_open = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Cover object
@@ -115,14 +115,14 @@ public:
 
   /**
    * @brief Set callback for receving callbacks when there is a new state that should be set.
-   * Will not be called if readOnly is true in Configuration.
+   * Will not be called if read_only is true in Configuration.
    */
   bool setOnState(std::function<void(Action)> state_callback);
 
   /**
    * @brief Set callback for receving callbacks when there is a new position that should be set, value between 0 (fully
    * closed) and 100 (fully open).
-   * Will not be called if readOnly is true in Configuration.
+   * Will not be called if read_only is true in Configuration.
    */
   bool setOnPosition(std::function<void(uint8_t)> position_callback);
 
