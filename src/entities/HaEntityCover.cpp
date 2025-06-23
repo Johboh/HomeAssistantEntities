@@ -1,6 +1,7 @@
 #include "HaEntityCover.h"
 #include <HaUtilities.h>
 #include <IJson.h>
+#include <algorithm>
 
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 #define COMPONENT "cover"
@@ -43,12 +44,8 @@ void HaEntityCover::publishConfiguration() {
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
   }
 
-  if (_configuration.position_closed) {
-    doc["position_closed"] = _configuration.position_closed.value();
-  }
-  if (_configuration.position_open) {
-    doc["position_open"] = _configuration.position_open.value();
-  }
+  doc["position_open"] = _configuration.position_open;
+  doc["position_closed"] = _configuration.position_closed;
 
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }
@@ -89,11 +86,17 @@ void HaEntityCover::publishState(std::optional<State> state) {
     }
   }
 }
+
 void HaEntityCover::publishPosition(std::optional<uint8_t> position) {
   if (position) {
+    uint8_t lo = _configuration.position_closed;
+    uint8_t hi = _configuration.position_open;
+    if (lo > hi) {
+      std::swap(lo, hi);
+    }
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_POSITION),
-        std::to_string(std::min((uint8_t)100, *position)));
+        std::to_string(std::clamp(*position, lo, hi)));
     _position = position;
   }
 }

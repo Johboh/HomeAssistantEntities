@@ -41,16 +41,18 @@ public:
      * 40, a value of 60 will be sent to device).
      *
      * Source: https://www.home-assistant.io/integrations/cover.mqtt/
+     * Default: 0
      */
-    std::optional<uint8_t> position_closed = std::nullopt;
+    uint8_t position_closed = 0;
     /**
      * see position_closed.
+     * Default: 100
      */
-    std::optional<uint8_t> position_open = std::nullopt;
+    uint8_t position_open = 100;
   };
 
   inline static Configuration _default = {
-      .device_class = "curtain", .read_only = false, .position_closed = std::nullopt, .position_open = std::nullopt};
+      .device_class = "curtain", .read_only = false, .position_closed = 0, .position_open = 100};
 
   /**
    * @brief Construct a new Ha Entity Cover object
@@ -92,8 +94,8 @@ public:
    * update().
    *
    * @param state the cover state. Or absent (std::nullopt) if state is unknown.
-   * @param position of the cover, between 0 (fully closed) and 100 (fully open). Or absent (std::nullopt) if position
-   * is unknown.
+   * @param position of the cover, between Configuration::position_closed (default 0) and Configuration::position_open
+   * (default 100). Or absent (std::nullopt) if position is unknown.
    */
   void publish(std::optional<State> state, std::optional<uint8_t> position = std::nullopt);
 
@@ -101,8 +103,8 @@ public:
    * @brief Publish the cover values, but only if the values has changed. Also see publish().
    *
    * @param state the cover state. Or absent (std::nullopt) if state is unknown.
-   * @param position of the cover, between 0 (fully closed) and 100 (fully open). Or absent (std::nullopt) if position
-   * is unknown.
+   * @param position of the cover, between Configuration::position_closed (default 0) and Configuration::position_open
+   * (default 100). Or absent (std::nullopt) if position is unknown.
    */
   void update(std::optional<State> state, std::optional<uint8_t> position = std::nullopt);
 
@@ -120,9 +122,9 @@ public:
   bool setOnState(std::function<void(Action)> state_callback);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new position that should be set, value between 0 (fully
-   * closed) and 100 (fully open).
-   * Will not be called if read_only is true in Configuration.
+   * @brief Set callback for receving callbacks when there is a new position that should be set, value between
+   * Configuration::position_closed (default 0) and Configuration::position_open (default 100). Will not be called if
+   * read_only is true in Configuration.
    */
   bool setOnPosition(std::function<void(uint8_t)> position_callback);
 
