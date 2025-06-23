@@ -31,12 +31,24 @@ void HaEntityCover::publishConfiguration() {
   }
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_STATE);
-  doc["command_topic"] =
-      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_STATE);
+  if (!_configuration.readOnly) {
+    doc["command_topic"] =
+        _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_STATE);
+  }
+
   doc["position_topic"] =
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
-  doc["set_position_topic"] =
-      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
+  if (!_configuration.readOnly) {
+    doc["set_position_topic"] =
+        _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION);
+  }
+
+  if (_configuration.position_closed) {
+    doc["position_closed"] = _configuration.position_closed.value();
+  }
+  if (_configuration.position_open) {
+    doc["position_open"] = _configuration.position_open.value();
+  }
 
   _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
 }

@@ -22,9 +22,35 @@ public:
      * Will eventually be replaced by a typed device class.
      */
     std::string device_class = "curtain";
+
+    /**
+     * If set to true, this device is only reporting its state and position, but cannot be controlled by Home Assistant.
+     * Usually, Home Assitant can open and close a cover/curtain/awning by posting the position to the position topic.
+     * If this set to false, the position topic will be created and Home Assistant can post the position.
+     */
+    bool readOnly = false;
+
+    /**
+     * From Home Assistant perspective:
+     * MQTT cover expects position and tilt values to be in range of 0 to 100, where 0 indicates closed position and 100
+     * indicates fully open position. If position min or max are set to a different range (e.g. 40 to 140), when sending
+     * command to the device the range will be adjusted to the device range (position 0 will send a value of 40 to
+     * device) and when position payload is received from the device it will be adjusted back to the 0 to 100 range
+     * (device value of 40 will report cover position 0). min and max can also be used to reverse the direction of the
+     * device, if min is set to 100 and max is set to 0 device operation will be inverted (e.g. when setting position to
+     * 40, a value of 60 will be sent to device).
+     *
+     * Source: https://www.home-assistant.io/integrations/cover.mqtt/
+     */
+    std::optional<uint8_t> position_closed = std::nullopt;
+    /**
+     * see position_closed.
+     */
+    std::optional<uint8_t> position_open = std::nullopt;
   };
 
-  inline static Configuration _default = {.device_class = "curtain"};
+  inline static Configuration _default = {
+      .device_class = "curtain", .readOnly = false, .position_closed = std::nullopt, .position_open = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Cover object
@@ -89,12 +115,14 @@ public:
 
   /**
    * @brief Set callback for receving callbacks when there is a new state that should be set.
+   * Will not be called if readOnly is true in Configuration.
    */
   bool setOnState(std::function<void(Action)> state_callback);
 
   /**
    * @brief Set callback for receving callbacks when there is a new position that should be set, value between 0 (fully
    * closed) and 100 (fully open).
+   * Will not be called if readOnly is true in Configuration.
    */
   bool setOnPosition(std::function<void(uint8_t)> position_callback);
 
