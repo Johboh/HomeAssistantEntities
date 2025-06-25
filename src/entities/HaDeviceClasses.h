@@ -576,6 +576,8 @@ class Frequency : public DeviceClass {
 public:
   enum Unit : UnitType { Hz = 1, kHz, MHz, GHz };
 
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
   std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
