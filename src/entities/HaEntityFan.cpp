@@ -50,7 +50,10 @@ void HaEntityFan::publishConfiguration() {
   }
 
   if (!_configuration.presets.empty()) {
-    doc["preset_modes"] = _configuration.presets;
+    JsonArrayType preset_modes_array = createJsonArray(doc, "preset_modes");
+    for (const std::string &preset : _configuration.presets) {
+      addToJsonArray(preset_modes_array, preset);
+    }
     doc["preset_mode_state_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_PRESET);
     doc["preset_mode_command_topic"] =
