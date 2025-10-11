@@ -39,6 +39,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Cover (open/opening, close/closing, position)
 - Button
 - Event
+- Fan
 - Light (brightness, color temperature, rgb, effect)
 - Select
 - Switch (on/off)
