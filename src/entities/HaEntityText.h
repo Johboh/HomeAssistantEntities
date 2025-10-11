@@ -81,7 +81,7 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the text. This will publish to MQTT regardless if the test has changed. Also see
+   * @brief Publish the text. This will publish to MQTT regardless if the text has changed. Also see
    * updateText().
    *
    * with_state in constructor must be set.
@@ -91,7 +91,7 @@ public:
   void publishText(std::string str);
 
   /**
-   * @brief Publish the text, but only if the test has changed. Also see publishText().
+   * @brief Publish the text, but only if the text has changed. Also see publishText().
    *
    * with_state in constructor must be set.
    *
