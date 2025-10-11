@@ -647,6 +647,30 @@ private:
   static constexpr const char *DEVICE_CLASS = "humidity";
 };
 
+// AbsoluteHumidity
+class AbsoluteHumidity : public DeviceClass {
+public:
+  enum Unit : UnitType { gm3 = 1, mgm3 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case gm3:
+      return "g/m³";
+    case mgm3:
+      return "mg/m³";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "absolute_humidity";
+};
+
 // Illuminance
 class Illuminance : public DeviceClass {
 public:
