@@ -24,6 +24,9 @@ jobs:
           - name: v54_build
             version_number: release-v5.4
             target: esp32c6
+          - name: v55_build
+            version_number: release-v5.5
+            target: esp32c6
         example:
           - name: actuators
           - name: sensors
