@@ -166,8 +166,8 @@ bool HaEntityFan::setOnSpeed(std::function<void(uint32_t)> callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_SPEED),
       [callback, config = _configuration](std::string, std::string message) {
-        uint32_t speed =
-            std::clamp(static_cast<uint32_t>(std::stoi(message)), config.speed_range_min, config.speed_range_max);
+        uint32_t speed = std::clamp(static_cast<uint32_t>(std::atoi(message.c_str())), config.speed_range_min,
+                                    config.speed_range_max);
         callback(speed);
       });
 }

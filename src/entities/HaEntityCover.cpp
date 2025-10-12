@@ -130,5 +130,5 @@ bool HaEntityCover::setOnState(std::function<void(Action)> state_callback) {
 bool HaEntityCover::setOnPosition(std::function<void(uint8_t)> position_callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION),
-      [position_callback](std::string topic, std::string message) { position_callback(std::stoi(message)); });
+      [position_callback](std::string topic, std::string message) { position_callback(std::atoi(message.c_str())); });
 }

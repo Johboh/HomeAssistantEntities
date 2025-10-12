@@ -18,9 +18,9 @@ HaEntityLight::RGB extractColor(std::string &input) {
   std::smatch matches;
 
   if (std::regex_match(input, matches, pattern)) {
-    color.r = static_cast<uint8_t>(std::stoi(matches[1]));
-    color.g = static_cast<uint8_t>(std::stoi(matches[2]));
-    color.b = static_cast<uint8_t>(std::stoi(matches[3]));
+    color.r = static_cast<uint8_t>(std::atoi(matches[1].str().c_str()));
+    color.g = static_cast<uint8_t>(std::atoi(matches[2].str().c_str()));
+    color.b = static_cast<uint8_t>(std::atoi(matches[3].str().c_str()));
   } else {
     // Handle invalid input
     color.r = color.g = color.b = 0;
@@ -189,7 +189,7 @@ bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS),
-      [callback](std::string topic, std::string message) { callback(std::stoi(message)); });
+      [callback](std::string topic, std::string message) { callback(std::atoi(message.c_str())); });
 }
 
 bool HaEntityLight::setOnColorTemperature(std::function<void(uint16_t)> callback) {
@@ -199,7 +199,7 @@ bool HaEntityLight::setOnColorTemperature(std::function<void(uint16_t)> callback
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE),
-      [callback](std::string topic, std::string message) { callback(std::stoi(message)); });
+      [callback](std::string topic, std::string message) { callback(std::atoi(message.c_str())); });
 }
 
 bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
