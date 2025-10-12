@@ -31,6 +31,20 @@ public:
     bool with_speed = false;
 
     /**
+     * @brief If with_speed is set, the minimum of numeric output range (off not included, so speed_range_min - 1
+     * represents 0 %). The percentage_step is defined by 100 / the number of speeds within the speed range.
+     *
+     */
+    uint32_t speed_range_min = 1;
+
+    /**
+     * @brief If with_speed is set, the maximum of numeric output range (representing 100 %). The percentage_step is
+     * defined by 100 / the number of speeds within the speed range.
+     *
+     */
+    uint32_t speed_range_max = 100;
+
+    /**
      * @brief If non empty, the presets this fan supports.
      */
     std::set<std::string> presets = {};
@@ -51,6 +65,8 @@ public:
   inline static Configuration _default = {.with_direction = false,
                                           .with_oscillation = false,
                                           .with_speed = false,
+                                          .speed_range_min = 1,
+                                          .speed_range_max = 100,
                                           .presets = {},
                                           .force_update = false,
                                           .retain = false};
@@ -66,7 +82,7 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id child identifier for this entity in case there are several fans of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
+   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
@@ -101,7 +117,7 @@ public:
   void updateDirection(std::string direction);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new direction that should be set. Direction is a free
+   * @brief Set callback for receiving callbacks when there is a new direction that should be set. Direction is a free
    * form string.
    *
    * with_direction in Configuration must be set.
@@ -130,7 +146,7 @@ public:
   void updateOscillation(bool oscillation);
 
   /**
-   * @brief Set callback for receving callbacks when oscillation should be turned on or off.
+   * @brief Set callback for receiving callbacks when oscillation should be turned on or off.
    *
    * with_oscillation in Configuration must be set.
    */
@@ -139,30 +155,31 @@ public:
   //--------------------------------------
 
   /**
-   * @brief Publish the speed in percentage. This will publish to MQTT regardless if the value has changed. Also see
+   * @brief Publish the speed. This will publish to MQTT regardless if the value has changed. Also see
    * updateSpeed().
    *
    * with_speed in Configuration must be set.
    *
-   * @param speed the speed in percentages, 1 to 100.
+   * @param speed the speed, value between the min/max set in the Configuration.
    */
-  void publishSpeed(uint8_t speed);
+  void publishSpeed(uint32_t speed);
 
   /**
-   * @brief Publish the oscillation, but only if the value has changed. Also see publishSpeed().
+   * @brief Publish the speed, but only if the value has changed. Also see publishSpeed().
    *
    * with_speed in Configuration must be set.
    *
-   * @param speed the speed in percentages, 1 to 100.
+   * @param speed the speed, value between the min/max set in the Configuration.
    */
-  void updateSpeed(uint8_t speed);
+  void updateSpeed(uint32_t speed);
 
   /**
-   * @brief Set callback for receving callbacks when a new speed should be set. Speed in percentages, 1 to 100.
+   * @brief Set callback for receiving callbacks when a new speed should be set. Value between the min/max set in the
+   * Configuration.
    *
    * with_speed in Configuration must be set.
    */
-  bool setOnSpeed(std::function<void(uint8_t)> callback);
+  bool setOnSpeed(std::function<void(uint32_t)> callback);
 
   //--------------------------------------
 
@@ -186,7 +203,7 @@ public:
   void updatePreset(std::string preset);
 
   /**
-   * @brief Set callback for receving callbacks when a new preset should be set.
+   * @brief Set callback for receiving callbacks when a new preset should be set.
    *
    * presets in Configuration must be set to a non empty set.
    */
@@ -210,7 +227,7 @@ public:
   void updateIsOn(bool on);
 
   /**
-   * @brief Set callback for receving callbacks when a new state should be set.
+   * @brief Set callback for receiving callbacks when a new state should be set.
    */
   bool setOnState(std::function<void(bool)> callback);
 
@@ -222,7 +239,7 @@ private:
 
 private:
   std::optional<bool> _on;
-  std::optional<uint8_t> _speed;
+  std::optional<uint32_t> _speed;
   std::optional<bool> _oscillation;
   std::optional<std::string> _preset;
   std::optional<std::string> _direction;

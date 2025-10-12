@@ -5,9 +5,9 @@
 #define COMPONENT "fan"
 #define OBJECT_ID "fan"
 #define OBJECT_ID_ONOFF "onoff"
+#define OBJECT_ID_SPEED "speed"
 #define OBJECT_ID_PRESET "preset"
 #define OBJECT_ID_DIRECTION "direction"
-#define OBJECT_ID_PERCENTAGE "percentage"
 #define OBJECT_ID_OSCILLATION "oscillation"
 
 HaEntityFan::HaEntityFan(HaBridge &ha_bridge, std::string name, std::string child_object_id,
@@ -44,9 +44,11 @@ void HaEntityFan::publishConfiguration() {
 
   if (_configuration.with_speed) {
     doc["percentage_state_topic"] =
-        _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_PERCENTAGE);
+        _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_SPEED);
     doc["percentage_command_topic"] =
-        _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_PERCENTAGE);
+        _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_SPEED);
+    doc["speed_range_min"] = _configuration.speed_range_min;
+    doc["speed_range_max"] = _configuration.speed_range_max;
   }
 
   if (!_configuration.presets.empty()) {
@@ -140,31 +142,32 @@ bool HaEntityFan::setOnOscillation(std::function<void(bool)> callback) {
 
 //--------------------------------------
 
-void HaEntityFan::publishSpeed(uint8_t speed) {
+void HaEntityFan::publishSpeed(uint32_t speed) {
   if (!_configuration.with_speed) {
     return;
   }
-  speed = std::clamp(speed, static_cast<uint8_t>(1), static_cast<uint8_t>(100));
+  speed = std::clamp(speed, _configuration.speed_range_min, _configuration.speed_range_max);
   _speed = speed;
   _ha_bridge.publishMessage(
-      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_PERCENTAGE),
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_SPEED),
       std::to_string(speed));
 }
 
-void HaEntityFan::updateSpeed(uint8_t speed) {
+void HaEntityFan::updateSpeed(uint32_t speed) {
   if (!_speed || *_speed != speed) {
     publishSpeed(speed);
   }
 }
 
-bool HaEntityFan::setOnSpeed(std::function<void(uint8_t)> callback) {
+bool HaEntityFan::setOnSpeed(std::function<void(uint32_t)> callback) {
   if (!_configuration.with_speed) {
     return false;
   }
   return _ha_bridge.remote().subscribe(
-      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_PERCENTAGE),
-      [callback](std::string, std::string message) {
-        uint8_t speed = static_cast<uint8_t>(std::clamp(std::stoi(message), 1, 100));
+      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_SPEED),
+      [callback, config = _configuration](std::string, std::string message) {
+        uint32_t speed =
+            std::clamp(static_cast<uint32_t>(std::stoi(message)), config.speed_range_min, config.speed_range_max);
         callback(speed);
       });
 }
