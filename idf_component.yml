@@ -4,4 +4,4 @@ url: https://github.com/Johboh/HomeAssistantEntities
 dependencies:
   idf: ">=4.4"
   johboh/nlohmann-json:
-    version: ">=3.11.3"
+    version: ">=3.12.0"
