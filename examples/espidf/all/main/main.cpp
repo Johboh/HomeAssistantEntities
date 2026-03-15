@@ -14,6 +14,7 @@
 #include <entities/HaEntityCarbonDioxide.h>
 #include <entities/HaEntityCover.h>
 #include <entities/HaEntityCurrent.h>
+#include <entities/HaEntityDeviceTrigger.h>
 #include <entities/HaEntityDoor.h>
 #include <entities/HaEntityEvent.h>
 #include <entities/HaEntityHumidity.h>
@@ -71,6 +72,8 @@ HaEntityCarbonDioxide _ha_entity_carbon_dioxide(ha_bridge, "Carbon dioxide");
 HaEntityCover _ha_entity_cover(ha_bridge, "cover", "left_window", {.device_class = "shade"});
 HaEntityCurrent _ha_entity_current(ha_bridge, "current", std::nullopt,
                                    {.unit = HaEntityCurrent::Unit::mA, .force_update = false});
+HaEntityDeviceTrigger _ha_entity_device_trigger(ha_bridge, "device_trigger", 
+                                   {.type = "button_short_press", .subtype = "button_1"});
 HaEntityDoor _ha_entity_door(ha_bridge, "door", "");
 HaEntityEvent _ha_entity_event(ha_bridge, "event", "party",
                                {.event_types = {"button_press"}, .device_class = HaEntityEvent::DeviceClass::Button});
@@ -139,6 +142,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_carbon_dioxide.publishConcentration(55.0);
     _ha_entity_cover.publish(HaEntityCover::State::Opening, 50);
     _ha_entity_current.publishCurrent(10);
+    _ha_entity_device_trigger.publishTrigger();
     _ha_entity_door.publishDoor(true);
     _ha_entity_event.publishEvent("button_press", {{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_humidity.publishHumidity(55.0);
@@ -192,6 +196,7 @@ void app_main(void) {
       _ha_entity_carbon_dioxide.publishConfiguration();
       _ha_entity_cover.publishConfiguration();
       _ha_entity_current.publishConfiguration();
+      _ha_entity_device_trigger.publishConfiguration();
       _ha_entity_door.publishConfiguration();
       _ha_entity_event.publishConfiguration();
       _ha_entity_humidity.publishConfiguration();
