@@ -5,7 +5,7 @@
 #define COMPONENT "device_automation"
 
 HaEntityDeviceTrigger::HaEntityDeviceTrigger(HaBridge &ha_bridge, std::string object_id, Configuration configuration)
-  : _ha_bridge(ha_bridge), _object_id(object_id), _configuration(configuration) {}
+    : _ha_bridge(ha_bridge), _object_id(object_id), _configuration(configuration) {}
 
 void HaEntityDeviceTrigger::publishConfiguration() {
   IJsonDocument doc;
@@ -15,7 +15,7 @@ void HaEntityDeviceTrigger::publishConfiguration() {
   doc["platform"] = "device_automation";
   doc["type"] = _configuration.type;
   doc["subtype"] = _configuration.subtype;
-  
+
   doc["topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
 
   _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
@@ -26,5 +26,6 @@ void HaEntityDeviceTrigger::republishState() {
 }
 
 void HaEntityDeviceTrigger::publishTrigger() {
-  _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id), _configuration.subtype);
+  _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
+                            _configuration.subtype);
 }

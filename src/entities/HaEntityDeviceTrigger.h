@@ -39,8 +39,8 @@ public:
   /**
    * @brief Construct a new Ha Entity Device Trigger object
    *
-   * @param object_id object ID for this device trigger. Should be unique for each device trigger for this node/device. Example:
-   * "buzzer_device_trigger". Valid characters are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * @param object_id object ID for this device trigger. Should be unique for each device trigger for this node/device.
+   * Example: "buzzer_device_trigger". Valid characters are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
   HaEntityDeviceTrigger(HaBridge &ha_bridge, std::string object_id, Configuration configuration);
