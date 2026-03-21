@@ -116,13 +116,13 @@ public:
   };
 
   /**
-   * @brief Set callback for receving callbacks when there is a new state that should be set.
+   * @brief Set callback for receiving callbacks when there is a new state that should be set.
    * Will not be called if read_only is true in Configuration.
    */
   bool setOnState(std::function<void(Action)> state_callback);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new position that should be set, value between
+   * @brief Set callback for receiving callbacks when there is a new position that should be set, value between
    * Configuration::position_closed (default 0) and Configuration::position_open (default 100). Will not be called if
    * read_only is true in Configuration.
    */

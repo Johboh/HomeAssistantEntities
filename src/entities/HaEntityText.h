@@ -8,7 +8,7 @@
 #include <string>
 
 /**
- * @brief Represent a raw Text sensor/acturator that can be written and read from Home Assistant.
+ * @brief Represent a raw Text sensor/actuator that can be written and read from Home Assistant.
  * Also see [HaEntityString].
  */
 class HaEntityText : public HaEntity {
@@ -100,7 +100,7 @@ public:
   void updateText(std::string str);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new text that should be set.
+   * @brief Set callback for receiving callbacks when there is a new text that should be set.
    */
   bool setOnText(std::function<void(std::string)> callback);
 

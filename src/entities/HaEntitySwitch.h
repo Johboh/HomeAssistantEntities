@@ -65,7 +65,7 @@ public:
   void updateSwitch(bool on);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new state that should be set.
+   * @brief Set callback for receiving callbacks when there is a new state that should be set.
    */
   bool setOnState(std::function<void(bool)> state_callback);
 

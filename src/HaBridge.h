@@ -48,11 +48,11 @@ public:
    *
    * @param component This is the first path after "homeassistant/" in the topic and defines the kind of component it
    * is. Examples are "sensor", "binary_sensor", "cover", "light", etc.
-   * @param object_id this is the object identifier, which is what the sensor/acturator is measuring/actuating. Examples
+   * @param object_id this is the object identifier, which is what the sensor/actuator is measuring/actuating. Examples
    * "voltage", "brightness", "movement", "cover", "light" etc. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
+   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock_upper/config". This also apply for

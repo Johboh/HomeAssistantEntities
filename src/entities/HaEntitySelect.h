@@ -51,7 +51,7 @@ public:
    * @brief Publish the current selected option. Must be one of the options in the options list. This will publish to
    * MQTT regardless if the value has changed. Also see updateSelection().
    *
-   * @param option thte option selected.
+   * @param option the option selected.
    */
   void publishSelection(std::string option);
 
@@ -59,12 +59,12 @@ public:
    * @brief Publish the current selected option, but only if the value has changed. Also see publishSelection(). Must be
    * one of the options in the options list.
    *
-   * @param option thte option selected.
+   * @param option the option selected.
    */
   void updateSelection(std::string option);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new option that should be set.
+   * @brief Set callback for receiving callbacks when there is a new option that should be set.
    */
   bool setOnSelected(std::function<void(std::string)> select_callback);
 

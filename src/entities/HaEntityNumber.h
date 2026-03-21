@@ -84,7 +84,7 @@ public:
   void updateNumber(float number);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new number.
+   * @brief Set callback for receiving callbacks when there is a new number.
    */
   bool setOnNumber(std::function<void(float)> callback);
 

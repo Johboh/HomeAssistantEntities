@@ -60,7 +60,7 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id non optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
+   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
@@ -186,31 +186,31 @@ public:
   void updateRgb(RGB rgb);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new on state that should be set.
+   * @brief Set callback for receiving callbacks when there is a new on state that should be set.
    */
   bool setOnOn(std::function<void(bool)> on_state_callback);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new brightness that should be set. Will only be
+   * @brief Set callback for receiving callbacks when there is a new brightness that should be set. Will only be
    * respected if the light is setup with this capability.
    */
   bool setOnBrightness(std::function<void(uint8_t)> brightness_callback);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new color temperature that should be set. Will only be
+   * @brief Set callback for receiving callbacks when there is a new color temperature that should be set. Will only be
    * respected if the light is setup with this capability. In mireds or Kelvin, depending on what was selected in the
    * Configuration.
    */
   bool setOnColorTemperature(std::function<void(uint16_t)> color_temperature_callback);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new effect that should be set. Will only be
+   * @brief Set callback for receiving callbacks when there is a new effect that should be set. Will only be
    * respected if the light is setup with this capability.
    */
   bool setOnEffect(std::function<void(std::string)> effect_callback);
 
   /**
-   * @brief Set callback for receving callbacks when there is a new RGB value that should be set. Will only be
+   * @brief Set callback for receiving callbacks when there is a new RGB value that should be set. Will only be
    * respected if the light is setup with this capability.
    */
   bool setOnRgb(std::function<void(RGB)> effect_callback);
