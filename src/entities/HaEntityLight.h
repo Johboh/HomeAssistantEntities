@@ -227,6 +227,9 @@ private:
   std::optional<std::string> _effect;
   std::optional<uint8_t> _brightness;
   std::optional<uint16_t> _color_temperature;
+
+  static const std::regex _rgb_pattern;
+  static RGB extractColor(std::string &input);
 };
 
 #endif // __HA_ENTITY_LIGHT_H__
