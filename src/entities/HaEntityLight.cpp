@@ -14,7 +14,7 @@
 
 HaEntityLight::RGB extractColor(std::string &input) {
   HaEntityLight::RGB color;
-  std::regex pattern(R"((\d+),(\d+),(\d+))");
+  static std::regex pattern(R"((\d+),(\d+),(\d+))");
   std::smatch matches;
 
   if (std::regex_match(input, matches, pattern)) {
