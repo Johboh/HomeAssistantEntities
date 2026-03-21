@@ -12,19 +12,15 @@
 #define OBJECT_ID_BRIGHTNESS "brightness"
 #define OBJECT_ID_COLOR_TEMPERATURE "color_temperature"
 
-const std::regex HaEntityLight::_rgb_pattern(R"((\d+),(\d+),(\d+))");
-
-HaEntityLight::RGB HaEntityLight::extractColor(std::string &input) {
+HaEntityLight::RGB extractColor(std::string &input) {
   HaEntityLight::RGB color;
+  std::regex pattern(R"((\d+),(\d+),(\d+))");
   std::smatch matches;
 
-  if (std::regex_match(input, matches, _rgb_pattern)) {
-    int r = std::atoi(matches[1].str().c_str());
-    int g = std::atoi(matches[2].str().c_str());
-    int b = std::atoi(matches[3].str().c_str());
-    color.r = static_cast<uint8_t>(std::clamp(r, 0, 255));
-    color.g = static_cast<uint8_t>(std::clamp(g, 0, 255));
-    color.b = static_cast<uint8_t>(std::clamp(b, 0, 255));
+  if (std::regex_match(input, matches, pattern)) {
+    color.r = static_cast<uint8_t>(std::atoi(matches[1].str().c_str()));
+    color.g = static_cast<uint8_t>(std::atoi(matches[2].str().c_str()));
+    color.b = static_cast<uint8_t>(std::atoi(matches[3].str().c_str()));
   } else {
     // Handle invalid input
     color.r = color.g = color.b = 0;
