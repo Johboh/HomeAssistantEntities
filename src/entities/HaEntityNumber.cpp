@@ -58,7 +58,13 @@ void HaEntityNumber::updateNumber(float number) {
 }
 
 bool HaEntityNumber::setOnNumber(std::function<void(float)> callback) {
-  return _ha_bridge.remote().subscribe(
-      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
-      [callback](std::string topic, std::string message) { callback(std::stof(message)); });
+  return _ha_bridge.remote().subscribe(_ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
+                                       [callback](std::string topic, std::string message) {
+                                         char *end;
+                                         float num = std::strtof(message.c_str(), &end);
+                                         if (end != message.c_str() && *end == '\0') {
+                                           callback(num);
+                                         }
+                                         // Invalid input, ignore
+                                       });
 }
