@@ -5,6 +5,7 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <functional>
 #include <nlohmann/json.hpp>
 
 #include <entities/HaEntityAtmosphericPressure.h>
@@ -60,7 +61,16 @@ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_pas
 // Create the Home Assistant bridge. This is shared across all entities.
 // We only have one per device/hardware. In our example, the name of our device is "livingroom".
 // See constructor of HaBridge for more documentation.
-HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc);
+bool verbose = false;
+// This is optional, only here for the sake of integration tests.
+std::functional<std::string()> availability_topic = [](IMQTTRemote &remote) {
+  remote.clientId() + "/my_custom_status_path";
+};
+// This is optional, only here for the sake of integration tests.
+std::functional<std::string()> unique_id = [](IMQTTRemote &remote, std::string &node_id) {
+  remote.clientId() + "_custom_extras_" + node_id;
+};
+HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc, verbose, availability_topic, unique_id);
 
 // ALl entities.
 HaEntityAtmosphericPressure _ha_entity_atm(ha_bridge, "pressure", std::nullopt,
@@ -72,8 +82,8 @@ HaEntityCarbonDioxide _ha_entity_carbon_dioxide(ha_bridge, "Carbon dioxide");
 HaEntityCover _ha_entity_cover(ha_bridge, "cover", "left_window", {.device_class = "shade"});
 HaEntityCurrent _ha_entity_current(ha_bridge, "current", std::nullopt,
                                    {.unit = HaEntityCurrent::Unit::mA, .force_update = false});
-HaEntityDeviceTrigger _ha_entity_device_trigger(ha_bridge, "device_trigger", 
-                                   {.type = "button_short_press", .subtype = "button_1"});
+HaEntityDeviceTrigger _ha_entity_device_trigger(ha_bridge, "device_trigger",
+                                                {.type = "button_short_press", .subtype = "button_1"});
 HaEntityDoor _ha_entity_door(ha_bridge, "door", "");
 HaEntityEvent _ha_entity_event(ha_bridge, "event", "party",
                                {.event_types = {"button_press"}, .device_class = HaEntityEvent::DeviceClass::Button});
