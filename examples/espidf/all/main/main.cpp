@@ -63,13 +63,9 @@ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_pas
 // See constructor of HaBridge for more documentation.
 bool verbose = false;
 // This is optional, only here for the sake of integration tests.
-std::functional<std::string()> availability_topic = [](IMQTTRemote &remote) {
-  remote.clientId() + "/my_custom_status_path";
-};
+auto availability_topic = [](IMQTTRemote &remote) { remote.clientId() + "/my_custom_status_path"; };
 // This is optional, only here for the sake of integration tests.
-std::functional<std::string()> unique_id = [](IMQTTRemote &remote, std::string &node_id) {
-  remote.clientId() + "_custom_extras_" + node_id;
-};
+auto unique_id = [](IMQTTRemote &remote, std::string &node_id) { remote.clientId() + "_custom_extras_" + node_id; };
 HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc, verbose, availability_topic, unique_id);
 
 // ALl entities.
