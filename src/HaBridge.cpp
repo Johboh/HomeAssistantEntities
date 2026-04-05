@@ -1,17 +1,20 @@
 #include "HaBridge.h"
-#include <HaUtilities.h>
 
 using namespace homeassistantentities;
 
-HaBridge::HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose)
-    : _verbose(verbose), _node_id(node_id), _remote(remote), _this_device_json_doc(this_device_json_doc) {}
+HaBridge::HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose,
+                   std::function<std::string(IMQTTRemote &)> availability_topic,
+                   std::function<std::string(IMQTTRemote &, std::string &)> unique_id)
+    : _verbose(verbose), _node_id(node_id), _remote(remote), _this_device_json_doc(this_device_json_doc),
+      _availability_topic(availability_topic), _unique_id(unique_id) {}
 
 void HaBridge::publishConfiguration(std::string component, std::string object_id, std::string child_object_id,
                                     const IJsonDocument &specific_doc) {
   IJsonDocument doc;
-  doc["availability_topic"] = santitizePath(_remote.clientId()) + "/status";
+  doc["availability_topic"] =
+      _availability_topic ? _availability_topic(_remote) : (santitizePath(_remote.clientId()) + "/status");
 
-  std::string unique_id = _remote.clientId() + "_" + _node_id;
+  std::string unique_id = _unique_id ? _unique_id(_remote, _node_id) : (_remote.clientId() + "_" + _node_id);
 
   auto coid = homeassistantentities::trim(child_object_id);
   if (!coid.empty()) {

@@ -1,9 +1,11 @@
 #ifndef __HA_BRIDGE_H__
 #define __HA_BRIDGE_H__
 
+#include <HaUtilities.h>
 #include <IJson.h>
 #include <IMQTTRemote.h>
 #include <cstdint>
+#include <functional>
 #include <string>
 
 /**
@@ -31,8 +33,15 @@ public:
    * Only a flat layout structure is supported, no nesting. This is called from the setup function below before we setup
    * the remote. set to empty document if no device information should be set.
    * @param verbose True to do extra debug logging and printouts.
+   * @param availability_topic the topic to use for availabilty. Defaults to using the MQTT client ID + /status, but can
+   * be anything.
+   * @param unique_id Each node need a unique ID for Home Assistant to uniquely identify the entry. This should be
+   * stable and never change for a given node and sensor/actuator/etc. Defaults
+   * to using MQTT client ID + "_" + node id.
    */
-  HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose = false);
+  HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose = false,
+           std::function<std::string(IMQTTRemote &remote)> availability_topic = {},
+           std::function<std::string(IMQTTRemote &remote, std::string &node_id)> unique_id = {});
 
 public:
   /**
@@ -112,6 +121,8 @@ private:
   std::string _node_id;
   IMQTTRemote &_remote;
   IJsonDocument &_this_device_json_doc;
+  std::function<std::string(IMQTTRemote &)> _availability_topic;
+  std::function<std::string(IMQTTRemote &, std::string &)> _unique_id;
 };
 
 #endif // __HA_BRIDGE_H__
