@@ -24,6 +24,7 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Number (with any unit and device class)
 - Particulate matter (μg/m³)
 - Power (mW, W, kW, MW, GW, TW)
+- Signal strength/RSSI (dB, dBm)
 - Sound (detected/not detected)
 - String (raw "String"-sensor)
 - Temperature (°C, °F, K)

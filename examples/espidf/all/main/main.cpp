@@ -28,6 +28,7 @@
 #include <entities/HaEntityPower.h>
 #include <entities/HaEntitySelect.h>
 #include <entities/HaEntitySensor.h>
+#include <entities/HaEntitySignalStrength.h>
 #include <entities/HaEntitySound.h>
 #include <entities/HaEntityString.h>
 #include <entities/HaEntitySwitch.h>
@@ -137,6 +138,8 @@ HaEntityVoltage _ha_entity_voltage(ha_bridge, "voltage", std::nullopt,
                                    {.unit = HaEntityVoltage::Unit::mV, .force_update = false});
 HaEntityWeight _ha_entity_weight(ha_bridge, "weight", std::nullopt,
                                  {.unit = HaEntityWeight::Unit::kg, .force_update = false});
+HaEntitySignalStrength _ha_entity_signal_strength(ha_bridge, "signal_strength", std::nullopt,
+                                                  {.unit = HaEntitySignalStrength::Unit::dBm, .force_update = false});
 
 void haStateTask(void *pvParameters) {
   nlohmann::json jsn;
@@ -176,6 +179,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_volatile_organic_compounds.publishConcentration(55.0);
     _ha_entity_voltage.publishVoltage(55.0);
     _ha_entity_weight.publishWeight(55.0);
+    _ha_entity_signal_strength.publishSignalStrength(-67);
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }
@@ -227,6 +231,7 @@ void app_main(void) {
       _ha_entity_volatile_organic_compounds.publishConfiguration();
       _ha_entity_voltage.publishConfiguration();
       _ha_entity_weight.publishConfiguration();
+      _ha_entity_signal_strength.publishConfiguration();
     });
 
     // Register for callbacks.
