@@ -99,6 +99,7 @@ HaEntityMotion _ha_entity_motion(ha_bridge, "motion");
 HaEntityNumber _ha_entity_number(ha_bridge, "number", "danceability",
                                  {.min_value = 0,
                                   .max_value = 100,
+                                  .step = 0.1,
                                   .unit = "ms",
                                   .device_class = "duration",
                                   .force_update = false,
