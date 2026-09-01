@@ -25,6 +25,11 @@ public:
     float max_value = 100.0;
 
     /**
+     * @brief Step value. Smallest value 0.001.
+     */
+    float step = 1.0;
+
+    /**
      * @brief the unit of measurement reported for this number. Make sure that the value you publish is of this unit.
      */
     std::string unit = "";
@@ -49,8 +54,13 @@ public:
     bool retain = false;
   };
 
-  inline static Configuration _default = {
-      .min_value = 1.0, .max_value = 100.0, .unit = "", .device_class = "", .force_update = false, .retain = false};
+  inline static Configuration _default = {.min_value = 1.0,
+                                          .max_value = 100.0,
+                                          .step = 1.0,
+                                          .unit = "",
+                                          .device_class = "",
+                                          .force_update = false,
+                                          .retain = false};
 
   /**
    * @brief Construct a new Ha Entity Number object
