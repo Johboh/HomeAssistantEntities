@@ -5,9 +5,10 @@
 using namespace homeassistantentities;
 
 HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id,
-                               Configuration configuration)
+                               const Configuration &configuration)
     : _name(trim(name)), _ha_bridge(ha_bridge), _object_id(configuration.device_class.objectId()),
-      _configuration(configuration) {
+      _icon(configuration.icon), _with_attributes(configuration.with_attributes),
+      _force_update(configuration.force_update) {
   _component = configuration.device_class.sensorType() == DeviceClass::SensorType::Sensor ? "sensor" : "binary_sensor";
 
   if (child_object_id) {
@@ -15,6 +16,30 @@ HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optio
     _child_object_id = coid.empty() ? "" : coid;
   } else {
     _child_object_id = "";
+  }
+
+  auto dc = configuration.device_class.deviceClass();
+  if (dc) {
+    auto trimmed_dc = trim(*dc);
+    if (!trimmed_dc.empty()) {
+      _device_class = trimmed_dc;
+    }
+  }
+
+  if (configuration.unit_of_measurement) {
+    _unit_of_measurement = configuration.device_class.unitOfMeasurement(*configuration.unit_of_measurement);
+  }
+
+  // Only "sensor" supports state_class in Home Assistant, and date/enum/timestamp forbid state_class.
+  if (_component == "sensor" && configuration.state_class) {
+    auto sc = trim(*configuration.state_class);
+    if (!sc.empty() && _device_class != "date" && _device_class != "enum" && _device_class != "timestamp") {
+      if ((_device_class == "energy" || _device_class == "gas" || _device_class == "water") && sc == "measurement") {
+        _state_class = "total_increasing";
+      } else {
+        _state_class = sc;
+      }
+    }
   }
 }
 
@@ -28,34 +53,24 @@ void HaEntitySensor::publishConfiguration() {
   }
   doc["platform"] = _component; // we have validated this to be either sensor or binary_sensor
 
-  if (_configuration.state_class) {
-    auto state_class = trim(*_configuration.state_class);
-    if (!state_class.empty()) {
-      doc["state_class"] = state_class;
-    }
+  if (_state_class) {
+    doc["state_class"] = *_state_class;
   }
-  auto device_class = _configuration.device_class.deviceClass();
-  if (device_class) {
-    auto trimmed_device_class = trim(*device_class);
-    if (!trimmed_device_class.empty()) {
-      doc["device_class"] = trimmed_device_class;
-    }
+  if (_device_class) {
+    doc["device_class"] = *_device_class;
   }
-  if (_configuration.icon) {
-    doc["icon"] = *_configuration.icon;
+  if (_icon) {
+    doc["icon"] = *_icon;
   }
-  doc["force_update"] = _configuration.force_update;
+  doc["force_update"] = _force_update;
 
-  if (_configuration.unit_of_measurement) {
-    auto unit_of_measurement = _configuration.device_class.unitOfMeasurement(*_configuration.unit_of_measurement);
-    if (unit_of_measurement) {
-      doc["unit_of_measurement"] = *unit_of_measurement;
-    }
+  if (_unit_of_measurement) {
+    doc["unit_of_measurement"] = *_unit_of_measurement;
   }
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id);
 
-  if (_configuration.with_attributes) {
+  if (_with_attributes) {
     doc["json_attributes_topic"] =
         _ha_bridge.getTopic(HaBridge::TopicType::Attributes, _component, _object_id, _child_object_id);
   }
@@ -72,12 +87,11 @@ void HaEntitySensor::republishState() {
   }
 }
 
-void HaEntitySensor::publishValue(double value, Attributes::Map attributes) {
-  auto value_str = std::to_string(value);
-  publishValue(value_str, attributes);
+void HaEntitySensor::publishValue(double value, const Attributes::Map &attributes) {
+  publishValue(formatNumber(value), attributes);
 }
 
-void HaEntitySensor::publishValue(std::string value, Attributes::Map attributes) {
+void HaEntitySensor::publishValue(const std::string &value, const Attributes::Map &attributes) {
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, _component, _object_id, _child_object_id),
                             value);
   _value = value;
@@ -87,34 +101,35 @@ void HaEntitySensor::publishValue(std::string value, Attributes::Map attributes)
   }
 }
 
-void HaEntitySensor::publishAttributes(Attributes::Map attributes) {
-  if (!_configuration.with_attributes) {
+void HaEntitySensor::publishAttributes(const Attributes::Map &attributes) {
+  if (!_with_attributes) {
     return;
   }
-  _attributes = attributes;
 
   IJsonDocument doc;
   if (Attributes::toJson(doc, attributes)) {
+    _attributes = attributes;
     auto message = toJsonString(doc);
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::Attributes, _component, _object_id, _child_object_id), message);
   }
 }
 
-void HaEntitySensor::updateValue(double value, Attributes::Map attributes) {
-  auto value_str = std::to_string(value);
-  updateValue(value_str, attributes);
+void HaEntitySensor::updateValue(double value, const Attributes::Map &attributes) {
+  updateValue(formatNumber(value), attributes);
 }
 
-void HaEntitySensor::updateValue(std::string value, Attributes::Map attributes) {
+void HaEntitySensor::updateValue(const std::string &value, const Attributes::Map &attributes) {
   if (!_value || *_value != value) {
     publishValue(value, {});
   }
 
-  updateAttributes(attributes);
+  if (!attributes.empty()) {
+    updateAttributes(attributes);
+  }
 }
 
-void HaEntitySensor::updateAttributes(Attributes::Map attributes) {
+void HaEntitySensor::updateAttributes(const Attributes::Map &attributes) {
   if (!_attributes || *_attributes != attributes) {
     publishAttributes(attributes);
   }

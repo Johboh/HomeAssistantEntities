@@ -7,8 +7,8 @@
 #include <cstdint>
 #include <functional>
 #include <map>
-#include <set>
 #include <string>
+#include <vector>
 
 /**
  * @brief Represent an Event that can be sent to Home Assistant.
@@ -25,12 +25,12 @@ public:
 
   struct Configuration {
     /**
-     * @brief A set of valid event_type strings.
+     * @brief A list of valid event_type strings.
      */
-    std::set<std::string> event_types = {};
+    std::vector<std::string> event_types = {};
 
     /**
-     * @brief the device class for for this event. None to not specify (default).
+     * @brief the device class for this event. None to not specify (default).
      */
     DeviceClass device_class = DeviceClass::None;
   };
@@ -61,7 +61,7 @@ public:
    * @param event the event.
    * @param attributes optional attributes to send with the event.
    */
-  void publishEvent(std::string event, Attributes::Map attributes = {});
+  void publishEvent(const std::string &event, const Attributes::Map &attributes = {});
 
 private:
   std::string _name;

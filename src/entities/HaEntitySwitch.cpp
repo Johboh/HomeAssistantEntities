@@ -1,6 +1,7 @@
 #include "HaEntitySwitch.h"
 #include <HaUtilities.h>
 #include <IJson.h>
+#include <utility>
 
 #define COMPONENT "switch"
 #define OBJECT_ID "switch"
@@ -10,8 +11,8 @@
 
 HaEntitySwitch::HaEntitySwitch(HaBridge &ha_bridge, std::string name, std::string child_object_id,
                                Configuration configuration)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
-      _configuration(configuration) {}
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(std::move(child_object_id)),
+      _configuration(std::move(configuration)) {}
 
 void HaEntitySwitch::publishConfiguration() {
   IJsonDocument doc;
@@ -39,8 +40,7 @@ void HaEntitySwitch::republishState() {
 
 void HaEntitySwitch::publishSwitch(bool on) {
   _ha_bridge.publishMessage(
-      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      std::string(on ? "ON" : "OFF"));
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF), on ? "ON" : "OFF");
   _on = on;
 }
 
@@ -51,7 +51,10 @@ void HaEntitySwitch::updateSwitch(bool on) {
 }
 
 bool HaEntitySwitch::setOnState(std::function<void(bool)> state_callback) {
+  if (!state_callback) {
+    return false;
+  }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      [state_callback](std::string topic, std::string message) { state_callback(message == "ON"); });
+      [state_callback](std::string, std::string message) { state_callback(message == "ON"); });
 }

@@ -4,6 +4,7 @@
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 
@@ -35,24 +36,13 @@ public:
     bool is_password = false;
 
     /**
-     * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-     * message (not only when the sensor’s new state is different to the current one).
-     */
-    bool force_update = false;
-
-    /**
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
   };
 
-  inline static Configuration _default = {.min_text_length = 0,
-                                          .max_text_length = 255,
-                                          .with_state_topic = false,
-                                          .is_password = false,
-                                          .force_update = false,
-                                          .retain = false};
+  inline static Configuration _default = {
+      .min_text_length = 0, .max_text_length = 255, .with_state_topic = false, .is_password = false, .retain = false};
 
   /**
    * @brief Construct a new Ha Entity Text object
@@ -64,12 +54,8 @@ public:
    * one main entity (or only) entity of this device. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
-   * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
+   * @param child_object_id optional child identifier for this entity in case there are several text entities of the
+   * same entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
@@ -84,20 +70,20 @@ public:
    * @brief Publish the text. This will publish to MQTT regardless if the text has changed. Also see
    * updateText().
    *
-   * with_state in constructor must be set.
+   * with_state_topic in Configuration must be set.
    *
    * @param str the text to publish.
    */
-  void publishText(std::string str);
+  void publishText(const std::string &str);
 
   /**
    * @brief Publish the text, but only if the text has changed. Also see publishText().
    *
-   * with_state in constructor must be set.
+   * with_state_topic in Configuration must be set.
    *
    * @param str the text to publish.
    */
-  void updateText(std::string str);
+  void updateText(const std::string &str);
 
   /**
    * @brief Set callback for receiving callbacks when there is a new text that should be set.

@@ -1,8 +1,10 @@
 #include "HaEntityLight.h"
 #include <HaUtilities.h>
 #include <IJson.h>
-#include <regex>
+#include <algorithm>
+#include <cstdlib>
 #include <string>
+#include <utility>
 
 #define COMPONENT "light"
 #define OBJECT_ID "light"
@@ -12,29 +14,39 @@
 #define OBJECT_ID_BRIGHTNESS "brightness"
 #define OBJECT_ID_COLOR_TEMPERATURE "color_temperature"
 
-HaEntityLight::RGB extractColor(std::string &input) {
-  HaEntityLight::RGB color;
-  static std::regex pattern(R"((\d+),(\d+),(\d+))");
-  std::smatch matches;
+namespace {
+bool parseRgb(const std::string &input, HaEntityLight::RGB &color) {
+  const char *p = input.c_str();
+  char *end = nullptr;
 
-  if (std::regex_match(input, matches, pattern)) {
-    color.r = static_cast<uint8_t>(std::atoi(matches[1].str().c_str()));
-    color.g = static_cast<uint8_t>(std::atoi(matches[2].str().c_str()));
-    color.b = static_cast<uint8_t>(std::atoi(matches[3].str().c_str()));
-  } else {
-    // Handle invalid input
-    color.r = color.g = color.b = 0;
+  long r = std::strtol(p, &end, 10);
+  if (end == p || *end != ',' || r < 0 || r > 255) {
+    return false;
   }
 
-  return color;
+  p = end + 1;
+  long g = std::strtol(p, &end, 10);
+  if (end == p || *end != ',' || g < 0 || g > 255) {
+    return false;
+  }
+
+  p = end + 1;
+  long b = std::strtol(p, &end, 10);
+  if (end == p || *end != '\0' || b < 0 || b > 255) {
+    return false;
+  }
+
+  color = {static_cast<uint8_t>(r), static_cast<uint8_t>(g), static_cast<uint8_t>(b)};
+  return true;
 }
+} // namespace
 
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 
 HaEntityLight::HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id,
                              Configuration configuration)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
-      _configuration(configuration) {}
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(std::move(child_object_id)),
+      _configuration(std::move(configuration)) {}
 
 void HaEntityLight::publishConfiguration() {
   IJsonDocument doc;
@@ -106,8 +118,7 @@ void HaEntityLight::republishState() {
 
 void HaEntityLight::publishIsOn(bool on) {
   _ha_bridge.publishMessage(
-      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      std::string(on ? "ON" : "OFF"));
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF), on ? "ON" : "OFF");
   _on = on;
 }
 
@@ -138,12 +149,14 @@ void HaEntityLight::publishRgb(RGB rgb) {
   }
 }
 
-void HaEntityLight::publishEffect(std::string effect) {
-  if (!_configuration.effects.empty()) {
-    _ha_bridge.publishMessage(
-        _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_EFFECT), effect);
-    _effect = effect;
+void HaEntityLight::publishEffect(const std::string &effect) {
+  const auto &effects = _configuration.effects;
+  if (effects.empty() || std::find(effects.begin(), effects.end(), effect) == effects.end()) {
+    return;
   }
+  _ha_bridge.publishMessage(
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_EFFECT), effect);
+  _effect = effect;
 }
 
 void HaEntityLight::updateIsOn(bool on) {
@@ -170,57 +183,78 @@ void HaEntityLight::updateRgb(RGB rgb) {
   }
 }
 
-void HaEntityLight::updateEffect(std::string effect) {
+void HaEntityLight::updateEffect(const std::string &effect) {
   if (!_effect || *_effect != effect) {
     publishEffect(effect);
   }
 }
 
 bool HaEntityLight::setOnOn(std::function<void(bool)> state_callback) {
+  if (!state_callback) {
+    return false;
+  }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      [state_callback](std::string topic, std::string message) { state_callback(message == "ON"); });
+      [state_callback](std::string, std::string message) { state_callback(message == "ON"); });
 }
 
 bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
-  if (!_configuration.with_brightness) {
+  if (!_configuration.with_brightness || !callback) {
     return false;
   }
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_BRIGHTNESS),
-      [callback](std::string topic, std::string message) { callback(std::atoi(message.c_str())); });
+      [callback](std::string, std::string message) {
+        char *end = nullptr;
+        long val = std::strtol(message.c_str(), &end, 10);
+        if (end != message.c_str() && *end == '\0' && val >= 0 && val <= 255) {
+          callback(static_cast<uint8_t>(val));
+        }
+      });
 }
 
 bool HaEntityLight::setOnColorTemperature(std::function<void(uint16_t)> callback) {
-  if (_configuration.with_color_temperature == Configuration::ColorTemperature::None) {
+  if (_configuration.with_color_temperature == Configuration::ColorTemperature::None || !callback) {
     return false;
   }
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE),
-      [callback](std::string topic, std::string message) { callback(std::atoi(message.c_str())); });
+      [callback](std::string, std::string message) {
+        char *end = nullptr;
+        long val = std::strtol(message.c_str(), &end, 10);
+        if (end != message.c_str() && *end == '\0' && val >= 0 && val <= 65535) {
+          callback(static_cast<uint16_t>(val));
+        }
+      });
 }
 
 bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
-  if (!_configuration.with_rgb_color) {
+  if (!_configuration.with_rgb_color || !callback) {
     return false;
   }
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_RGB),
-      [callback](std::string topic, std::string message) {
-        RGB rgb = extractColor(message);
-        callback(rgb);
+      [callback](std::string, std::string message) {
+        RGB rgb{};
+        if (parseRgb(message, rgb)) {
+          callback(rgb);
+        }
       });
 }
 
 bool HaEntityLight::setOnEffect(std::function<void(std::string)> callback) {
-  if (_configuration.effects.empty()) {
+  if (_configuration.effects.empty() || !callback) {
     return false;
   }
 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_EFFECT),
-      [callback](std::string topic, std::string message) { callback(message); });
+      [callback, effects = _configuration.effects](std::string, std::string message) {
+        if (std::find(effects.begin(), effects.end(), message) != effects.end()) {
+          callback(message);
+        }
+      });
 }

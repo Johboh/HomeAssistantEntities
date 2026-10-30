@@ -3,30 +3,55 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdio>
+#include <iterator>
 #include <string>
 
 namespace homeassistantentities {
 
 inline std::string trim(const std::string &str) {
-  auto first = std::find_if_not(str.begin(), str.end(), [](int c) { return std::isspace(c); });
-  auto last = std::find_if_not(str.rbegin(), str.rend(), [](int c) { return std::isspace(c); }).base();
-  return (first == last ? std::string() : std::string(first, last));
+  auto first = std::find_if_not(str.begin(), str.end(), [](unsigned char c) { return std::isspace(c); });
+  auto last = std::find_if_not(str.rbegin(), std::make_reverse_iterator(first), [](unsigned char c) {
+                return std::isspace(c);
+              }).base();
+  return std::string(first, last);
 }
 
 /**
  * @brief Given a string that is supposed to be in an MQTT path, return a valid path. Only [a-zA-Z0-9_-] are allowed.
- * Everyting else is replaced by _.
+ * Everything else is replaced by _.
  */
-inline std::string santitizePath(const std::string &str) {
+inline std::string sanitizePath(const std::string &str) {
   std::string result;
-  for (char c : str) {
+  result.reserve(str.size());
+  for (unsigned char c : str) {
     if (std::isalnum(c) || c == '-' || c == '_') {
-      result += c;
+      result += static_cast<char>(c);
     } else {
       result += '_';
     }
   }
   return result;
+}
+
+inline std::string santitizePath(const std::string &str) { return sanitizePath(str); }
+
+inline std::string formatNumber(double value) {
+  if (value == 0.0) {
+    value = 0.0; // Avoid "-0"
+  }
+  char buf[32];
+  std::snprintf(buf, sizeof(buf), "%.9g", value);
+  return std::string(buf);
+}
+
+inline std::string formatNumber(float value) {
+  if (value == 0.0f) {
+    value = 0.0f; // Avoid "-0"
+  }
+  char buf[24];
+  std::snprintf(buf, sizeof(buf), "%.7g", static_cast<double>(value));
+  return std::string(buf);
 }
 
 }; // namespace homeassistantentities

@@ -6,8 +6,8 @@
 #include <cstdint>
 #include <functional>
 #include <optional>
-#include <set>
 #include <string>
+#include <vector>
 
 /**
  * @brief Represent a Select that can be set by Home Assistant or reported back to Home Assistant.
@@ -17,9 +17,10 @@ class HaEntitySelect : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief Set of options that can be selected. An empty set or a set with a single item is allowed.
+     * @brief List of options that can be selected (order preserved in Home Assistant UI). An empty list or a list with
+     * a single item is allowed.
      */
-    std::set<std::string> options;
+    std::vector<std::string> options = {};
 
     /**
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
@@ -53,7 +54,7 @@ public:
    *
    * @param option the option selected.
    */
-  void publishSelection(std::string option);
+  void publishSelection(const std::string &option);
 
   /**
    * @brief Publish the current selected option, but only if the value has changed. Also see publishSelection(). Must be
@@ -61,7 +62,7 @@ public:
    *
    * @param option the option selected.
    */
-  void updateSelection(std::string option);
+  void updateSelection(const std::string &option);
 
   /**
    * @brief Set callback for receiving callbacks when there is a new option that should be set.

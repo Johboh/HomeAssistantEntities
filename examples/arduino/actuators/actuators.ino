@@ -91,9 +91,9 @@ void setup() {
       _ha_entity_light_right_bench.publishConfiguration();
 
       // Subscribe to new light "on" state pushed by Home Assistant.
-      _ha_entity_light_left_bench.setOnOn([&](bool on) { gpio_set_level(LED_PIN, on); });
+      _ha_entity_light_left_bench.setOnOn([&](bool on) { digitalWrite(LED_PIN, on); });
       _ha_entity_light_right_bench.setOnBrightness(
-          [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for left light", brightness); });
+          [&](uint8_t brightness) { Serial.println("Got brightness " + String(brightness) + " for right light"); });
     }
   });
 #else // Not PlatformIO (Arduino IDE)

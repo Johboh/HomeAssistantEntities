@@ -1,6 +1,9 @@
 #include "HaEntityFan.h"
 #include <HaUtilities.h>
 #include <IJson.h>
+#include <algorithm>
+#include <cstdlib>
+#include <utility>
 
 #define COMPONENT "fan"
 #define OBJECT_ID "fan"
@@ -12,8 +15,15 @@
 
 HaEntityFan::HaEntityFan(HaBridge &ha_bridge, std::string name, std::string child_object_id,
                          Configuration configuration)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id),
-      _configuration(configuration) {}
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(std::move(child_object_id)),
+      _configuration(std::move(configuration)) {
+  if (_configuration.speed_range_min < 1) {
+    _configuration.speed_range_min = 1;
+  }
+  if (_configuration.speed_range_max < _configuration.speed_range_min) {
+    _configuration.speed_range_max = _configuration.speed_range_min;
+  }
+}
 
 void HaEntityFan::publishConfiguration() {
   IJsonDocument doc;
@@ -25,7 +35,6 @@ void HaEntityFan::publishConfiguration() {
   }
 
   doc["platform"] = "fan";
-  doc["force_update"] = _configuration.force_update;
   doc["retain"] = _configuration.retain;
 
   if (_configuration.with_direction) {
@@ -87,7 +96,7 @@ void HaEntityFan::republishState() {
   }
 }
 
-void HaEntityFan::publishDirection(std::string direction) {
+void HaEntityFan::publishDirection(const std::string &direction) {
   if (!_configuration.with_direction) {
     return;
   }
@@ -96,14 +105,14 @@ void HaEntityFan::publishDirection(std::string direction) {
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_DIRECTION), direction);
 }
 
-void HaEntityFan::updateDirection(std::string direction) {
+void HaEntityFan::updateDirection(const std::string &direction) {
   if (!_direction || *_direction != direction) {
     publishDirection(direction);
   }
 }
 
 bool HaEntityFan::setOnDirection(std::function<void(std::string)> callback) {
-  if (!_configuration.with_direction) {
+  if (!_configuration.with_direction || !callback) {
     return false;
   }
   return _ha_bridge.remote().subscribe(
@@ -130,8 +139,9 @@ void HaEntityFan::updateOscillation(bool oscillation) {
 }
 
 bool HaEntityFan::setOnOscillation(std::function<void(bool)> callback) {
-  if (!_configuration.with_oscillation)
+  if (!_configuration.with_oscillation || !callback) {
     return false;
+  }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_OSCILLATION),
       [callback](std::string, std::string message) {
@@ -142,11 +152,17 @@ bool HaEntityFan::setOnOscillation(std::function<void(bool)> callback) {
 
 //--------------------------------------
 
+uint32_t HaEntityFan::clampSpeed(uint32_t speed) const {
+  // In Home Assistant MQTT Fan, speed_range_min - 1 represents 0% (off).
+  uint32_t min_with_off = _configuration.speed_range_min > 0 ? (_configuration.speed_range_min - 1) : 0;
+  return std::clamp(speed, min_with_off, _configuration.speed_range_max);
+}
+
 void HaEntityFan::publishSpeed(uint32_t speed) {
   if (!_configuration.with_speed) {
     return;
   }
-  speed = std::clamp(speed, _configuration.speed_range_min, _configuration.speed_range_max);
+  speed = clampSpeed(speed);
   _speed = speed;
   _ha_bridge.publishMessage(
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_SPEED),
@@ -154,32 +170,40 @@ void HaEntityFan::publishSpeed(uint32_t speed) {
 }
 
 void HaEntityFan::updateSpeed(uint32_t speed) {
+  if (!_configuration.with_speed) {
+    return;
+  }
+  speed = clampSpeed(speed);
   if (!_speed || *_speed != speed) {
     publishSpeed(speed);
   }
 }
 
 bool HaEntityFan::setOnSpeed(std::function<void(uint32_t)> callback) {
-  if (!_configuration.with_speed) {
+  if (!_configuration.with_speed || !callback) {
     return false;
   }
+  uint32_t min_with_off = _configuration.speed_range_min > 0 ? (_configuration.speed_range_min - 1) : 0;
+  uint32_t max_speed = _configuration.speed_range_max;
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_SPEED),
-      [callback, config = _configuration](std::string, std::string message) {
-        uint32_t speed = std::clamp(static_cast<uint32_t>(std::atoi(message.c_str())), config.speed_range_min,
-                                    config.speed_range_max);
-        callback(speed);
+      [callback, min_with_off, max_speed](std::string, std::string message) {
+        char *end = nullptr;
+        unsigned long parsed = std::strtoul(message.c_str(), &end, 10);
+        if (end != message.c_str() && *end == '\0' && message.find('-') == std::string::npos) {
+          uint32_t clamped = parsed > max_speed ? max_speed : std::max(static_cast<uint32_t>(parsed), min_with_off);
+          callback(clamped);
+        }
       });
 }
 
 //--------------------------------------
 
-void HaEntityFan::publishPreset(std::string preset) {
-  auto presets = _configuration.presets;
+void HaEntityFan::publishPreset(const std::string &preset) {
+  const auto &presets = _configuration.presets;
   if (presets.empty()) {
     return;
   }
-  // Check if preset is in the list of allowed presets
   if (std::find(presets.begin(), presets.end(), preset) == presets.end()) {
     return;
   }
@@ -188,19 +212,23 @@ void HaEntityFan::publishPreset(std::string preset) {
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_PRESET), preset);
 }
 
-void HaEntityFan::updatePreset(std::string preset) {
+void HaEntityFan::updatePreset(const std::string &preset) {
   if (!_preset || *_preset != preset) {
     publishPreset(preset);
   }
 }
 
 bool HaEntityFan::setOnPreset(std::function<void(std::string)> callback) {
-  if (_configuration.presets.empty()) {
+  if (_configuration.presets.empty() || !callback) {
     return false;
   }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_PRESET),
-      [callback](std::string, std::string message) { callback(message); });
+      [callback, presets = _configuration.presets](std::string, std::string message) {
+        if (std::find(presets.begin(), presets.end(), message) != presets.end()) {
+          callback(message);
+        }
+      });
 }
 
 //--------------------------------------
@@ -218,6 +246,9 @@ void HaEntityFan::updateIsOn(bool on) {
 }
 
 bool HaEntityFan::setOnState(std::function<void(bool)> callback) {
+  if (!callback) {
+    return false;
+  }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
       [callback](std::string, std::string message) {

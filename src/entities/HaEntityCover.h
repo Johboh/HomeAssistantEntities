@@ -25,8 +25,8 @@ public:
 
     /**
      * If set to true, this device is only reporting its state and position, but cannot be controlled by Home Assistant.
-     * Usually, Home Assitant can open and close a cover/curtain/awning by posting the position to the position topic.
-     * If this set to false, the position topic will be created and Home Assistant can post the position.
+     * Usually, Home Assistant can open and close a cover/curtain/awning by posting the position to the position topic.
+     * If this is set to false, the position topic will be created and Home Assistant can post the position.
      */
     bool read_only = false;
 
@@ -64,12 +64,8 @@ public:
    * one main entity (or only) entity of this device. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
-   * @param child_object_id non optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID.  Valid characters
+   * @param child_object_id optional child identifier for this entity in case there are several covers of the same
+   * entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
@@ -129,6 +125,7 @@ public:
   bool setOnPosition(std::function<void(uint8_t)> position_callback);
 
 private:
+  uint8_t clampPosition(uint8_t position) const;
   void publishState(std::optional<State> state);
   void publishPosition(std::optional<uint8_t> position);
 

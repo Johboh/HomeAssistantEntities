@@ -10,13 +10,13 @@
 
 /**
  * @brief Bridge for MQTT and Home Assistant.
- * Used in composition with the actual HaEntity implementations. see also the HaEntity.h interface.
- * Each HaEntity need their own unique instance of HaBridge.
+ * Used in composition with the actual HaEntity implementations. See also the HaEntity.h interface.
+ * A single HaBridge instance is typically shared across all HaEntity instances on the same device/node.
  */
 class HaBridge {
 public:
   /**
-   * @brief Construct a new Ha Entity object with a device.
+   * @brief Construct a new HaBridge object for a device/node.
    *
    * @param remote the MQTT Interface / Remote to send messages and subscribe to topics.
    * @param node_id this is used as the root in the MQTT path for publishing values to a state topic, or for
@@ -25,7 +25,7 @@ public:
    * a temperature for bathroom: "bathroom" which will lead to state topic "bathroom/sensor/temperature/state", and the
    * Home Assistant Configuration will be published under "homeassistant/sensor/bathroom/temperature/config" Valid
    * characters are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param json_this_device_doc Information about this device. The device is this hardware that have all the Home
+   * @param this_device_json_doc Information about this device. The device is this hardware that have all the Home
    * Assistant entities. A device is not required. If there is a device, the name displayed in the UI will be the device
    * name combined with the entity name. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
@@ -46,9 +46,10 @@ public:
 public:
   /**
    * @brief Call to publish the configuration for the HaEntity.
-   * This function will set the "availability_topic" and the "unique_id" field, as well as add the
-   * "device". The caller should set any entity specific fields like "name", "state_topic", "device_class",
-   * "unit_of_measurement" or whatever is needed in the Configuration for the specific entity.
+   * This function will set the "availability_topic" and the "unique_id" field (except for "device_automation"
+   * components where Home Assistant forbids them), as well as add the "device". The caller should set any entity
+   * specific fields like "name", "state_topic", "device_class", "unit_of_measurement" or whatever is needed in the
+   * Configuration for the specific entity.
    *
    * The component and the object_id will create a topic like this (node_id is from the constructor of the HaBridge):
    * homeassistant/<component>/<node_id>/<object_id>/config
@@ -69,8 +70,8 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param specific_doc Any entity specific values. See brief documentation.
    */
-  void publishConfiguration(std::string component, std::string object_id, std::string child_object_id,
-                            const IJsonDocument &specific_doc);
+  void publishConfiguration(const std::string &component, const std::string &object_id,
+                            const std::string &child_object_id, const IJsonDocument &specific_doc);
 
   /**
    * @brief Publish a message.
@@ -81,7 +82,7 @@ public:
    * @param retain True to set this message as retained.
    * @returns true on success, or false on failure.
    */
-  bool publishMessage(std::string topic, std::string message, bool retain = false);
+  bool publishMessage(const std::string &topic, const std::string &message, bool retain = false);
 
   enum class TopicType {
     State,      // Usually when the entity post a state for the entity.
@@ -101,11 +102,11 @@ public:
    * entity type for the same node ID. Example: If you have a lock for the node ID "door", the state topic would be
    * "door/binary_sensor/lock/state" This works if you only have one lock on your door, but if you have two locks, you
    * want to add a child object ID to them. By setting the child_object_id to say "upper", the state topic will be
-   * ""door/binary_sensor/lock/upper/state". Valid characters
+   * "door/binary_sensor/lock/upper/state". Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    */
-  std::string getTopic(TopicType topic_type, std::string component, std::string object_id,
-                       std::string child_object_id = "");
+  std::string getTopic(TopicType topic_type, const std::string &component, const std::string &object_id,
+                       const std::string &child_object_id = "");
 
   /**
    * @brief Raw IMQTTRemote. Usually only needed for subscription. Otherwise use publishConfiguration() and

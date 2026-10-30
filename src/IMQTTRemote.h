@@ -12,11 +12,13 @@
 #include <string>
 
 /**
- * @brief Inteface to separate the concerns between the actual MQTT implementation that has a lifecycle, connection
+ * @brief Interface to separate the concerns between the actual MQTT implementation that has a lifecycle, connection
  * handling, and consumers who only need the API itself.
  */
 class IMQTTRemote {
 public:
+  virtual ~IMQTTRemote() = default;
+
   // First parameter is topic, second one is the message.
   typedef std::function<void(std::string, std::string)> SubscriptionCallback;
 
@@ -40,10 +42,10 @@ public:
   /**
    * @brief Subscribe to a topic. The callback will be invoked on every new message.
    * There can only be one callback per topic. If trying to subscribe to an already subscribe topic, it will be ignored.
-   * Don't do have operations in the callback or delays as this will block the MQTT callback.
+   * Don't do heavy operations in the callback or delays as this will block the MQTT callback.
    * If not connected, will subscribe to this topic once connected.
    *
-   * @param message_callback a message callback with the topic and the message. The topic is repeated for convinience,
+   * @param message_callback a message callback with the topic and the message. The topic is repeated for convenience,
    * but it will always be for the subscribed topic.
    */
   virtual bool subscribe(std::string topic, SubscriptionCallback message_callback) = 0;
@@ -60,7 +62,7 @@ public:
 
   /**
    * @brief The client ID for this device. This is used for the last will / status
-   * topic.Example, if this is "esp_now_router", then the status/last will topic will be "esp_now_router/status". This
+   * topic. Example, if this is "esp_now_router", then the status/last will topic will be "esp_now_router/status". This
    * has to be [a-zA-Z0-9_] only.
    */
   virtual std::string &clientId() = 0;

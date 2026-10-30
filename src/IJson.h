@@ -21,7 +21,7 @@
 
 #define JsonArrayType auto &
 
-#define createJsonArray(doc, name) doc[name]
+#define createJsonArray(doc, name) (doc[name] = nlohmann::json::array())
 
 #define addToJsonArray(doc, value) doc.push_back(value)
 

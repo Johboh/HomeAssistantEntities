@@ -67,21 +67,21 @@ public:
   std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
     switch (unit) {
     case m2:
-      return "m2";
+      return "m²";
     case cm2:
-      return "cm2";
+      return "cm²";
     case km2:
-      return "km2";
+      return "km²";
     case mm2:
-      return "mm2";
+      return "mm²";
     case in2:
-      return "in2";
+      return "in²";
     case ft2:
-      return "ft2";
+      return "ft²";
     case yd2:
-      return "yd2";
+      return "yd²";
     case mi2:
-      return "mi2";
+      return "mi²";
     case ac:
       return "ac";
     case ha:
@@ -1516,7 +1516,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return std::nullopt; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 };
 
 class Brightness : public DeviceClass {
@@ -1573,7 +1573,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return std::nullopt; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
   std::string objectId() const override { return "json"; }
 };
@@ -1584,7 +1584,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return std::nullopt; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
   std::string objectId() const override { return "string"; }
 };
@@ -1607,7 +1607,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "battery";
@@ -1622,7 +1622,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "battery_charging";
@@ -1637,7 +1637,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "carbon_monoxide";
@@ -1652,7 +1652,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "cold";
@@ -1667,7 +1667,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "connectivity";
@@ -1682,7 +1682,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "door";
@@ -1697,7 +1697,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "garage_door";
@@ -1712,7 +1712,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "gas";
@@ -1727,7 +1727,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "heat";
@@ -1742,7 +1742,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "light";
@@ -1757,7 +1757,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "lock";
@@ -1772,7 +1772,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "moisture";
@@ -1787,7 +1787,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "motion";
@@ -1802,7 +1802,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "moving";
@@ -1817,7 +1817,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "occupancy";
@@ -1832,7 +1832,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "opening";
@@ -1847,7 +1847,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "plug";
@@ -1862,7 +1862,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "power";
@@ -1877,7 +1877,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "presence";
@@ -1892,7 +1892,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "problem";
@@ -1907,7 +1907,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "running";
@@ -1922,7 +1922,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "safety";
@@ -1937,7 +1937,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "smoke";
@@ -1952,7 +1952,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "sound";
@@ -1967,7 +1967,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "tamper";
@@ -1982,7 +1982,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "update";
@@ -1997,7 +1997,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "vibration";
@@ -2012,7 +2012,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
 private:
   static constexpr const char *DEVICE_CLASS = "window";
@@ -2030,7 +2030,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return std::nullopt; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 };
 
 class Boolean : public DeviceClass {
@@ -2039,7 +2039,7 @@ public:
 
   std::optional<std::string> deviceClass() const override { return std::nullopt; }
 
-  std::optional<std::string> unitOfMeasurement(UnitType unit) const override { return std::nullopt; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
   std::string objectId() const override { return "boolean"; }
 };

@@ -47,7 +47,7 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
+   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
@@ -58,12 +58,7 @@ public:
   HaEntityVolatileOrganicCompounds(HaBridge &ha_bridge, std::string name,
                                    std::optional<std::string> child_object_id = std::nullopt,
                                    Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .device_class = deviceClass(configuration),
-                                             .unit_of_measurement = unitOfMeasurement(configuration),
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(makeSensor(ha_bridge, name, child_object_id, configuration)) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -86,29 +81,28 @@ public:
   void updateConcentration(double concentration) { _ha_entity_sensor.updateValue(concentration); }
 
 private:
-  const homeassistantentities::DeviceClass &deviceClass(const Configuration &configuration) const {
-    switch (configuration.unit) {
-    case Unit::Concentration:
-      return _volatile_organic_compounds;
-    case Unit::Parts:
-      return _volatile_organic_compounds_parts;
+  static HaEntitySensor makeSensor(HaBridge &ha_bridge, const std::string &name,
+                                   const std::optional<std::string> &child_object_id,
+                                   const Configuration &configuration) {
+    if (configuration.unit == Unit::Concentration) {
+      return HaEntitySensor(
+          ha_bridge, name, child_object_id,
+          HaEntitySensor::Configuration{
+              .device_class = homeassistantentities::Sensor::VolatileOrganicCompounds{},
+              .unit_of_measurement = homeassistantentities::Sensor::VolatileOrganicCompounds::Unit::ug_m3,
+              .force_update = configuration.force_update,
+          });
     }
-    return _volatile_organic_compounds_parts; // noop
-  }
-
-  std::optional<homeassistantentities::UnitType> unitOfMeasurement(const Configuration &configuration) const {
-    switch (configuration.unit) {
-    case Unit::Concentration:
-      return homeassistantentities::Sensor::VolatileOrganicCompounds::Unit::ug_m3;
-    case Unit::Parts:
-      return homeassistantentities::Sensor::VolatileOrganicCompoundsParts::Unit::ppb;
-    }
-    return std::nullopt;
+    return HaEntitySensor(
+        ha_bridge, name, child_object_id,
+        HaEntitySensor::Configuration{
+            .device_class = homeassistantentities::Sensor::VolatileOrganicCompoundsParts{},
+            .unit_of_measurement = homeassistantentities::Sensor::VolatileOrganicCompoundsParts::Unit::ppb,
+            .force_update = configuration.force_update,
+        });
   }
 
 private:
-  const homeassistantentities::Sensor::VolatileOrganicCompounds _volatile_organic_compounds;
-  const homeassistantentities::Sensor::VolatileOrganicCompoundsParts _volatile_organic_compounds_parts;
   HaEntitySensor _ha_entity_sensor;
 };
 

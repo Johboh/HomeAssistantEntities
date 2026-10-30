@@ -42,7 +42,7 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
+   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
@@ -52,13 +52,13 @@ public:
    */
   HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                   Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .device_class = _boolean,
-                                             .state_class = std::nullopt,
-                                             .with_attributes = configuration.with_attributes,
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(ha_bridge, name, child_object_id,
+                          HaEntitySensor::Configuration{
+                              .device_class = homeassistantentities::BinarySensor::Undefined::Boolean{},
+                              .state_class = std::nullopt,
+                              .with_attributes = configuration.with_attributes,
+                              .force_update = configuration.force_update,
+                          }) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -71,7 +71,7 @@ public:
    * @param value the value to publish.
    * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
    */
-  void publishBoolean(bool value, Attributes::Map attributes = {}) {
+  void publishBoolean(bool value, const Attributes::Map &attributes = {}) {
     _ha_entity_sensor.publishValue(value ? "ON" : "OFF", attributes);
   }
 
@@ -82,7 +82,7 @@ public:
    * @param value the value to publish.
    * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
    */
-  void updateBoolean(bool value, Attributes::Map attributes = {}) {
+  void updateBoolean(bool value, const Attributes::Map &attributes = {}) {
     _ha_entity_sensor.updateValue(value ? "ON" : "OFF", attributes);
   }
 
@@ -92,7 +92,7 @@ public:
    *
    * @param attributes attributes to publish.
    */
-  void publishAttributes(Attributes::Map attributes) { _ha_entity_sensor.publishAttributes(attributes); }
+  void publishAttributes(const Attributes::Map &attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
   /**
    * @brief Publish attributes only, but only if the value has changed. Also see
@@ -100,10 +100,9 @@ public:
    *
    * @param attributes attributes to publish.
    */
-  void updateAttributes(Attributes::Map attributes) { _ha_entity_sensor.updateAttributes(attributes); }
+  void updateAttributes(const Attributes::Map &attributes) { _ha_entity_sensor.updateAttributes(attributes); }
 
 private:
-  const homeassistantentities::BinarySensor::Undefined::Boolean _boolean;
   HaEntitySensor _ha_entity_sensor;
 };
 

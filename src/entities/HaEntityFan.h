@@ -4,12 +4,14 @@
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
+#include <functional>
 #include <optional>
-#include <set>
 #include <string>
+#include <vector>
 
 /**
- * @brief Represent a fan with speed.
+ * @brief Represent a fan with speed, direction, oscillation, and presets.
+ * See https://www.home-assistant.io/integrations/fan.mqtt/
  */
 class HaEntityFan : public HaEntity {
 public:
@@ -33,28 +35,19 @@ public:
     /**
      * @brief If with_speed is set, the minimum of numeric output range (off not included, so speed_range_min - 1
      * represents 0 %). The percentage_step is defined by 100 / the number of speeds within the speed range.
-     *
      */
     uint32_t speed_range_min = 1;
 
     /**
      * @brief If with_speed is set, the maximum of numeric output range (representing 100 %). The percentage_step is
      * defined by 100 / the number of speeds within the speed range.
-     *
      */
     uint32_t speed_range_max = 100;
 
     /**
-     * @brief If non empty, the presets this fan supports.
+     * @brief If non empty, the presets this fan supports (order preserved in Home Assistant UI).
      */
-    std::set<std::string> presets = {};
-
-    /**
-     * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-     * message (not only when the sensor’s new state is different to the current one).
-     */
-    bool force_update = false;
+    std::vector<std::string> presets = {};
 
     /**
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
@@ -68,7 +61,6 @@ public:
                                           .speed_range_min = 1,
                                           .speed_range_max = 100,
                                           .presets = {},
-                                          .force_update = false,
                                           .retain = false};
 
   /**
@@ -82,11 +74,7 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id child identifier for this entity in case there are several fans of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
+   * entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
@@ -105,7 +93,7 @@ public:
    *
    * @param direction the direction to publish. Direction is a free form string.
    */
-  void publishDirection(std::string direction);
+  void publishDirection(const std::string &direction);
 
   /**
    * @brief Publish the direction, but only if the value has changed. Also see publishDirection().
@@ -114,7 +102,7 @@ public:
    *
    * @param direction the direction to publish. Direction is a free form string.
    */
-  void updateDirection(std::string direction);
+  void updateDirection(const std::string &direction);
 
   /**
    * @brief Set callback for receiving callbacks when there is a new direction that should be set. Direction is a free
@@ -160,7 +148,7 @@ public:
    *
    * with_speed in Configuration must be set.
    *
-   * @param speed the speed, value between the min/max set in the Configuration.
+   * @param speed the speed, value between speed_range_min - 1 (representing 0%) and speed_range_max.
    */
   void publishSpeed(uint32_t speed);
 
@@ -169,13 +157,13 @@ public:
    *
    * with_speed in Configuration must be set.
    *
-   * @param speed the speed, value between the min/max set in the Configuration.
+   * @param speed the speed, value between speed_range_min - 1 (representing 0%) and speed_range_max.
    */
   void updateSpeed(uint32_t speed);
 
   /**
-   * @brief Set callback for receiving callbacks when a new speed should be set. Value between the min/max set in the
-   * Configuration.
+   * @brief Set callback for receiving callbacks when a new speed should be set. Value between speed_range_min - 1
+   * (representing 0%) and speed_range_max set in the Configuration.
    *
    * with_speed in Configuration must be set.
    */
@@ -187,25 +175,25 @@ public:
    * @brief Publish a preset. This will publish to MQTT regardless if the value has changed. Also see
    * updatePreset().
    *
-   * presets in Configuration must be set to a non empty set.
+   * presets in Configuration must be set to a non empty list.
    *
    * @param preset the preset.
    */
-  void publishPreset(std::string preset);
+  void publishPreset(const std::string &preset);
 
   /**
    * @brief Publish a preset, but only if the value has changed. Also see publishPreset().
    *
-   * presets in Configuration must be set to a non empty set.
+   * presets in Configuration must be set to a non empty list.
    *
    * @param preset the preset.
    */
-  void updatePreset(std::string preset);
+  void updatePreset(const std::string &preset);
 
   /**
    * @brief Set callback for receiving callbacks when a new preset should be set.
    *
-   * presets in Configuration must be set to a non empty set.
+   * presets in Configuration must be set to a non empty list.
    */
   bool setOnPreset(std::function<void(std::string)> callback);
 
@@ -230,6 +218,9 @@ public:
    * @brief Set callback for receiving callbacks when a new state should be set.
    */
   bool setOnState(std::function<void(bool)> callback);
+
+private:
+  uint32_t clampSpeed(uint32_t speed) const;
 
 private:
   std::string _name;

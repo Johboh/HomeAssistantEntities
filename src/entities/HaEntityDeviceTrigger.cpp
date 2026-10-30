@@ -1,11 +1,12 @@
 #include "HaEntityDeviceTrigger.h"
 #include <HaUtilities.h>
 #include <IJson.h>
+#include <utility>
 
 #define COMPONENT "device_automation"
 
 HaEntityDeviceTrigger::HaEntityDeviceTrigger(HaBridge &ha_bridge, std::string object_id, Configuration configuration)
-    : _ha_bridge(ha_bridge), _object_id(object_id), _configuration(configuration) {}
+    : _ha_bridge(ha_bridge), _object_id(std::move(object_id)), _configuration(std::move(configuration)) {}
 
 void HaEntityDeviceTrigger::publishConfiguration() {
   IJsonDocument doc;

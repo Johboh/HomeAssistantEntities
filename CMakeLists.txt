@@ -1,4 +1,4 @@
-FILE(GLOB_RECURSE lib_sources "./src/*.*" "./src/entities/*.*")
+FILE(GLOB_RECURSE lib_sources "./src/*.cpp")
 
 idf_component_register(COMPONENT_NAME "HomeAssistantEntities"
                         SRCS ${lib_sources}

@@ -11,7 +11,7 @@
 
 /**
  * @brief Represent a Carbon Dioxide sensor (e.g. SGP30) (see
- * homeassistantentities::Sensor::CarbonDioxide:Unit  in HaDeviceClasses.h).
+ * homeassistantentities::Sensor::CarbonDioxide::Unit in HaDeviceClasses.h).
  */
 class HaEntityCarbonDioxide : public HaEntity {
 public:
@@ -37,24 +37,19 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
+   * entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
   HaEntityCarbonDioxide(HaBridge &ha_bridge, std::string name,
                         std::optional<std::string> child_object_id = std::nullopt,
                         Configuration configuration = _default)
-      : _ha_entity_sensor(
-            HaEntitySensor(ha_bridge, name, child_object_id,
-                           HaEntitySensor::Configuration{
-                               .device_class = _carbon_dioxide,
-                               .unit_of_measurement = homeassistantentities::Sensor::CarbonDioxide::Unit::ppm,
-                               .force_update = configuration.force_update,
-                           })) {}
+      : _ha_entity_sensor(ha_bridge, name, child_object_id,
+                          HaEntitySensor::Configuration{
+                              .device_class = homeassistantentities::Sensor::CarbonDioxide{},
+                              .unit_of_measurement = homeassistantentities::Sensor::CarbonDioxide::Unit::ppm,
+                              .force_update = configuration.force_update,
+                          }) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -64,7 +59,7 @@ public:
    * @brief Publish the carbon dioxide concentration. This will publish to MQTT regardless if the value has changed.
    * Also see updateConcentration().
    *
-   * @param ppm the carbon dioxide concentration in ppm/parts per million.
+   * @param concentration the carbon dioxide concentration in ppm/parts per million.
    */
   void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
 
@@ -72,12 +67,11 @@ public:
    * @brief Publish the carbon dioxide concentration, but only if the value has changed. Also see
    * publishConcentration().
    *
-   * @param ppm the carbon dioxide concentration in ppm/parts per million.
+   * @param concentration the carbon dioxide concentration in ppm/parts per million.
    */
   void updateConcentration(double concentration) { _ha_entity_sensor.updateValue(concentration); }
 
 private:
-  const homeassistantentities::Sensor::CarbonDioxide _carbon_dioxide;
   HaEntitySensor _ha_entity_sensor;
 };
 

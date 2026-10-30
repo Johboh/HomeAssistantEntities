@@ -64,16 +64,16 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
+   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
+   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock_upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable).
    * @param configuration the configuration for this entity.
    */
   HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id,
-                 Configuration configuration);
+                 const Configuration &configuration);
 
 public:
   void publishConfiguration() override;
@@ -86,7 +86,7 @@ public:
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void publishValue(double value, Attributes::Map attributes = {});
+  void publishValue(double value, const Attributes::Map &attributes = {});
 
   /**
    * @brief Publish the value for this sensor, but only if the value has changed. Also see publishValue().
@@ -94,16 +94,16 @@ public:
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void updateValue(double value, Attributes::Map attributes = {});
+  void updateValue(double value, const Attributes::Map &attributes = {});
 
   /**
-   * @brief Publish the value for this sensor. This will publish to MQTT regardless if the value has changed.  Also see
+   * @brief Publish the value for this sensor. This will publish to MQTT regardless if the value has changed. Also see
    * updateValue().
    *
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void publishValue(std::string value, Attributes::Map attributes = {});
+  void publishValue(const std::string &value, const Attributes::Map &attributes = {});
 
   /**
    * @brief Publish the value for this sensor, but only if the value has changed. Also see publishValue().
@@ -111,7 +111,7 @@ public:
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void updateValue(std::string value, Attributes::Map attributes = {});
+  void updateValue(const std::string &value, const Attributes::Map &attributes = {});
 
   /**
    * @brief Publish attributes only. with_attributes in configuration must be set. This will publish to MQTT regardless
@@ -119,7 +119,7 @@ public:
    *
    * @param attributes attributes to publish.
    */
-  void publishAttributes(Attributes::Map attributes);
+  void publishAttributes(const Attributes::Map &attributes);
 
   /**
    * @brief Publish attributes only. with_attributes in configuration must be set. This will publish to MQTT only
@@ -127,7 +127,7 @@ public:
    *
    * @param attributes attributes to publish.
    */
-  void updateAttributes(Attributes::Map attributes);
+  void updateAttributes(const Attributes::Map &attributes);
 
 private:
   std::string _name;
@@ -135,7 +135,12 @@ private:
   std::string _object_id;
   std::string _component;
   std::string _child_object_id;
-  Configuration _configuration;
+  std::optional<std::string> _device_class;
+  std::optional<std::string> _unit_of_measurement;
+  std::optional<std::string> _state_class;
+  std::optional<std::string> _icon;
+  bool _with_attributes;
+  bool _force_update;
 
 private:
   std::optional<std::string> _value;

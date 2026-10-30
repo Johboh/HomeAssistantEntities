@@ -1,6 +1,7 @@
 #include "HaEntityButton.h"
 #include <HaUtilities.h>
 #include <IJson.h>
+#include <utility>
 
 #define COMPONENT "button"
 #define OBJECT_ID "button"
@@ -10,7 +11,7 @@
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 
 HaEntityButton::HaEntityButton(HaBridge &ha_bridge, std::string name, std::string child_object_id)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(child_object_id) {}
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(std::move(child_object_id)) {}
 
 void HaEntityButton::publishConfiguration() {
   IJsonDocument doc;
@@ -30,9 +31,12 @@ void HaEntityButton::publishConfiguration() {
 void HaEntityButton::republishState() {}
 
 bool HaEntityButton::setOnPressed(std::function<void(void)> callback) {
+  if (!callback) {
+    return false;
+  }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COMMAND),
-      [callback](std::string topic, std::string message) {
+      [callback](std::string, std::string message) {
         if (message == PAYLOAD_PRESS) {
           callback();
         }

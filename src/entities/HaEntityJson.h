@@ -11,7 +11,7 @@
 
 /**
  * @brief Represent a raw JSON sensor with a state topic on which you post your JSON.
- * Also see [HaEntitystd::string] which is very similar. TODO(johboh): merge?
+ * Also see [HaEntityString] which is very similar. TODO(johboh): merge?
  */
 class HaEntityJson : public HaEntity {
 public:
@@ -37,7 +37,7 @@ public:
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home asisstant
+   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
    * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
    * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
@@ -47,11 +47,12 @@ public:
    */
   HaEntityJson(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                Configuration configuration = _default)
-      : _ha_entity_sensor(HaEntitySensor(ha_bridge, name, child_object_id,
-                                         HaEntitySensor::Configuration{
-                                             .device_class = _json,
-                                             .force_update = configuration.force_update,
-                                         })) {}
+      : _ha_entity_sensor(ha_bridge, name, child_object_id,
+                          HaEntitySensor::Configuration{
+                              .device_class = homeassistantentities::Sensor::Undefined::Json{},
+                              .state_class = std::nullopt,
+                              .force_update = configuration.force_update,
+                          }) {}
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
@@ -63,7 +64,7 @@ public:
    *
    * @param json_doc the JSON document to publish.
    */
-  void publishJson(IJsonDocument &json_doc) {
+  void publishJson(const IJsonDocument &json_doc) {
     auto message = toJsonString(json_doc);
     _ha_entity_sensor.publishValue(message);
   }
@@ -73,13 +74,12 @@ public:
    *
    * @param json_doc the JSON document to publish.
    */
-  void updateJson(IJsonDocument &json_doc) {
+  void updateJson(const IJsonDocument &json_doc) {
     auto message = toJsonString(json_doc);
     _ha_entity_sensor.updateValue(message);
   }
 
 private:
-  const homeassistantentities::Sensor::Undefined::Json _json;
   HaEntitySensor _ha_entity_sensor;
 };
 

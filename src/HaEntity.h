@@ -16,6 +16,8 @@
  */
 class HaEntity {
 public:
+  virtual ~HaEntity() = default;
+
   /**
    * @brief Publish the Home Assistant configuration.
    */

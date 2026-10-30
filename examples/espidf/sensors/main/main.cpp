@@ -15,7 +15,7 @@
 // Information about this device.
 // All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
 // Only a flat layout structure is supported, no nesting.
-// We call the setupJsonForThisDevice() from the ardunio setup() function to populate the Json document.
+// We call setupJsonForThisDevice() from app_main() to populate the Json document.
 nlohmann::json _json_this_device_doc;
 void setupJsonForThisDevice() {
   _json_this_device_doc["identifiers"] = "my_hardware_" + std::string(mqtt_client_id);
@@ -34,10 +34,10 @@ MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_pas
 // See constructor of HaBridge for more documentation.
 HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc);
 
-// Create the three sensors with the "Human readable" strings. This what will show up in Home Assistant.
+// Create the sensors with the "Human readable" strings. This what will show up in Home Assistant.
 HaEntityBrightness _ha_entity_brightness(ha_bridge, "brightness");
 
-// For multiple sensors with the same time for the same device, we need to add a child object id to separate them (third
+// For multiple sensors of the same type for the same device, we need to add a child object id to separate them (third
 // parameter).
 HaEntityTemperature _ha_entity_temperature_inside(ha_bridge, "temperature inside", "inside");
 HaEntityTemperature _ha_entity_temperature_outside(ha_bridge, "temperature outside", "outside");
@@ -66,6 +66,8 @@ void app_main();
 }
 
 void app_main(void) {
+  setupJsonForThisDevice();
+
   // TODO (you): You need to connect to WiFi here first.
   // For a simple one line utility, see https://github.com/johboh/ConnectionHelper
   // Once connected to wifi, continue with below.
@@ -77,6 +79,9 @@ void app_main(void) {
 
     // Start MQTT
     _mqtt_remote.start([](bool connected) {
+      if (!connected) {
+        return;
+      }
       // Publish Home Assistant Configuration for the sensors once connected to MQTT.
       _ha_entity_brightness.publishConfiguration();
       _ha_entity_generic_sensor.publishConfiguration();
@@ -85,7 +90,7 @@ void app_main(void) {
     });
 
     // Start task for periodically publishing state.
-    xTaskCreate(haStateTask, "haStateTask", 2048, NULL, 15, NULL);
+    xTaskCreate(haStateTask, "haStateTask", 4096, NULL, 15, NULL);
 
   } else {
     ESP_LOGE(TAG, "Failed to connect");

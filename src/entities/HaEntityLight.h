@@ -6,13 +6,13 @@
 #include <cstdint>
 #include <functional>
 #include <optional>
-#include <set>
 #include <string>
+#include <vector>
 
 /**
  * @brief Represent a Light that can be controlled from Home Assistant. It goes two ways, as the light can be changed
- * independently and will report back state to Home Assistant. Supports brightness. But not things like color, white
- * balance and so on. Add support if needed. See https://www.home-assistant.io/integrations/light.mqtt/
+ * independently and will report back state to Home Assistant. Supports brightness, color temperature, RGB, and effects.
+ * See https://www.home-assistant.io/integrations/light.mqtt/
  */
 class HaEntityLight : public HaEntity {
 public:
@@ -39,15 +39,21 @@ public:
     bool with_rgb_color = false;
 
     /**
-     * @brief if non empty, the supported effects.
+     * @brief if non empty, the supported effects (order preserved in Home Assistant UI).
      */
-    std::set<std::string> effects = {};
+    std::vector<std::string> effects = {};
 
     /**
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
   };
+
+  inline static Configuration _default = {.with_brightness = false,
+                                          .with_color_temperature = Configuration::ColorTemperature::None,
+                                          .with_rgb_color = false,
+                                          .effects = {},
+                                          .retain = false};
 
   /**
    * @brief Construct a new Ha Entity Light object
@@ -59,16 +65,13 @@ public:
    * one main entity (or only) entity of this device. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
    * information.
-   * @param child_object_id non optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
+   * @param child_object_id optional child identifier for this entity in case there are several lights of the same
+   * entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration what this light supports.
    */
-  HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id, Configuration configuration);
+  HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                Configuration configuration = _default);
 
 public:
   void publishConfiguration() override;
@@ -128,18 +131,18 @@ public:
    * @brief Publish the current selected effect. This will publish to MQTT regardless if the value has changed. Also see
    * updateEffect().
    *
-   * @param effect currently selected. Should be any of the effects from the Capabilities. Will only be published if the
+   * @param effect currently selected. Must be one of the effects in the Configuration. Will only be published if the
    * light is setup with this capability in the Configuration.
    */
-  void publishEffect(std::string effect);
+  void publishEffect(const std::string &effect);
 
   /**
    * @brief Publish the current selected effect, but only if the value has changed. Also see publishEffect().
    *
-   * @param effect currently selected. Should be any of the effects from the Capabilities. Will only be published if the
+   * @param effect currently selected. Must be one of the effects in the Configuration. Will only be published if the
    * light is setup with this capability in the Configuration.
    */
-  void updateEffect(std::string effect);
+  void updateEffect(const std::string &effect);
 
   struct RGB {
     uint8_t r;
@@ -155,16 +158,18 @@ public:
    * @brief Publish the current RGB value. This will publish to MQTT regardless if the value has changed. Also see
    * updateRgb().
    *
-   * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
-   * Configuration.
+   * @param r red (0-255)
+   * @param g green (0-255)
+   * @param b blue (0-255)
    */
   void publishRgb(uint8_t r, uint8_t g, uint8_t b) { publishRgb({r, g, b}); }
 
   /**
    * @brief Publish the current RGB value, but only if the value has changed. Also see publishRgb().
    *
-   * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
-   * Configuration.
+   * @param r red (0-255)
+   * @param g green (0-255)
+   * @param b blue (0-255)
    */
   void updateRgb(uint8_t r, uint8_t g, uint8_t b) { updateRgb({r, g, b}); }
 
@@ -172,7 +177,7 @@ public:
    * @brief Publish the current RGB value. This will publish to MQTT regardless if the value has changed. Also see
    * updateRgb().
    *
-   * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
+   * @param rgb currently in effect. Will only be published if the light is setup with this capability in the
    * Configuration.
    */
   void publishRgb(RGB rgb);
@@ -180,7 +185,7 @@ public:
   /**
    * @brief Publish the current RGB value, but only if the value has changed. Also see publishRgb().
    *
-   * @param rgb currently in affect. Will only be published if the light is setup with this capability in the
+   * @param rgb currently in effect. Will only be published if the light is setup with this capability in the
    * Configuration.
    */
   void updateRgb(RGB rgb);
@@ -213,7 +218,7 @@ public:
    * @brief Set callback for receiving callbacks when there is a new RGB value that should be set. Will only be
    * respected if the light is setup with this capability.
    */
-  bool setOnRgb(std::function<void(RGB)> effect_callback);
+  bool setOnRgb(std::function<void(RGB)> rgb_callback);
 
 private:
   std::string _name;

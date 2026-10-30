@@ -15,7 +15,7 @@
 // Information about this device.
 // All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
 // Only a flat layout structure is supported, no nesting.
-// We call the setupJsonForThisDevice() from the ardunio setup() function to populate the Json document.
+// We call setupJsonForThisDevice() from app_main() to populate the Json document.
 nlohmann::json _json_this_device_doc;
 void setupJsonForThisDevice() {
   _json_this_device_doc["identifiers"] = "my_hardware_" + std::string(mqtt_client_id);
@@ -43,8 +43,8 @@ HaEntityLight _ha_entity_light_right_bench(ha_bridge, "right bench", "right_benc
 void haStateTask(void *pvParameters) {
   while (1) {
     bool on = gpio_get_level(PIN_LED);
-    // Left light is state of LED, and we publish brightess as well as we "know" it at this time.
-    // Right light is inverse state of LED, but we don't publish brightness as we don't "know" it as this time.
+    // Left light is state of LED, and we publish brightness as well as we "know" it at this time.
+    // Right light is inverse state of LED, but we don't publish brightness as we don't "know" it at this time.
     _ha_entity_light_left_bench.publishIsOn(on);
     _ha_entity_light_left_bench.publishBrightness(255);
     _ha_entity_light_right_bench.publishIsOn(!on);
@@ -57,6 +57,8 @@ void app_main();
 }
 
 void app_main(void) {
+  setupJsonForThisDevice();
+
   // Setup led
   gpio_set_direction(PIN_LED, GPIO_MODE_OUTPUT);
   gpio_set_level(PIN_LED, 1);
@@ -72,6 +74,9 @@ void app_main(void) {
 
     // Start MQTT
     _mqtt_remote.start([](bool connected) {
+      if (!connected) {
+        return;
+      }
       // Publish Home Assistant Configuration for both lights once connected to MQTT.
       _ha_entity_light_left_bench.publishConfiguration();
       _ha_entity_light_right_bench.publishConfiguration();
@@ -79,11 +84,11 @@ void app_main(void) {
       // Subscribe to new light "on" state pushed by Home Assistant.
       _ha_entity_light_left_bench.setOnOn([&](bool on) { gpio_set_level(PIN_LED, on); });
       _ha_entity_light_right_bench.setOnBrightness(
-          [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for left light", brightness); });
+          [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for right light", brightness); });
     });
 
     // Start task for periodically publishing state.
-    xTaskCreate(haStateTask, "haStateTask", 2048, NULL, 15, NULL);
+    xTaskCreate(haStateTask, "haStateTask", 4096, NULL, 15, NULL);
 
   } else {
     ESP_LOGE(TAG, "Failed to connect");

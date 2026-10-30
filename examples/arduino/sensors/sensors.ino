@@ -90,10 +90,12 @@ void setup() {
 #if defined(ESP32) && defined(PLATFORMIO)
   _mqtt_remote.start([](bool connected) {
     // Publish Home Assistant Configuration for the sensors once connected to MQTT.
-    _ha_entity_brightness.publishConfiguration();
-    _ha_entity_generic_sensor.publishConfiguration();
-    _ha_entity_temperature_inside.publishConfiguration();
-    _ha_entity_temperature_outside.publishConfiguration();
+    if (connected) {
+      _ha_entity_brightness.publishConfiguration();
+      _ha_entity_generic_sensor.publishConfiguration();
+      _ha_entity_temperature_inside.publishConfiguration();
+      _ha_entity_temperature_outside.publishConfiguration();
+    }
   });
 #else // Not PlatformIO (Arduino IDE)
   _mqtt_remote.setOnConnectionChange([](bool connected) {

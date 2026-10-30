@@ -1,12 +1,14 @@
 #include "HaEntityEvent.h"
 #include <HaUtilities.h>
 #include <IJson.h>
+#include <algorithm>
+#include <utility>
 
 #define COMPONENT "event"
 
 HaEntityEvent::HaEntityEvent(HaBridge &ha_bridge, std::string name, std::string object_id, Configuration configuration)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id),
-      _configuration(configuration) {}
+    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(std::move(object_id)),
+      _configuration(std::move(configuration)) {}
 
 void HaEntityEvent::publishConfiguration() {
   IJsonDocument doc;
@@ -44,7 +46,12 @@ void HaEntityEvent::republishState() {
   // Events are never republished.
 }
 
-void HaEntityEvent::publishEvent(std::string event, Attributes::Map attributes) {
+void HaEntityEvent::publishEvent(const std::string &event, const Attributes::Map &attributes) {
+  const auto &event_types = _configuration.event_types;
+  if (std::find(event_types.begin(), event_types.end(), event) == event_types.end()) {
+    return;
+  }
+
   IJsonDocument doc;
   doc["event_type"] = event;
 

@@ -1,13 +1,18 @@
 #include "HaEntityNumber.h"
 #include <HaUtilities.h>
 #include <IJson.h>
+#include <cmath>
+#include <cstdlib>
+#include <utility>
 
 #define COMPONENT "number"
 
+using namespace homeassistantentities;
+
 HaEntityNumber::HaEntityNumber(HaBridge &ha_bridge, std::string name, std::string object_id,
                                Configuration configuration)
-    : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(object_id),
-      _configuration(configuration) {}
+    : _name(trim(name)), _ha_bridge(ha_bridge), _object_id(std::move(object_id)),
+      _configuration(std::move(configuration)) {}
 
 void HaEntityNumber::publishConfiguration() {
   IJsonDocument doc;
@@ -22,15 +27,16 @@ void HaEntityNumber::publishConfiguration() {
   doc["step"] = _configuration.step;
   doc["min"] = _configuration.min_value;
   doc["max"] = _configuration.max_value;
-  doc["force_update"] = _configuration.force_update;
   doc["retain"] = _configuration.retain;
 
-  if (!_configuration.unit.empty()) {
-    doc["unit_of_measurement"] = _configuration.unit;
+  auto unit = trim(_configuration.unit);
+  if (!unit.empty()) {
+    doc["unit_of_measurement"] = unit;
   }
 
-  if (!_configuration.device_class.empty()) {
-    doc["device_class"] = _configuration.device_class;
+  auto device_class = trim(_configuration.device_class);
+  if (!device_class.empty()) {
+    doc["device_class"] = device_class;
   }
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
@@ -46,26 +52,33 @@ void HaEntityNumber::republishState() {
 }
 
 void HaEntityNumber::publishNumber(float number) {
-  // numbered == OFF
+  if (!std::isfinite(number)) {
+    return;
+  }
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id),
-                            std::to_string(number));
+                            formatNumber(number));
   _number = number;
 }
 
 void HaEntityNumber::updateNumber(float number) {
+  if (!std::isfinite(number)) {
+    return;
+  }
   if (!_number || *_number != number) {
     publishNumber(number);
   }
 }
 
 bool HaEntityNumber::setOnNumber(std::function<void(float)> callback) {
+  if (!callback) {
+    return false;
+  }
   return _ha_bridge.remote().subscribe(_ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
-                                       [callback](std::string topic, std::string message) {
-                                         char *end;
+                                       [callback](std::string, std::string message) {
+                                         char *end = nullptr;
                                          float num = std::strtof(message.c_str(), &end);
-                                         if (end != message.c_str() && *end == '\0') {
+                                         if (end != message.c_str() && *end == '\0' && std::isfinite(num)) {
                                            callback(num);
                                          }
-                                         // Invalid input, ignore
                                        });
 }

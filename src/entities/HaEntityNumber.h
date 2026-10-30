@@ -4,6 +4,7 @@
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 
@@ -17,17 +18,17 @@ public:
     /**
      * @brief The minimum value allowed.
      */
-    float min_value = 1.0;
+    float min_value = 1.0f;
 
     /**
      * @brief The maximum value allowed.
      */
-    float max_value = 100.0;
+    float max_value = 100.0f;
 
     /**
      * @brief Step value. Smallest value 0.001.
      */
-    float step = 1.0;
+    float step = 1.0f;
 
     /**
      * @brief the unit of measurement reported for this number. Make sure that the value you publish is of this unit.
@@ -42,25 +43,13 @@ public:
     std::string device_class = "";
 
     /**
-     * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-     * message (not only when the sensor’s new state is different to the current one).
-     */
-    bool force_update = false;
-
-    /**
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
   };
 
-  inline static Configuration _default = {.min_value = 1.0,
-                                          .max_value = 100.0,
-                                          .step = 1.0,
-                                          .unit = "",
-                                          .device_class = "",
-                                          .force_update = false,
-                                          .retain = false};
+  inline static Configuration _default = {
+      .min_value = 1.0f, .max_value = 100.0f, .step = 1.0f, .unit = "", .device_class = "", .retain = false};
 
   /**
    * @brief Construct a new Ha Entity Number object
