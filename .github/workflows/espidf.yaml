@@ -6,18 +6,6 @@ jobs:
     strategy:
       matrix:
         version:
-          - name: v44_build
-            version_number: release-v4.4
-            target: esp32c3
-          - name: v50_build
-            version_number: release-v5.0
-            target: esp32c3
-          - name: v51_build
-            version_number: release-v5.1
-            target: esp32c6
-          - name: v52_build
-            version_number: release-v5.2
-            target: esp32c6
           - name: v53_build
             version_number: release-v5.3
             target: esp32c6
@@ -26,6 +14,12 @@ jobs:
             target: esp32c6
           - name: v55_build
             version_number: release-v5.5
+            target: esp32c6
+          - name: v60_build
+            version_number: release-v6.0
+            target: esp32c6
+          - name: v61_build
+            version_number: release-v6.1
             target: esp32c6
         example:
           - name: actuators
