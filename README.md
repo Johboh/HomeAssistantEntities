@@ -56,7 +56,7 @@ Add the following to `lib_deps`:
 ```
 You also need a MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
-   johboh/MQTTRemote@^6.0.2
+   johboh/MQTTRemote@^6.0.5
    bblanchon/ArduinoJson@^7.1.0
 ```
 
@@ -74,7 +74,7 @@ dependencies:
 You also need a MQTT library. See Dependencies section. Suggestion:
 ```
   johboh/mqttremote:
-    version: ">=6.0.2"
+    version: ">=6.0.5"
 ```
 
 ### Examples
