@@ -10,26 +10,32 @@ jobs:
             example: examples/arduino/actuators
             board: d1_mini
             extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_project_options: ""
           - variant: sensors_arduino_json_8266
             example: examples/arduino/sensors
             board: d1_mini
             extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_project_options: ""
           - variant: actuators_arduino_json
             example: examples/arduino/actuators
             board: lolin_s2_mini
             extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
           - variant: actuators_nlohmann_json
             example: examples/arduino/actuators
             board: lolin_c3_mini
             extra_dependencies: "johboh/MQTTRemote@^6.0.5, johboh/nlohmann-json@^3.12.0"
+            extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
           - variant: sensors_arduino_json
             example: examples/arduino/sensors
             board: lolin_s2_mini
             extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
           - variant: sensors_nlohmann_json
             example: examples/arduino/sensors
             board: lolin_c3_mini
             extra_dependencies: "johboh/MQTTRemote@^6.0.5, johboh/nlohmann-json@^3.12.0"
+            extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
 
     steps:
       - uses: actions/checkout@v3
@@ -46,7 +52,7 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO targets
-        run: ${{ env.PLATFORMIO_CI_BASE_CMD }} --project-option="lib_deps=${{ matrix.target.extra_dependencies }}"
+        run: ${{ env.PLATFORMIO_CI_BASE_CMD }} --project-option="lib_deps=${{ matrix.target.extra_dependencies }}" ${{ matrix.target.extra_project_options }}
         env:
           PLATFORMIO_CI_BASE_CMD: pio ci --lib="." --board=${{ matrix.target.board }} --project-option="build_unflags=-std=gnu++11" --project-option="build_flags=-std=gnu++17" --project-option="lib_ldf_mode=deep"
           PLATFORMIO_CI_SRC: ${{ matrix.target.example }}

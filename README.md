@@ -95,7 +95,13 @@ Newer versions most probably work too, but they have not been verified.
 - *An MQTT implementation is required.* There is a copy of [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) in this library from [Johboh/MQTTRemote](https://github.com/Johboh/MQTTRemote). You can either add a dependency on [MQTTRemote](https://github.com/Johboh/MQTTRemote) to get a fully working MQTT client (the examples are using this dependency), or you can implement/adapt/forward to your own MQTT implementation. This library only depends on the [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) interface.
 - Needs C++17 for `std::optional`.
   - For PlatformIO in `platformio.ini`:
-    ```C++
+    ```ini
     build_unflags=-std=gnu++11 # "Disable" C++11
     build_flags=-std=gnu++17 # "Enable" C++17
     ```
+- When using ESP32 with `nlohmann-json`, the compiled binary size can exceed the default 1.25MB partition. Use a larger partition scheme such as `min_spiffs.csv` (1.9MB with OTA) or `huge_app.csv` (3MB no OTA):
+  - In `platformio.ini`:
+    ```ini
+    board_build.partitions = min_spiffs.csv
+    ```
+  - In Arduino IDE: Tools -> Partition Scheme -> "Minimal SPIFFS (Large APPS with OTA)" or "Huge APP (3MB No OTA/1MB SPIFFS)".

@@ -2,6 +2,9 @@
 // This is for the Arduino IDE, where we always build with ArduinoJson. arduino-cli will not build/include libraries
 // that are not included anywhere. So we must include ArduinoJson.h so its available for IJson.h later.
 // For Platform IO, this is not the case and these examples are built both with ArduinoJson and nlohmann-json.
+// Note: When building for ESP32 with nlohmann-json, the binary size can exceed the default 1.25MB partition.
+// In PlatformIO, configure `board_build.partitions = min_spiffs.csv` (or `huge_app.csv`) in `platformio.ini`.
+// In Arduino IDE, select Tools -> Partition Scheme -> "Minimal SPIFFS (Large APPS with OTA)" or "Huge APP".
 #ifndef PLATFORMIO
 #include <ArduinoJson.h>
 #endif
