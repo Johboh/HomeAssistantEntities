@@ -2,6 +2,6 @@ version: "8.0.22"
 description: Library for providing sensors and actuators to Home Assistant using MQTT.
 url: https://github.com/Johboh/HomeAssistantEntities
 dependencies:
-  idf: ">=4.4"
+  idf: ">=5.0"
   johboh/nlohmann-json:
     version: ">=3.12.0"
