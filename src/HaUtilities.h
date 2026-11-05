@@ -57,6 +57,19 @@ inline std::string formatNumber(float value) {
   return std::string(buf);
 }
 
+/**
+ * @brief Count UTF-8 code points in a string (matching Home Assistant's character-length validation).
+ */
+inline std::size_t utf8CodePointCount(const std::string &str) {
+  std::size_t count = 0;
+  for (unsigned char c : str) {
+    if ((c & 0xC0) != 0x80) {
+      ++count;
+    }
+  }
+  return count;
+}
+
 }; // namespace homeassistantentities
 
 #endif // __HA_UTILITIES_H__

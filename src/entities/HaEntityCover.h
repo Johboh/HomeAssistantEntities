@@ -52,10 +52,32 @@ public:
      * Default: 100
      */
     uint8_t position_open = 100;
+
+    /**
+     * @brief If true (default), configure position_topic (and set_position_topic when !read_only). Set to false for
+     * covers that only report/accept discrete open/closed/stopped states.
+     */
+    bool with_position = true;
+
+    /**
+     * @brief If true (default), configure state_topic (and command_topic when !read_only). Set to false for covers that
+     * only report/accept numeric position.
+     */
+    bool with_state_topic = true;
+
+    /**
+     * @brief If true, tells Home Assistant to publish command messages with retain set to true.
+     */
+    bool retain = false;
   };
 
-  inline static Configuration _default = {
-      .device_class = "curtain", .read_only = false, .position_closed = 0, .position_open = 100};
+  inline static Configuration _default = {.device_class = "curtain",
+                                          .read_only = false,
+                                          .position_closed = 0,
+                                          .position_open = 100,
+                                          .with_position = true,
+                                          .with_state_topic = true,
+                                          .retain = false};
 
   /**
    * @brief Construct a new Ha Entity Cover object

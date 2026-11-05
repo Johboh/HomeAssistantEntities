@@ -49,7 +49,18 @@ bool parseRgb(const std::string &input, HaEntityLight::RGB &color) {
 HaEntityLight::HaEntityLight(HaBridge &ha_bridge, std::string name, std::string child_object_id,
                              Configuration configuration)
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(std::move(child_object_id)),
-      _configuration(std::move(configuration)) {}
+      _configuration(std::move(configuration)) {
+  if (_configuration.min_color_temperature && *_configuration.min_color_temperature == 0) {
+    _configuration.min_color_temperature = std::nullopt;
+  }
+  if (_configuration.max_color_temperature && *_configuration.max_color_temperature == 0) {
+    _configuration.max_color_temperature = std::nullopt;
+  }
+  if (_configuration.min_color_temperature && _configuration.max_color_temperature &&
+      *_configuration.min_color_temperature > *_configuration.max_color_temperature) {
+    std::swap(_configuration.min_color_temperature, _configuration.max_color_temperature);
+  }
+}
 
 void HaEntityLight::publishConfiguration() {
   IJsonDocument doc;
@@ -78,6 +89,19 @@ void HaEntityLight::publishConfiguration() {
         _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE);
     if (_configuration.with_color_temperature == Configuration::ColorTemperature::Kelvin) {
       doc["color_temp_kelvin"] = true;
+      if (_configuration.min_color_temperature) {
+        doc["min_kelvin"] = *_configuration.min_color_temperature;
+      }
+      if (_configuration.max_color_temperature) {
+        doc["max_kelvin"] = *_configuration.max_color_temperature;
+      }
+    } else {
+      if (_configuration.min_color_temperature) {
+        doc["min_mireds"] = *_configuration.min_color_temperature;
+      }
+      if (_configuration.max_color_temperature) {
+        doc["max_mireds"] = *_configuration.max_color_temperature;
+      }
     }
   }
   if (_configuration.with_rgb_color) {
@@ -134,12 +158,19 @@ void HaEntityLight::publishBrightness(uint8_t brightness) {
   }
 }
 
+uint16_t HaEntityLight::clampColorTemperature(uint16_t temperature) const {
+  uint16_t lo = _configuration.min_color_temperature.value_or(1);
+  uint16_t hi = _configuration.max_color_temperature.value_or(65535);
+  return std::clamp(temperature, lo, hi);
+}
+
 void HaEntityLight::publishColorTemperature(uint16_t temperature) {
-  if (_configuration.with_color_temperature != Configuration::ColorTemperature::None) {
+  if (_configuration.with_color_temperature != Configuration::ColorTemperature::None && temperature > 0) {
+    uint16_t clamped = clampColorTemperature(temperature);
     _ha_bridge.publishMessage(
         _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE),
-        std::to_string(temperature));
-    _color_temperature = temperature;
+        std::to_string(clamped));
+    _color_temperature = clamped;
   }
 }
 
@@ -175,8 +206,12 @@ void HaEntityLight::updateBrightness(uint8_t brightness) {
 }
 
 void HaEntityLight::updateColorTemperature(uint16_t temperature) {
-  if (!_color_temperature || *_color_temperature != temperature) {
-    publishColorTemperature(temperature);
+  if (_configuration.with_color_temperature == Configuration::ColorTemperature::None || temperature == 0) {
+    return;
+  }
+  uint16_t clamped = clampColorTemperature(temperature);
+  if (!_color_temperature || *_color_temperature != clamped) {
+    publishColorTemperature(clamped);
   }
 }
 
@@ -222,12 +257,14 @@ bool HaEntityLight::setOnColorTemperature(std::function<void(uint16_t)> callback
     return false;
   }
 
+  uint16_t lo = _configuration.min_color_temperature.value_or(1);
+  uint16_t hi = _configuration.max_color_temperature.value_or(65535);
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COLOR_TEMPERATURE),
-      [callback](std::string, std::string message) {
+      [callback, lo, hi](std::string, std::string message) {
         char *end = nullptr;
         long val = std::strtol(message.c_str(), &end, 10);
-        if (end != message.c_str() && *end == '\0' && val >= 0 && val <= 65535) {
+        if (end != message.c_str() && *end == '\0' && val >= lo && val <= hi) {
           callback(static_cast<uint16_t>(val));
         }
       });

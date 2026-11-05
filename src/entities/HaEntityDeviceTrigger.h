@@ -6,10 +6,12 @@
 
 #include <HaBridge.h>
 #include <HaEntity.h>
+#include <optional>
 #include <string>
 
 /**
  * @brief Represent a Device Trigger that can be sent to Home Assistant.
+ * Note: Home Assistant requires device information to be configured on the HaBridge for device triggers.
  * See more at https://www.home-assistant.io/integrations/device_trigger.mqtt/
  */
 class HaEntityDeviceTrigger : public HaEntity {
@@ -34,9 +36,16 @@ public:
      * If set to an unsupported value, will render as subtype type,
      * e.g. left_button pressed with type set to button_short_press and subtype set to left_button
      *
-     * This type is also used as the payload when publishing the trigger event.
+     * By default, this subtype is also used as the payload when publishing the trigger event unless payload is set.
      */
     std::string subtype;
+
+    /**
+     * @brief Optional custom payload to match and publish for the trigger event.
+     * If unset (std::nullopt), subtype is used as the payload. If set to an empty string (""), no payload filter is
+     * configured in Home Assistant (any payload on the trigger topic fires the trigger).
+     */
+    std::optional<std::string> payload = std::nullopt;
   };
 
   /**

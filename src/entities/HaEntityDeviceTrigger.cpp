@@ -9,13 +9,24 @@
 #define COMPONENT "device_automation"
 
 HaEntityDeviceTrigger::HaEntityDeviceTrigger(HaBridge &ha_bridge, std::string object_id, Configuration configuration)
-    : _ha_bridge(ha_bridge), _object_id(std::move(object_id)), _configuration(std::move(configuration)) {}
+    : _ha_bridge(ha_bridge), _object_id(homeassistantentities::trim(object_id)),
+      _configuration(std::move(configuration)) {
+  _configuration.type = homeassistantentities::trim(_configuration.type);
+  _configuration.subtype = homeassistantentities::trim(_configuration.subtype);
+}
 
 void HaEntityDeviceTrigger::publishConfiguration() {
+  if (_configuration.type.empty() || _configuration.subtype.empty()) {
+    return;
+  }
+
   IJsonDocument doc;
 
   doc["automation_type"] = "trigger";
-  doc["payload"] = _configuration.subtype;
+  const std::string &payload = _configuration.payload ? *_configuration.payload : _configuration.subtype;
+  if (!payload.empty()) {
+    doc["payload"] = payload;
+  }
   doc["platform"] = "device_automation";
   doc["type"] = _configuration.type;
   doc["subtype"] = _configuration.subtype;
@@ -30,6 +41,9 @@ void HaEntityDeviceTrigger::republishState() {
 }
 
 void HaEntityDeviceTrigger::publishTrigger() {
-  _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
-                            _configuration.subtype);
+  if (_configuration.type.empty() || _configuration.subtype.empty()) {
+    return;
+  }
+  const std::string &payload = _configuration.payload ? *_configuration.payload : _configuration.subtype;
+  _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id), payload);
 }

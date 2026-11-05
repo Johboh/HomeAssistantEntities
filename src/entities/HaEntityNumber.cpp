@@ -4,6 +4,7 @@
 #include "HaEntityNumber.h"
 #include <HaUtilities.h>
 #include <IJson.h>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <utility>
@@ -15,7 +16,20 @@ using namespace homeassistantentities;
 HaEntityNumber::HaEntityNumber(HaBridge &ha_bridge, std::string name, std::string object_id,
                                Configuration configuration)
     : _name(trim(name)), _ha_bridge(ha_bridge), _object_id(std::move(object_id)),
-      _configuration(std::move(configuration)) {}
+      _configuration(std::move(configuration)) {
+  if (!std::isfinite(_configuration.min_value)) {
+    _configuration.min_value = 1.0f;
+  }
+  if (!std::isfinite(_configuration.max_value)) {
+    _configuration.max_value = 100.0f;
+  }
+  if (_configuration.min_value > _configuration.max_value) {
+    std::swap(_configuration.min_value, _configuration.max_value);
+  }
+  if (!std::isfinite(_configuration.step) || _configuration.step <= 0.0f) {
+    _configuration.step = 1.0f;
+  }
+}
 
 void HaEntityNumber::publishConfiguration() {
   IJsonDocument doc;
@@ -26,11 +40,16 @@ void HaEntityNumber::publishConfiguration() {
     doc["name"] = nullptr;
   }
 
-  doc["platform"] = "number";
   doc["step"] = _configuration.step;
   doc["min"] = _configuration.min_value;
   doc["max"] = _configuration.max_value;
   doc["retain"] = _configuration.retain;
+
+  if (_configuration.mode == Configuration::Mode::Box) {
+    doc["mode"] = "box";
+  } else if (_configuration.mode == Configuration::Mode::Slider) {
+    doc["mode"] = "slider";
+  }
 
   auto unit = trim(_configuration.unit);
   if (!unit.empty()) {
@@ -58,17 +77,19 @@ void HaEntityNumber::publishNumber(float number) {
   if (!std::isfinite(number)) {
     return;
   }
+  float clamped = std::clamp(number, _configuration.min_value, _configuration.max_value);
   _ha_bridge.publishMessage(_ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id),
-                            formatNumber(number));
-  _number = number;
+                            formatNumber(clamped));
+  _number = clamped;
 }
 
 void HaEntityNumber::updateNumber(float number) {
   if (!std::isfinite(number)) {
     return;
   }
-  if (!_number || *_number != number) {
-    publishNumber(number);
+  float clamped = std::clamp(number, _configuration.min_value, _configuration.max_value);
+  if (!_number || *_number != clamped) {
+    publishNumber(clamped);
   }
 }
 
@@ -76,11 +97,14 @@ bool HaEntityNumber::setOnNumber(std::function<void(float)> callback) {
   if (!callback) {
     return false;
   }
+  float min_val = _configuration.min_value;
+  float max_val = _configuration.max_value;
   return _ha_bridge.remote().subscribe(_ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
-                                       [callback](std::string, std::string message) {
+                                       [callback, min_val, max_val](std::string, std::string message) {
                                          char *end = nullptr;
                                          float num = std::strtof(message.c_str(), &end);
-                                         if (end != message.c_str() && *end == '\0' && std::isfinite(num)) {
+                                         if (end != message.c_str() && *end == '\0' && std::isfinite(num) &&
+                                             num >= min_val && num <= max_val) {
                                            callback(num);
                                          }
                                        });

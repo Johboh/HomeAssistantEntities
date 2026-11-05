@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <vector>
 
 /**
  * @brief A generic sensor/binary sensor. Consider using any of the specific sensors first, like HaEntityTemperature,
@@ -54,6 +55,18 @@ public:
      * message (not only when the sensor’s new state is different to the current one).
      */
     bool force_update = false;
+
+    /**
+     * @brief Optional custom unit of measurement string (e.g. ISO 4217 currency code such as "EUR" or "USD" for
+     * Sensor::Monetary, or a custom unit for Sensor::Undefined::Empty). Used when unit_of_measurement is not set.
+     */
+    std::optional<std::string> custom_unit_of_measurement = std::nullopt;
+
+    /**
+     * @brief Valid option strings when using Sensor::Enum (device_class "enum"). Required by Home Assistant for enum
+     * sensors.
+     */
+    std::vector<std::string> options = {};
   };
 
   /**
@@ -142,6 +155,7 @@ private:
   std::optional<std::string> _unit_of_measurement;
   std::optional<std::string> _state_class;
   std::optional<std::string> _icon;
+  std::vector<std::string> _options;
   bool _with_attributes;
   bool _force_update;
 

@@ -21,6 +21,7 @@ public:
     pm1,  // Concentration of particulate matter less than 1 micrometer in µg/m³
     pm25, // Concentration of particulate matter less than 2.5 micrometers in µg/m³
     pm10, // Concentration of particulate matter less than 10 micrometers in µg/m³
+    pm4,  // Concentration of particulate matter less than 4 micrometers in µg/m³
   };
 
   struct Configuration {
@@ -99,6 +100,13 @@ private:
                             HaEntitySensor::Configuration{
                                 .device_class = homeassistantentities::Sensor::Pm25{},
                                 .unit_of_measurement = homeassistantentities::Sensor::Pm25::Unit::ug_m3,
+                                .force_update = configuration.force_update,
+                            });
+    case Size::pm4:
+      return HaEntitySensor(ha_bridge, name, child_object_id,
+                            HaEntitySensor::Configuration{
+                                .device_class = homeassistantentities::Sensor::Pm4{},
+                                .unit_of_measurement = homeassistantentities::Sensor::Pm4::Unit::ug_m3,
                                 .force_update = configuration.force_update,
                             });
     case Size::pm10:

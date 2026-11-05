@@ -49,10 +49,26 @@ public:
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
+
+    enum class Mode {
+      Auto,
+      Box,
+      Slider,
+    };
+
+    /**
+     * @brief Control how the number should be displayed in the Home Assistant UI ("auto", "box", or "slider").
+     */
+    Mode mode = Mode::Auto;
   };
 
-  inline static Configuration _default = {
-      .min_value = 1.0f, .max_value = 100.0f, .step = 1.0f, .unit = "", .device_class = "", .retain = false};
+  inline static Configuration _default = {.min_value = 1.0f,
+                                          .max_value = 100.0f,
+                                          .step = 1.0f,
+                                          .unit = "",
+                                          .device_class = "",
+                                          .retain = false,
+                                          .mode = Configuration::Mode::Auto};
 
   /**
    * @brief Construct a new Ha Entity Number object

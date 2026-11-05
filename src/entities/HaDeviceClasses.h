@@ -34,12 +34,44 @@ public:
     }
     return "unknown_device_class";
   }
+
+  virtual std::optional<std::string> defaultStateClass() const {
+    return sensorType() == SensorType::Sensor ? std::optional<std::string>("measurement") : std::nullopt;
+  }
 };
 
 /**
  * @brief Device classes and their units from https://www.home-assistant.io/integrations/sensor/#device-class
  */
 namespace Sensor {
+
+/**
+ * @brief Apparent power in mVA, VA, kVA.
+ */
+class ApparentPower : public DeviceClass {
+public:
+  enum Unit : UnitType { mVA = 1, VA, kVA };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case mVA:
+      return "mVA";
+    case VA:
+      return "VA";
+    case kVA:
+      return "kVA";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "apparent_power";
+};
 
 /**
  * @brief Air Quality Index (unitless).
@@ -105,7 +137,7 @@ private:
  */
 class AtmosphericPressure : public DeviceClass {
 public:
-  enum Unit : UnitType { cbar = 1, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi };
+  enum Unit : UnitType { cbar = 1, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi, mPa, inH2O, atm };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -131,6 +163,12 @@ public:
       return "Pa";
     case psi:
       return "psi";
+    case mPa:
+      return "mPa";
+    case inH2O:
+      return "inH₂O";
+    case atm:
+      return "atm";
     default:
       return std::nullopt;
     }
@@ -217,7 +255,7 @@ private:
 // CarbonMonoxide
 class CarbonMonoxide : public DeviceClass {
 public:
-  enum Unit : UnitType { ppm = 1 };
+  enum Unit : UnitType { ppm = 1, ppb, mg_m3, ug_m3 };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -227,6 +265,12 @@ public:
     switch (unit) {
     case ppm:
       return "ppm";
+    case ppb:
+      return "ppb";
+    case mg_m3:
+      return "mg/m³";
+    case ug_m3:
+      return "μg/m³";
     default:
       return std::nullopt;
     }
@@ -236,10 +280,36 @@ private:
   static constexpr const char *DEVICE_CLASS = "carbon_monoxide";
 };
 
+// Conductivity
+class Conductivity : public DeviceClass {
+public:
+  enum Unit : UnitType { S_cm = 1, mS_cm, uS_cm };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case S_cm:
+      return "S/cm";
+    case mS_cm:
+      return "mS/cm";
+    case uS_cm:
+      return "μS/cm";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "conductivity";
+};
+
 // Current
 class Current : public DeviceClass {
 public:
-  enum Unit : UnitType { A = 1, mA };
+  enum Unit : UnitType { A = 1, mA, uA };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -251,6 +321,8 @@ public:
       return "A";
     case mA:
       return "mA";
+    case uA:
+      return "μA";
     default:
       return std::nullopt;
     }
@@ -395,6 +467,8 @@ public:
 
   std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
+  std::optional<std::string> defaultStateClass() const override { return std::nullopt; }
+
 private:
   static constexpr const char *DEVICE_CLASS = "date";
 };
@@ -402,7 +476,7 @@ private:
 // Distance
 class Distance : public DeviceClass {
 public:
-  enum Unit : UnitType { km = 1, m, cm, mm, mi, nmi, yd, in };
+  enum Unit : UnitType { km = 1, m, cm, mm, mi, nmi, yd, in, ft };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -426,6 +500,8 @@ public:
       return "yd";
     case in:
       return "in";
+    case ft:
+      return "ft";
     default:
       return std::nullopt;
     }
@@ -438,7 +514,7 @@ private:
 // Duration
 class Duration : public DeviceClass {
 public:
-  enum Unit : UnitType { d = 1, h, min, s, ms };
+  enum Unit : UnitType { d = 1, h, min, s, ms, us };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -456,6 +532,8 @@ public:
       return "s";
     case ms:
       return "ms";
+    case us:
+      return "μs";
     default:
       return std::nullopt;
     }
@@ -468,11 +546,13 @@ private:
 // Energy
 class Energy : public DeviceClass {
 public:
-  enum Unit : UnitType { J = 1, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal };
+  enum Unit : UnitType { J = 1, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal, thm };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> defaultStateClass() const override { return "total_increasing"; }
 
   std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
     switch (unit) {
@@ -504,6 +584,8 @@ public:
       return "Mcal";
     case Gcal:
       return "Gcal";
+    case thm:
+      return "thm";
     default:
       return std::nullopt;
     }
@@ -513,10 +595,38 @@ private:
   static constexpr const char *DEVICE_CLASS = "energy";
 };
 
+// EnergyDistance
+class EnergyDistance : public DeviceClass {
+public:
+  enum Unit : UnitType { kWh_100km = 1, Wh_km, mi_kWh, km_kWh };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case kWh_100km:
+      return "kWh/100km";
+    case Wh_km:
+      return "Wh/km";
+    case mi_kWh:
+      return "mi/kWh";
+    case km_kWh:
+      return "km/kWh";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "energy_distance";
+};
+
 // EnergyStorage
 class EnergyStorage : public DeviceClass {
 public:
-  enum Unit : UnitType { J = 1, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal };
+  enum Unit : UnitType { J = 1, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal, thm };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -552,6 +662,8 @@ public:
       return "Mcal";
     case Gcal:
       return "Gcal";
+    case thm:
+      return "thm";
     default:
       return std::nullopt;
     }
@@ -570,6 +682,8 @@ public:
 
   std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
+  std::optional<std::string> defaultStateClass() const override { return std::nullopt; }
+
 private:
   static constexpr const char *DEVICE_CLASS = "enum";
 };
@@ -577,7 +691,7 @@ private:
 // Frequency
 class Frequency : public DeviceClass {
 public:
-  enum Unit : UnitType { Hz = 1, kHz, MHz, GHz };
+  enum Unit : UnitType { Hz = 1, kHz, MHz, GHz, mHz };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -593,6 +707,8 @@ public:
       return "MHz";
     case GHz:
       return "GHz";
+    case mHz:
+      return "mHz";
     default:
       return std::nullopt;
     }
@@ -605,11 +721,13 @@ private:
 // Gas
 class Gas : public DeviceClass {
 public:
-  enum Unit : UnitType { m3 = 1, ft3, CCF };
+  enum Unit : UnitType { m3 = 1, ft3, CCF, L, MCF };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> defaultStateClass() const override { return "total_increasing"; }
 
   std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
     switch (unit) {
@@ -619,6 +737,10 @@ public:
       return "ft³";
     case CCF:
       return "CCF";
+    case L:
+      return "L";
+    case MCF:
+      return "MCF";
     default:
       return std::nullopt;
     }
@@ -751,6 +873,8 @@ public:
 
   std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
+  std::optional<std::string> defaultStateClass() const override { return "total"; }
+
 private:
   static constexpr const char *DEVICE_CLASS = "monetary";
 };
@@ -758,7 +882,7 @@ private:
 // NitrogenDioxide
 class NitrogenDioxide : public DeviceClass {
 public:
-  enum Unit : UnitType { ug_m3 = 1 };
+  enum Unit : UnitType { ug_m3 = 1, ppb, ppm };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -768,6 +892,10 @@ public:
     switch (unit) {
     case ug_m3:
       return "µg/m³";
+    case ppb:
+      return "ppb";
+    case ppm:
+      return "ppm";
     default:
       return std::nullopt;
     }
@@ -780,7 +908,7 @@ private:
 // NitrogenMonoxide
 class NitrogenMonoxide : public DeviceClass {
 public:
-  enum Unit : UnitType { ug_m3 = 1 };
+  enum Unit : UnitType { ug_m3 = 1, ppb };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -790,6 +918,8 @@ public:
     switch (unit) {
     case ug_m3:
       return "µg/m³";
+    case ppb:
+      return "ppb";
     default:
       return std::nullopt;
     }
@@ -824,7 +954,7 @@ private:
 // Ozone
 class Ozone : public DeviceClass {
 public:
-  enum Unit : UnitType { ug_m3 = 1 };
+  enum Unit : UnitType { ug_m3 = 1, ppb, ppm };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -834,6 +964,10 @@ public:
     switch (unit) {
     case ug_m3:
       return "µg/m³";
+    case ppb:
+      return "ppb";
+    case ppm:
+      return "ppm";
     default:
       return std::nullopt;
     }
@@ -898,6 +1032,28 @@ public:
 
 private:
   static constexpr const char *DEVICE_CLASS = "pm25";
+};
+
+// Pm4
+class Pm4 : public DeviceClass {
+public:
+  enum Unit : UnitType { ug_m3 = 1 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case ug_m3:
+      return "µg/m³";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "pm4";
 };
 
 // Pm10
@@ -1035,7 +1191,7 @@ private:
 // Pressure
 class Pressure : public DeviceClass {
 public:
-  enum Unit : UnitType { Pa = 1, kPa, hPa, bar, cbar, mbar, mmHg, inHg, psi };
+  enum Unit : UnitType { Pa = 1, kPa, hPa, bar, cbar, mbar, mmHg, inHg, psi, mPa, inH2O, atm };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1061,6 +1217,12 @@ public:
       return "inHg";
     case psi:
       return "psi";
+    case mPa:
+      return "mPa";
+    case inH2O:
+      return "inH₂O";
+    case atm:
+      return "atm";
     default:
       return std::nullopt;
     }
@@ -1070,10 +1232,60 @@ private:
   static constexpr const char *DEVICE_CLASS = "pressure";
 };
 
+// Radon
+class Radon : public DeviceClass {
+public:
+  enum Unit : UnitType { Bq_m3 = 1, pCi_L };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Bq_m3:
+      return "Bq/m³";
+    case pCi_L:
+      return "pCi/L";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "radon";
+};
+
+// ReactiveEnergy
+class ReactiveEnergy : public DeviceClass {
+public:
+  enum Unit : UnitType { varh = 1, kvarh };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> defaultStateClass() const override { return "total_increasing"; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case varh:
+      return "varh";
+    case kvarh:
+      return "kvarh";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "reactive_energy";
+};
+
 // ReactivePower
 class ReactivePower : public DeviceClass {
 public:
-  enum Unit : UnitType { var = 1 };
+  enum Unit : UnitType { var = 1, mvar, kvar };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1083,6 +1295,10 @@ public:
     switch (unit) {
     case var:
       return "var";
+    case mvar:
+      return "mvar";
+    case kvar:
+      return "kvar";
     default:
       return std::nullopt;
     }
@@ -1143,7 +1359,7 @@ private:
 // Speed
 class Speed : public DeviceClass {
 public:
-  enum Unit : UnitType { ft_s = 1, in_d, in_h, in_s, km_h, kn, m_s, mph, mm_d, mm_s };
+  enum Unit : UnitType { ft_s = 1, in_d, in_h, in_s, km_h, kn, m_s, mph, mm_d, mm_s, Beaufort, m_min, mm_h };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1171,6 +1387,12 @@ public:
       return "mm/d";
     case mm_s:
       return "mm/s";
+    case Beaufort:
+      return "Beaufort";
+    case m_min:
+      return "m/min";
+    case mm_h:
+      return "mm/h";
     default:
       return std::nullopt;
     }
@@ -1183,7 +1405,7 @@ private:
 // SulphurDioxide
 class SulphurDioxide : public DeviceClass {
 public:
-  enum Unit : UnitType { ug_m3 = 1 };
+  enum Unit : UnitType { ug_m3 = 1, ppb };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1193,6 +1415,8 @@ public:
     switch (unit) {
     case ug_m3:
       return "µg/m³";
+    case ppb:
+      return "ppb";
     default:
       return std::nullopt;
     }
@@ -1228,6 +1452,32 @@ private:
   static constexpr const char *DEVICE_CLASS = "temperature";
 };
 
+// TemperatureDelta
+class TemperatureDelta : public DeviceClass {
+public:
+  enum Unit : UnitType { C = 1, F, K };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case C:
+      return "°C";
+    case F:
+      return "°F";
+    case K:
+      return "K";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "temperature_delta";
+};
+
 // Timestamp
 class Timestamp : public DeviceClass {
 public:
@@ -1237,14 +1487,31 @@ public:
 
   std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
+  std::optional<std::string> defaultStateClass() const override { return std::nullopt; }
+
 private:
   static constexpr const char *DEVICE_CLASS = "timestamp";
+};
+
+// Uptime
+class Uptime : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+  std::optional<std::string> defaultStateClass() const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "uptime";
 };
 
 // VolatileOrganicCompounds
 class VolatileOrganicCompounds : public DeviceClass {
 public:
-  enum Unit : UnitType { ug_m3 = 1 };
+  enum Unit : UnitType { ug_m3 = 1, mg_m3 };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1254,6 +1521,8 @@ public:
     switch (unit) {
     case ug_m3:
       return "µg/m³";
+    case mg_m3:
+      return "mg/m³";
     default:
       return std::nullopt;
     }
@@ -1290,7 +1559,7 @@ private:
 // Voltage
 class Voltage : public DeviceClass {
 public:
-  enum Unit : UnitType { V = 1, mV, uV };
+  enum Unit : UnitType { V = 1, mV, uV, kV, MV };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1304,6 +1573,10 @@ public:
       return "mV";
     case uV:
       return "µV";
+    case kV:
+      return "kV";
+    case MV:
+      return "MV";
     default:
       return std::nullopt;
     }
@@ -1316,11 +1589,13 @@ private:
 // Volume
 class Volume : public DeviceClass {
 public:
-  enum Unit : UnitType { L = 1, mL, gal, fl_oz, m3, ft3, CCF };
+  enum Unit : UnitType { L = 1, mL, gal, fl_oz, m3, ft3, CCF, MCF };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> defaultStateClass() const override { return "total_increasing"; }
 
   std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
     switch (unit) {
@@ -1338,6 +1613,8 @@ public:
       return "ft³";
     case CCF:
       return "CCF";
+    case MCF:
+      return "MCF";
     default:
       return std::nullopt;
     }
@@ -1350,7 +1627,7 @@ private:
 // VolumeFlowRate
 class VolumeFlowRate : public DeviceClass {
 public:
-  enum Unit : UnitType { m3_h = 1, ft3_min, L_min, gal_min, mL_s };
+  enum Unit : UnitType { m3_h = 1, ft3_min, L_min, gal_min, mL_s, m3_min, m3_s, L_h, L_s, gal_h, gal_d };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1368,6 +1645,18 @@ public:
       return "gal/min";
     case mL_s:
       return "mL/s";
+    case m3_min:
+      return "m³/min";
+    case m3_s:
+      return "m³/s";
+    case L_h:
+      return "L/h";
+    case L_s:
+      return "L/s";
+    case gal_h:
+      return "gal/h";
+    case gal_d:
+      return "gal/d";
     default:
       return std::nullopt;
     }
@@ -1380,7 +1669,7 @@ private:
 // VolumeStorage
 class VolumeStorage : public DeviceClass {
 public:
-  enum Unit : UnitType { L = 1, mL, gal, fl_oz, m3, ft3, CCF };
+  enum Unit : UnitType { L = 1, mL, gal, fl_oz, m3, ft3, CCF, MCF };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1402,6 +1691,8 @@ public:
       return "ft³";
     case CCF:
       return "CCF";
+    case MCF:
+      return "MCF";
     default:
       return std::nullopt;
     }
@@ -1414,11 +1705,13 @@ private:
 // Water
 class Water : public DeviceClass {
 public:
-  enum Unit : UnitType { L = 1, gal, m3, ft3, CCF };
+  enum Unit : UnitType { L = 1, gal, m3, ft3, CCF, MCF };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
   std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> defaultStateClass() const override { return "total_increasing"; }
 
   std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
     switch (unit) {
@@ -1432,6 +1725,8 @@ public:
       return "ft³";
     case CCF:
       return "CCF";
+    case MCF:
+      return "MCF";
     default:
       return std::nullopt;
     }
@@ -1475,10 +1770,34 @@ private:
   static constexpr const char *DEVICE_CLASS = "weight";
 };
 
+// WindDirection
+class WindDirection : public DeviceClass {
+public:
+  enum Unit : UnitType { Degree = 1 };
+
+  SensorType sensorType() const override { return SensorType::Sensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> defaultStateClass() const override { return "measurement_angle"; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType unit) const override {
+    switch (unit) {
+    case Degree:
+      return "°";
+    default:
+      return std::nullopt;
+    }
+  }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "wind_direction";
+};
+
 // WindSpeed
 class WindSpeed : public DeviceClass {
 public:
-  enum Unit : UnitType { Beaufort = 1, ft_s, km_h, kn, m_s, mph };
+  enum Unit : UnitType { Beaufort = 1, ft_s, km_h, kn, m_s, mph, in_s, m_min, mm_s };
 
   SensorType sensorType() const override { return SensorType::Sensor; }
 
@@ -1498,6 +1817,12 @@ public:
       return "m/s";
     case mph:
       return "mph";
+    case in_s:
+      return "in/s";
+    case m_min:
+      return "m/min";
+    case mm_s:
+      return "mm/s";
     default:
       return std::nullopt;
     }
@@ -1578,6 +1903,8 @@ public:
 
   std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
 
+  std::optional<std::string> defaultStateClass() const override { return std::nullopt; }
+
   std::string objectId() const override { return "json"; }
 };
 
@@ -1588,6 +1915,8 @@ public:
   std::optional<std::string> deviceClass() const override { return std::nullopt; }
 
   std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+  std::optional<std::string> defaultStateClass() const override { return std::nullopt; }
 
   std::string objectId() const override { return "string"; }
 };
@@ -1719,6 +2048,21 @@ public:
 
 private:
   static constexpr const char *DEVICE_CLASS = "gas";
+};
+
+/**
+ * @brief on means glass break detected, off means clear
+ */
+class GlassBreak : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::BinarySensor; }
+
+  std::optional<std::string> deviceClass() const override { return DEVICE_CLASS; }
+
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+
+private:
+  static constexpr const char *DEVICE_CLASS = "glass_break";
 };
 
 /**

@@ -32,9 +32,9 @@ public:
    * Assistant entities. A device is not required. If there is a device, the name displayed in the UI will be the device
    * name combined with the entity name. See
    * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information. All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
-   * Only a flat layout structure is supported, no nesting. This is called from the setup function below before we setup
-   * the remote. set to empty document if no device information should be set.
+   * information. All these keys will be added to a "device" key in the Home Assistant configuration for each entity
+   * (including arrays or nested objects such as "identifiers", "connections", or "via_device"). Set to empty document
+   * if no device information should be set.
    * @param verbose True to do extra debug logging and printouts.
    * @param availability_topic the topic to use for availabilty. Defaults to using the MQTT client ID + /status, but can
    * be anything.

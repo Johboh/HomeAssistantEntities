@@ -42,10 +42,19 @@ public:
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
+
+    /**
+     * @brief Optional regular expression pattern that the text being set or received must match in Home Assistant.
+     */
+    std::string pattern = "";
   };
 
-  inline static Configuration _default = {
-      .min_text_length = 0, .max_text_length = 255, .with_state_topic = false, .is_password = false, .retain = false};
+  inline static Configuration _default = {.min_text_length = 0,
+                                          .max_text_length = 255,
+                                          .with_state_topic = false,
+                                          .is_password = false,
+                                          .retain = false,
+                                          .pattern = ""};
 
   /**
    * @brief Construct a new Ha Entity Text object

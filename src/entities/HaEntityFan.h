@@ -85,6 +85,11 @@ public:
               Configuration configuration = _default);
 
 public:
+  enum class Direction {
+    Forward,
+    Reverse,
+  };
+
   void publishConfiguration() override;
   void republishState() override;
 
@@ -94,22 +99,28 @@ public:
    *
    * with_direction in Configuration must be set.
    *
-   * @param direction the direction to publish. Direction is a free form string.
+   * @param direction the direction to publish ("forward" or "reverse").
    */
   void publishDirection(const std::string &direction);
+  void publishDirection(Direction direction) {
+    publishDirection(direction == Direction::Forward ? "forward" : "reverse");
+  }
 
   /**
    * @brief Publish the direction, but only if the value has changed. Also see publishDirection().
    *
    * with_direction in Configuration must be set.
    *
-   * @param direction the direction to publish. Direction is a free form string.
+   * @param direction the direction to publish ("forward" or "reverse").
    */
   void updateDirection(const std::string &direction);
+  void updateDirection(Direction direction) {
+    updateDirection(direction == Direction::Forward ? "forward" : "reverse");
+  }
 
   /**
-   * @brief Set callback for receiving callbacks when there is a new direction that should be set. Direction is a free
-   * form string.
+   * @brief Set callback for receiving callbacks when there is a new direction that should be set ("forward" or
+   * "reverse").
    *
    * with_direction in Configuration must be set.
    */

@@ -50,13 +50,27 @@ public:
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
+
+    /**
+     * @brief Optional minimum color temperature (in mireds when ColorTemperature::Mireds, or Kelvin when
+     * ColorTemperature::Kelvin). Must be > 0 if set.
+     */
+    std::optional<uint16_t> min_color_temperature = std::nullopt;
+
+    /**
+     * @brief Optional maximum color temperature (in mireds when ColorTemperature::Mireds, or Kelvin when
+     * ColorTemperature::Kelvin). Must be > 0 if set.
+     */
+    std::optional<uint16_t> max_color_temperature = std::nullopt;
   };
 
   inline static Configuration _default = {.with_brightness = false,
                                           .with_color_temperature = Configuration::ColorTemperature::None,
                                           .with_rgb_color = false,
                                           .effects = {},
-                                          .retain = false};
+                                          .retain = false,
+                                          .min_color_temperature = std::nullopt,
+                                          .max_color_temperature = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Light object
@@ -222,6 +236,9 @@ public:
    * respected if the light is setup with this capability.
    */
   bool setOnRgb(std::function<void(RGB)> rgb_callback);
+
+private:
+  uint16_t clampColorTemperature(uint16_t temperature) const;
 
 private:
   std::string _name;

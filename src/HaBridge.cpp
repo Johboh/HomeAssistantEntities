@@ -30,9 +30,14 @@ void HaBridge::publishConfiguration(const std::string &component, const std::str
     doc["unique_id"] = unique_id;
   }
 
-  // Set optional device keys.
+  // Set optional device keys (required by Home Assistant for device_automation).
+  bool has_device = false;
   for (auto kv : IJsonIteratorBegin(_this_device_json_doc)) {
     doc["device"][kv.key()] = kv.value();
+    has_device = true;
+  }
+  if (component == "device_automation" && !has_device) {
+    return;
   }
 
   for (auto kv : IJsonConstIteratorBegin(specific_doc)) {
