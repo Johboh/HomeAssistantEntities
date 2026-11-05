@@ -1,3 +1,6 @@
+// Copyright (c) Johan Böhlin
+// SPDX-License-Identifier: MIT
+
 #ifndef __IJSON_H__
 #define __IJSON_H__
 

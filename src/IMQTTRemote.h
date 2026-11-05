@@ -1,3 +1,6 @@
+// Copyright (c) Johan Böhlin
+// SPDX-License-Identifier: MIT
+
 #ifndef __I_MQTT_REMOTE_H__
 #define __I_MQTT_REMOTE_H__
 

@@ -1,3 +1,6 @@
+// Copyright (c) Johan Böhlin
+// SPDX-License-Identifier: MIT
+
 #ifndef __CREDENTIALS_H__
 #define __CREDENTIALS_H__
 

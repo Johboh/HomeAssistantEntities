@@ -1,3 +1,6 @@
+// Copyright (c) Johan Böhlin
+// SPDX-License-Identifier: MIT
+
 #include "HaEntitySwitch.h"
 #include <HaUtilities.h>
 #include <IJson.h>

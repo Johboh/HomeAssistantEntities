@@ -1,3 +1,6 @@
+// Copyright (c) Johan Böhlin
+// SPDX-License-Identifier: MIT
+
 #include <Arduino.h>
 // This is for the Arduino IDE, where we always build with ArduinoJson. arduino-cli will not build/include libraries
 // that are not included anywhere. So we must include ArduinoJson.h so its available for IJson.h later.

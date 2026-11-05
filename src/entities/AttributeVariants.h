@@ -1,3 +1,6 @@
+// Copyright (c) Johan Böhlin
+// SPDX-License-Identifier: MIT
+
 #ifndef __ATTRIBUTE_VARIANTS_H__
 #define __ATTRIBUTE_VARIANTS_H__
 

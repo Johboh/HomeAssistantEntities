@@ -1,3 +1,6 @@
+// Copyright (c) Johan Böhlin
+// SPDX-License-Identifier: MIT
+
 #ifndef __HA_ENTITY_JSON_H__
 #define __HA_ENTITY_JSON_H__
 

@@ -1,3 +1,6 @@
+// Copyright (c) Johan Böhlin
+// SPDX-License-Identifier: MIT
+
 #include "credentials.h"
 #include <HaBridge.h>
 #include <MQTTRemote.h>

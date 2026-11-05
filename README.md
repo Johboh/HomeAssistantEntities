@@ -105,3 +105,6 @@ Newer versions most probably work too, but they have not been verified.
     board_build.partitions = min_spiffs.csv
     ```
   - In Arduino IDE: Tools -> Partition Scheme -> "Minimal SPIFFS (Large APPS with OTA)" or "Huge APP (3MB No OTA/1MB SPIFFS)".
+
+### License
+Licensed under the MIT License
