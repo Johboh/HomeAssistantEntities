@@ -70,8 +70,12 @@ HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc);
 HaEntityLight _ha_entity_light_left_bench(ha_bridge, "left bench", "left_bench", {.with_brightness = true});
 HaEntityLight _ha_entity_light_right_bench(ha_bridge, "right bench", "right_bench", {.with_brightness = true});
 
-bool _was_connected = false;
 unsigned long _last_publish_ms = 0;
+
+void publishConfiguration() {
+  _ha_entity_light_left_bench.publishConfiguration();
+  _ha_entity_light_right_bench.publishConfiguration();
+}
 
 void setup() {
   Serial.begin(115200);
@@ -88,31 +92,30 @@ void setup() {
   Serial.print("IP number: ");
   Serial.println(WiFi.localIP());
 
+  // Subscribe once before connecting; MQTTRemote automatically re-subscribes on reconnect.
+  _ha_entity_light_left_bench.setOnOn([&](bool on) { digitalWrite(LED_PIN, on); });
+  _ha_entity_light_right_bench.setOnBrightness(
+      [&](uint8_t brightness) { Serial.println("Got brightness " + String(brightness) + " for right light"); });
+
+  // Re-publish discovery and known state if Home Assistant restarts while we stay connected to the MQTT broker.
+  // Note: Home Assistant's birth message is not retained by default, so we also publish on MQTT (re)connection below.
+  ha_bridge.onHomeAssistantBirth([]() {
+    publishConfiguration();
+    _ha_entity_light_left_bench.republishState();
+    _ha_entity_light_right_bench.republishState();
+  });
+
   // When using Platform IO with ESP32
 #if defined(ESP32) && defined(PLATFORMIO)
   _mqtt_remote.start([](bool connected) {
     if (connected) {
-      // Publish Home Assistant Configuration for both lights once connected to MQTT.
-      _ha_entity_light_left_bench.publishConfiguration();
-      _ha_entity_light_right_bench.publishConfiguration();
-
-      // Subscribe to new light "on" state pushed by Home Assistant.
-      _ha_entity_light_left_bench.setOnOn([&](bool on) { digitalWrite(LED_PIN, on); });
-      _ha_entity_light_right_bench.setOnBrightness(
-          [&](uint8_t brightness) { Serial.println("Got brightness " + String(brightness) + " for right light"); });
+      publishConfiguration();
     }
   });
 #else // Not PlatformIO (Arduino IDE)
   _mqtt_remote.setOnConnectionChange([](bool connected) {
-    // Publish Home Assistant Configuration for both lights once connected to MQTT.
     if (connected) {
-      _ha_entity_light_left_bench.publishConfiguration();
-      _ha_entity_light_right_bench.publishConfiguration();
-
-      // Subscribe to new light "on" state pushed by Home Assistant.
-      _ha_entity_light_left_bench.setOnOn([&](bool on) { digitalWrite(LED_PIN, on); });
-      _ha_entity_light_right_bench.setOnBrightness(
-          [&](uint8_t brightness) { Serial.println("Got brightness " + String(brightness) + " for right light"); });
+      publishConfiguration();
     }
   });
 #endif

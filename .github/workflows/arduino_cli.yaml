@@ -8,6 +8,8 @@ jobs:
         example:
           - name: actuators
           - name: sensors
+          - name: child_devices
+          - name: gateway_and_lifecycle
 
     steps:
       - name: Checkout repo

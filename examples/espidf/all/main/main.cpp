@@ -61,7 +61,7 @@ void setupJsonForThisDevice() {
 
 // Setup MQTT
 MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_password,
-                        {.rx_buffer_size = 256, .tx_buffer_size = 1024, .keep_alive_s = 10});
+                        {.rx_buffer_size = 256, .tx_buffer_size = 1024, .task_size = 8192, .keep_alive_s = 10});
 
 // Create the Home Assistant bridge. This is shared across all entities.
 // We only have one per device/hardware. In our example, the name of our device is "livingroom".
@@ -197,6 +197,41 @@ extern "C" {
 void app_main();
 }
 
+void publishAllConfigurations() {
+  _ha_entity_atm.publishConfiguration();
+  _ha_entity_bool.publishConfiguration();
+  _ha_entity_bright.publishConfiguration();
+  _ha_entity_button.publishConfiguration();
+  _ha_entity_carbon_dioxide.publishConfiguration();
+  _ha_entity_cover.publishConfiguration();
+  _ha_entity_current.publishConfiguration();
+  _ha_entity_device_trigger.publishConfiguration();
+  _ha_entity_door.publishConfiguration();
+  _ha_entity_event.publishConfiguration();
+  _ha_entity_fan.publishConfiguration();
+  _ha_entity_humidity.publishConfiguration();
+  _ha_entity_json.publishConfiguration();
+  _ha_entity_light.publishConfiguration();
+  _ha_entity_lock.publishConfiguration();
+  _ha_entity_motion.publishConfiguration();
+  _ha_entity_number.publishConfiguration();
+  _ha_entity_particulate_matter.publishConfiguration();
+  _ha_entity_power.publishConfiguration();
+  _ha_entity_select.publishConfiguration();
+  _ha_entity_sensor.publishConfiguration();
+  _ha_entity_sound.publishConfiguration();
+  _ha_entity_string.publishConfiguration();
+  _ha_entity_switch.publishConfiguration();
+  _ha_entity_temperature.publishConfiguration();
+  _ha_entity_text.publishConfiguration();
+  _ha_entity_timestamp.publishConfiguration();
+  _ha_entity_unit_concentration.publishConfiguration();
+  _ha_entity_volatile_organic_compounds.publishConfiguration();
+  _ha_entity_voltage.publishConfiguration();
+  _ha_entity_weight.publishConfiguration();
+  _ha_entity_signal_strength.publishConfiguration();
+}
+
 void app_main(void) {
   setupJsonForThisDevice();
 
@@ -208,46 +243,6 @@ void app_main(void) {
   auto connected = true; // TODO (you): You need to connect to WiFi here first.
   if (connected) {
     // Connected to WIFI.
-
-    // Start MQTT
-    _mqtt_remote.start([](bool connected) {
-      if (!connected) {
-        return;
-      }
-      // Publish Home Assistant Configuration once connected to MQTT.
-      _ha_entity_atm.publishConfiguration();
-      _ha_entity_bool.publishConfiguration();
-      _ha_entity_bright.publishConfiguration();
-      _ha_entity_button.publishConfiguration();
-      _ha_entity_carbon_dioxide.publishConfiguration();
-      _ha_entity_cover.publishConfiguration();
-      _ha_entity_current.publishConfiguration();
-      _ha_entity_device_trigger.publishConfiguration();
-      _ha_entity_door.publishConfiguration();
-      _ha_entity_event.publishConfiguration();
-      _ha_entity_fan.publishConfiguration();
-      _ha_entity_humidity.publishConfiguration();
-      _ha_entity_json.publishConfiguration();
-      _ha_entity_light.publishConfiguration();
-      _ha_entity_lock.publishConfiguration();
-      _ha_entity_motion.publishConfiguration();
-      _ha_entity_number.publishConfiguration();
-      _ha_entity_particulate_matter.publishConfiguration();
-      _ha_entity_power.publishConfiguration();
-      _ha_entity_select.publishConfiguration();
-      _ha_entity_sensor.publishConfiguration();
-      _ha_entity_sound.publishConfiguration();
-      _ha_entity_string.publishConfiguration();
-      _ha_entity_switch.publishConfiguration();
-      _ha_entity_temperature.publishConfiguration();
-      _ha_entity_text.publishConfiguration();
-      _ha_entity_timestamp.publishConfiguration();
-      _ha_entity_unit_concentration.publishConfiguration();
-      _ha_entity_volatile_organic_compounds.publishConfiguration();
-      _ha_entity_voltage.publishConfiguration();
-      _ha_entity_weight.publishConfiguration();
-      _ha_entity_signal_strength.publishConfiguration();
-    });
 
     // Register for callbacks.
     _ha_entity_button.setOnPressed([]() {});
@@ -267,6 +262,17 @@ void app_main(void) {
     _ha_entity_select.setOnSelected([](std::string selected) {});
     _ha_entity_text.setOnText([](std::string text) {});
     _ha_entity_switch.setOnState([](bool on) {});
+
+    // Re-publish configurations if Home Assistant restarts while we stay connected to MQTT.
+    ha_bridge.onHomeAssistantBirth([]() { publishAllConfigurations(); });
+
+    // Start MQTT (also publish on initial/re-established MQTT connection since HA's birth message is not retained by
+    // default).
+    _mqtt_remote.start([](bool connected) {
+      if (connected) {
+        publishAllConfigurations();
+      }
+    });
 
     // Start task for periodically publishing state.
     xTaskCreate(haStateTask, "haStateTask", 4096, NULL, 15, NULL);

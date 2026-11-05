@@ -30,7 +30,7 @@ void setupJsonForThisDevice() {
 
 // Setup MQTT
 MQTTRemote _mqtt_remote(mqtt_client_id, mqtt_host, 1883, mqtt_username, mqtt_password,
-                        {.rx_buffer_size = 256, .tx_buffer_size = 1024, .keep_alive_s = 10});
+                        {.rx_buffer_size = 256, .tx_buffer_size = 1024, .task_size = 6144, .keep_alive_s = 10});
 
 // Create the Home Assistant bridge. This is shared across all entities.
 // We only have one per device/hardware. In our example, the name of our device is "livingroom".
@@ -59,6 +59,11 @@ extern "C" {
 void app_main();
 }
 
+void publishConfiguration() {
+  _ha_entity_light_left_bench.publishConfiguration();
+  _ha_entity_light_right_bench.publishConfiguration();
+}
+
 void app_main(void) {
   setupJsonForThisDevice();
 
@@ -75,19 +80,24 @@ void app_main(void) {
   if (connected) {
     // Connected to WIFI.
 
+    // Subscribe once before starting MQTT; MQTTRemote automatically re-subscribes on reconnect.
+    _ha_entity_light_left_bench.setOnOn([&](bool on) { gpio_set_level(PIN_LED, on); });
+    _ha_entity_light_right_bench.setOnBrightness(
+        [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for right light", brightness); });
+
+    // Re-publish discovery and known state if Home Assistant restarts while we stay connected to the MQTT broker.
+    // Note: Home Assistant's birth message is not retained by default, so we also publish on MQTT (re)connection below.
+    ha_bridge.onHomeAssistantBirth([]() {
+      publishConfiguration();
+      _ha_entity_light_left_bench.republishState();
+      _ha_entity_light_right_bench.republishState();
+    });
+
     // Start MQTT
     _mqtt_remote.start([](bool connected) {
-      if (!connected) {
-        return;
+      if (connected) {
+        publishConfiguration();
       }
-      // Publish Home Assistant Configuration for both lights once connected to MQTT.
-      _ha_entity_light_left_bench.publishConfiguration();
-      _ha_entity_light_right_bench.publishConfiguration();
-
-      // Subscribe to new light "on" state pushed by Home Assistant.
-      _ha_entity_light_left_bench.setOnOn([&](bool on) { gpio_set_level(PIN_LED, on); });
-      _ha_entity_light_right_bench.setOnBrightness(
-          [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for right light", brightness); });
     });
 
     // Start task for periodically publishing state.

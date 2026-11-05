@@ -40,6 +40,7 @@ public:
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void unpublishConfiguration() override { _ha_entity_sensor.unpublishConfiguration(); }
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
@@ -56,6 +57,11 @@ public:
    * @param locked true if lock is locked, or false if unlocked.
    */
   void updateLock(bool locked) { _ha_entity_sensor.updateValue(locked ? "OFF" : "ON"); } // locked == OFF
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override {
+    return buildChildComponentConfiguration(_ha_entity_sensor, out);
+  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

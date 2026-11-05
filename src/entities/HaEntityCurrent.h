@@ -61,6 +61,7 @@ public:
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void unpublishConfiguration() override { _ha_entity_sensor.unpublishConfiguration(); }
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
@@ -77,6 +78,11 @@ public:
    * @param current current in the unit specified in the configuration.
    */
   void updateCurrent(double current) { _ha_entity_sensor.updateValue(current); }
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override {
+    return buildChildComponentConfiguration(_ha_entity_sensor, out);
+  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

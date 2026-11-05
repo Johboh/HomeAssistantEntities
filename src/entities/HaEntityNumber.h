@@ -60,6 +60,16 @@ public:
      * @brief Control how the number should be displayed in the Home Assistant UI ("auto", "box", or "slider").
      */
     Mode mode = Mode::Auto;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:speedometer").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
   };
 
   inline static Configuration _default = {.min_value = 1.0f,
@@ -68,7 +78,9 @@ public:
                                           .unit = "",
                                           .device_class = "",
                                           .retain = false,
-                                          .mode = Configuration::Mode::Auto};
+                                          .mode = Configuration::Mode::Auto,
+                                          .icon = "",
+                                          .entity_category = ""};
 
   /**
    * @brief Construct a new Ha Entity Number object
@@ -88,6 +100,7 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -105,6 +118,9 @@ public:
    * @brief Set callback for receiving callbacks when there is a new number.
    */
   bool setOnNumber(std::function<void(float)> callback);
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   std::string _name;

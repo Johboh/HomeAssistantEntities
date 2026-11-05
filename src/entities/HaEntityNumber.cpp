@@ -31,9 +31,13 @@ HaEntityNumber::HaEntityNumber(HaBridge &ha_bridge, std::string name, std::strin
   }
 }
 
-void HaEntityNumber::publishConfiguration() {
-  IJsonDocument doc;
+bool HaEntityNumber::buildComponentConfiguration(ComponentConfig &out) {
+  out.component = COMPONENT;
+  out.object_id = _object_id;
+  out.child_object_id = "";
+  out.bridge = &_ha_bridge;
 
+  auto &doc = out.doc;
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
@@ -61,11 +65,29 @@ void HaEntityNumber::publishConfiguration() {
     doc["device_class"] = device_class;
   }
 
+  auto icon = trim(_configuration.icon);
+  if (!icon.empty()) {
+    doc["icon"] = icon;
+  }
+  auto ec = trim(_configuration.entity_category);
+  if (!ec.empty()) {
+    doc["entity_category"] = ec;
+  }
+
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
 
-  _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
+  return true;
 }
+
+void HaEntityNumber::publishConfiguration() {
+  ComponentConfig cfg;
+  if (buildComponentConfiguration(cfg)) {
+    _ha_bridge.publishConfiguration(cfg.component, cfg.object_id, cfg.child_object_id, cfg.doc);
+  }
+}
+
+void HaEntityNumber::unpublishConfiguration() { _ha_bridge.unpublishConfiguration(COMPONENT, _object_id, ""); }
 
 void HaEntityNumber::republishState() {
   if (_number) {

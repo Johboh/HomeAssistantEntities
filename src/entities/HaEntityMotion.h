@@ -40,6 +40,7 @@ public:
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void unpublishConfiguration() override { _ha_entity_sensor.unpublishConfiguration(); }
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
@@ -56,6 +57,11 @@ public:
    * @param detected true or false if motion is detected.
    */
   void updateMotion(bool detected) { _ha_entity_sensor.updateValue(detected ? "ON" : "OFF"); }
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override {
+    return buildChildComponentConfiguration(_ha_entity_sensor, out);
+  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

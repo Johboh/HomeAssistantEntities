@@ -62,13 +62,26 @@ HaEntityLight::HaEntityLight(HaBridge &ha_bridge, std::string name, std::string 
   }
 }
 
-void HaEntityLight::publishConfiguration() {
-  IJsonDocument doc;
+bool HaEntityLight::buildComponentConfiguration(ComponentConfig &out) {
+  out.component = COMPONENT;
+  out.object_id = OBJECT_ID;
+  out.child_object_id = _child_object_id;
+  out.bridge = &_ha_bridge;
 
+  auto &doc = out.doc;
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
     doc["name"] = nullptr;
+  }
+
+  auto icon = homeassistantentities::trim(_configuration.icon);
+  if (!icon.empty()) {
+    doc["icon"] = icon;
+  }
+  auto ec = homeassistantentities::trim(_configuration.entity_category);
+  if (!ec.empty()) {
+    doc["entity_category"] = ec;
   }
 
   doc["retain"] = _configuration.retain;
@@ -122,7 +135,18 @@ void HaEntityLight::publishConfiguration() {
     }
   }
 
-  _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
+  return true;
+}
+
+void HaEntityLight::publishConfiguration() {
+  ComponentConfig cfg;
+  if (buildComponentConfiguration(cfg)) {
+    _ha_bridge.publishConfiguration(cfg.component, cfg.object_id, cfg.child_object_id, cfg.doc);
+  }
+}
+
+void HaEntityLight::unpublishConfiguration() {
+  _ha_bridge.unpublishConfiguration(COMPONENT, OBJECT_ID, _child_object_id);
 }
 
 void HaEntityLight::republishState() {

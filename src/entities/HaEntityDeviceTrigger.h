@@ -59,12 +59,16 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
    * @brief Publish a trigger event.
    */
   void publishTrigger();
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   HaBridge &_ha_bridge;

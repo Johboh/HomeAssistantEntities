@@ -25,9 +25,13 @@ HaEntityCover::HaEntityCover(HaBridge &ha_bridge, std::string name, std::string 
   }
 }
 
-void HaEntityCover::publishConfiguration() {
-  IJsonDocument doc;
+bool HaEntityCover::buildComponentConfiguration(ComponentConfig &out) {
+  out.component = COMPONENT;
+  out.object_id = OBJECT_ID;
+  out.child_object_id = _child_object_id;
+  out.bridge = &_ha_bridge;
 
+  auto &doc = out.doc;
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
@@ -37,6 +41,14 @@ void HaEntityCover::publishConfiguration() {
   auto trimmed_device_class = trim(_configuration.device_class);
   if (!trimmed_device_class.empty()) {
     doc["device_class"] = trimmed_device_class;
+  }
+  auto icon = trim(_configuration.icon);
+  if (!icon.empty()) {
+    doc["icon"] = icon;
+  }
+  auto ec = trim(_configuration.entity_category);
+  if (!ec.empty()) {
+    doc["entity_category"] = ec;
   }
 
   if (!_configuration.read_only) {
@@ -63,7 +75,18 @@ void HaEntityCover::publishConfiguration() {
     doc["position_closed"] = _configuration.position_closed;
   }
 
-  _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
+  return true;
+}
+
+void HaEntityCover::publishConfiguration() {
+  ComponentConfig cfg;
+  if (buildComponentConfiguration(cfg)) {
+    _ha_bridge.publishConfiguration(cfg.component, cfg.object_id, cfg.child_object_id, cfg.doc);
+  }
+}
+
+void HaEntityCover::unpublishConfiguration() {
+  _ha_bridge.unpublishConfiguration(COMPONENT, OBJECT_ID, _child_object_id);
 }
 
 void HaEntityCover::republishState() { publish(_state, _position); }

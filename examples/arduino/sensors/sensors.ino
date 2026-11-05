@@ -77,6 +77,13 @@ HaEntitySensor
 
 unsigned long _last_publish_ms = 0;
 
+void publishConfiguration() {
+  _ha_entity_brightness.publishConfiguration();
+  _ha_entity_generic_sensor.publishConfiguration();
+  _ha_entity_temperature_inside.publishConfiguration();
+  _ha_entity_temperature_outside.publishConfiguration();
+}
+
 void setup() {
   Serial.begin(115200);
   setupJsonForThisDevice(); // Populate json dict.
@@ -92,25 +99,22 @@ void setup() {
   Serial.print("IP number: ");
   Serial.println(WiFi.localIP());
 
+  // Re-publish discovery configuration whenever Home Assistant restarts and announces "online" on homeassistant/status.
+  // Note: Home Assistant's birth message is published with retain=false by default, so we also publish on initial
+  // MQTT (re)connection below for when Home Assistant is already running when this device boots.
+  ha_bridge.onHomeAssistantBirth([]() { publishConfiguration(); });
+
   // When using Platform IO with ESP32
 #if defined(ESP32) && defined(PLATFORMIO)
   _mqtt_remote.start([](bool connected) {
-    // Publish Home Assistant Configuration for the sensors once connected to MQTT.
     if (connected) {
-      _ha_entity_brightness.publishConfiguration();
-      _ha_entity_generic_sensor.publishConfiguration();
-      _ha_entity_temperature_inside.publishConfiguration();
-      _ha_entity_temperature_outside.publishConfiguration();
+      publishConfiguration();
     }
   });
 #else // Not PlatformIO (Arduino IDE)
   _mqtt_remote.setOnConnectionChange([](bool connected) {
-    // Publish Home Assistant Configuration for the sensors once connected to MQTT.
     if (connected) {
-      _ha_entity_brightness.publishConfiguration();
-      _ha_entity_generic_sensor.publishConfiguration();
-      _ha_entity_temperature_inside.publishConfiguration();
-      _ha_entity_temperature_outside.publishConfiguration();
+      publishConfiguration();
     }
   });
 #endif

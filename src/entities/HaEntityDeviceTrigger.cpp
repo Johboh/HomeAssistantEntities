@@ -15,13 +15,17 @@ HaEntityDeviceTrigger::HaEntityDeviceTrigger(HaBridge &ha_bridge, std::string ob
   _configuration.subtype = homeassistantentities::trim(_configuration.subtype);
 }
 
-void HaEntityDeviceTrigger::publishConfiguration() {
+bool HaEntityDeviceTrigger::buildComponentConfiguration(ComponentConfig &out) {
   if (_configuration.type.empty() || _configuration.subtype.empty()) {
-    return;
+    return false;
   }
 
-  IJsonDocument doc;
+  out.component = COMPONENT;
+  out.object_id = _object_id;
+  out.child_object_id = "";
+  out.bridge = &_ha_bridge;
 
+  auto &doc = out.doc;
   doc["automation_type"] = "trigger";
   const std::string &payload = _configuration.payload ? *_configuration.payload : _configuration.subtype;
   if (!payload.empty()) {
@@ -32,9 +36,17 @@ void HaEntityDeviceTrigger::publishConfiguration() {
   doc["subtype"] = _configuration.subtype;
 
   doc["topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);
-
-  _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
+  return true;
 }
+
+void HaEntityDeviceTrigger::publishConfiguration() {
+  ComponentConfig cfg;
+  if (buildComponentConfiguration(cfg)) {
+    _ha_bridge.publishConfiguration(cfg.component, cfg.object_id, cfg.child_object_id, cfg.doc);
+  }
+}
+
+void HaEntityDeviceTrigger::unpublishConfiguration() { _ha_bridge.unpublishConfiguration(COMPONENT, _object_id, ""); }
 
 void HaEntityDeviceTrigger::republishState() {
   // Device triggers are never republished.

@@ -69,6 +69,16 @@ public:
      * @brief If true, tells Home Assistant to publish command messages with retain set to true.
      */
     bool retain = false;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:curtains").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
   };
 
   inline static Configuration _default = {.device_class = "curtain",
@@ -77,7 +87,9 @@ public:
                                           .position_open = 100,
                                           .with_position = true,
                                           .with_state_topic = true,
-                                          .retain = false};
+                                          .retain = false,
+                                          .icon = "",
+                                          .entity_category = ""};
 
   /**
    * @brief Construct a new Ha Entity Cover object
@@ -99,6 +111,7 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   enum class State {
@@ -148,6 +161,9 @@ public:
    * read_only is true in Configuration.
    */
   bool setOnPosition(std::function<void(uint8_t)> position_callback);
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   uint8_t clampPosition(uint8_t position) const;

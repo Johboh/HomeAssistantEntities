@@ -48,6 +48,19 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 
 *_If you can't find a sensor/actuator you need, either use the generic sensor, create a pull request to add one or raise an issue on GitHub and we'll add it to this library._
 
+### Device Topologies & Home Assistant MQTT Discovery
+In addition to standard single-component discovery (`entity.publishConfiguration()`), [HaBridge.h](./src/HaBridge.h) and [HaDeviceInformation.h](./src/HaDeviceInformation.h) support the full [Home Assistant MQTT Discovery specification](https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery):
+
+- **Child devices (`child_device` / `child_devices`)**: Create logical sub-units on a single physical device (e.g., individual outlets on a smart power strip or multi-channel relays) with `ha_bridge.childDevice(child_node_id, child_identifier, child_name)`. Entities bound to a child bridge scope their state/command topics under the child while linking to the parent device in Home Assistant.
+- **Gateways & sub-devices (`via_device`)**: Model separate physical sub-devices (BLE/Zigbee/RF nodes) routed through a hub by setting `HaBridge::DeviceInfo::via_device` to the hub's identifier (plus `connections`, `suggested_area`, `configuration_url`, `serial_number`, etc.) via `HaBridge::populateDeviceJson(...)`.
+- **Unified device-based discovery & migration**: Publish an entire device (including all components and `child_devices`) in a single MQTT discovery payload (`<prefix>/device/<node_id>/config`) with `ha_bridge.publishDeviceConfiguration({sensor_a, switch_b, ...})`. Existing deployments using per-entity discovery can migrate without losing entity IDs or history via `ha_bridge.migrateToDeviceConfiguration(...)`.
+- **Automatic ESP hardware & firmware metadata**: Populate `sw_version`, `hw_version` (chip model & silicon revision), MAC `connections`, `configuration_url` (local IPv4), and `HaBridge::OriginInfo` automatically on ESP-IDF, Arduino ESP32, and ESP8266 using `HaDeviceInformation::populateDeviceJson(...)` and `HaDeviceInformation::detectOriginInfo(...)` from [HaDeviceInformation.h](./src/HaDeviceInformation.h).
+- **Lifecycle, birth messages & MQTT Subentries**:
+  - Subscribe to Home Assistant restarts (`homeassistant/status`) with `ha_bridge.onHomeAssistantBirth(...)` to re-publish discovery and live state (used alongside your MQTT connection callback, since Home Assistant's birth message is published with `retain: false` by default).
+  - Dynamically remove entities or whole devices from Home Assistant with `entity.unpublishConfiguration()` / `ha_bridge.unpublishDeviceConfiguration()`.
+  - Customize discovery prefix (`setDiscoveryPrefix`), availability payloads (`setAvailabilityPayloads`), and entity metadata (`entity_category`, `icon`, `expire_after`, `off_delay`, `enabled_by_default`).
+  - Inspect exact state, command, availability, and discovery topics via `getTopic(...)`, `getAvailabilityTopic()`, `getDiscoveryTopic(...)`, and `getDeviceDiscoveryTopic()` when configuring Home Assistant MQTT Subentries manually.
+
 ### Installation
 #### PlatformIO (Arduino or ESP-IDF):
 Add the following to `lib_deps`:
@@ -80,9 +93,13 @@ You also need a MQTT library. See Dependencies section. Suggestion:
 ### Examples
 - [Arduino: Sensors](examples/arduino/sensors/sensors.ino)
 - [Arduino: Actuators](examples/arduino/actuators/actuators.ino)
+- [Arduino: Child Devices & Device Discovery](examples/arduino/child_devices/child_devices.ino)
+- [Arduino: Gateway (`via_device`) & Discovery Lifecycle](examples/arduino/gateway_and_lifecycle/gateway_and_lifecycle.ino)
 - [ESP-IDF: Sensors](examples/espidf/sensors/main/main.cpp)
 - [ESP-IDF: Actuators](examples/espidf/actuators/main/main.cpp)
 - [ESP-IDF: All Entities](examples/espidf/all/main/main.cpp)
+- [ESP-IDF: Child Devices & Device Discovery](examples/espidf/child_devices/main/main.cpp)
+- [ESP-IDF: Gateway (`via_device`) & Discovery Lifecycle](examples/espidf/gateway_and_lifecycle/main/main.cpp)
 
 ### Functionality verified on the following platforms and frameworks
 - ESP32 (tested with PlatformIO [espressif32@6.4.0](https://github.com/platformio/platform-espressif32) / [arduino-esp32@2.0.11](https://github.com/espressif/arduino-esp32) / [ESP-IDF@4.4.6](https://github.com/espressif/esp-idf) / [ESP-IDF@5.1.2](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C3), [ESP-IDF@5.4.1](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C6)

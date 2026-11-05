@@ -62,6 +62,16 @@ public:
      * ColorTemperature::Kelvin). Must be > 0 if set.
      */
     std::optional<uint16_t> max_color_temperature = std::nullopt;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:led-strip").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
   };
 
   inline static Configuration _default = {.with_brightness = false,
@@ -70,7 +80,9 @@ public:
                                           .effects = {},
                                           .retain = false,
                                           .min_color_temperature = std::nullopt,
-                                          .max_color_temperature = std::nullopt};
+                                          .max_color_temperature = std::nullopt,
+                                          .icon = "",
+                                          .entity_category = ""};
 
   /**
    * @brief Construct a new Ha Entity Light object
@@ -92,6 +104,7 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -236,6 +249,9 @@ public:
    * respected if the light is setup with this capability.
    */
   bool setOnRgb(std::function<void(RGB)> rgb_callback);
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   uint16_t clampColorTemperature(uint16_t temperature) const;

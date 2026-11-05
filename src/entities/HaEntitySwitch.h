@@ -22,9 +22,25 @@ public:
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
+
+    /**
+     * @brief Optional device class for this switch (e.g. "outlet" or "switch").
+     * See https://www.home-assistant.io/integrations/switch/#device-class
+     */
+    std::string device_class = "";
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:power-socket-eu").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
   };
 
-  inline static Configuration _default = {.retain = false};
+  inline static Configuration _default = {.retain = false, .device_class = "", .icon = "", .entity_category = ""};
 
   /**
    * @brief Construct a new Ha Entity Switch object
@@ -50,6 +66,7 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -71,6 +88,9 @@ public:
    * @brief Set callback for receiving callbacks when there is a new state that should be set.
    */
   bool setOnState(std::function<void(bool)> state_callback);
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   std::string _name;

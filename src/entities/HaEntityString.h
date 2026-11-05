@@ -66,6 +66,7 @@ public:
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void unpublishConfiguration() override { _ha_entity_sensor.unpublishConfiguration(); }
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
@@ -103,6 +104,11 @@ public:
    * @param attributes attributes to publish.
    */
   void updateAttributes(const Attributes::Map &attributes) { _ha_entity_sensor.updateAttributes(attributes); }
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override {
+    return buildChildComponentConfiguration(_ha_entity_sensor, out);
+  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

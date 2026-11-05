@@ -4,6 +4,11 @@
 #ifndef __HA_ENTITY_H__
 #define __HA_ENTITY_H__
 
+#include <IJson.h>
+#include <string>
+
+class HaBridge;
+
 /**
  * @brief Abstract for a HaEntity.
  *
@@ -22,14 +27,50 @@ public:
   virtual ~HaEntity() = default;
 
   /**
-   * @brief Publish the Home Assistant configuration.
+   * @brief Publish the Home Assistant configuration (single-component discovery).
    */
   virtual void publishConfiguration() = 0;
+
+  /**
+   * @brief Remove the Home Assistant configuration by publishing an empty retained payload to the discovery topic.
+   */
+  virtual void unpublishConfiguration() {}
 
   /**
    * @brief Republish any previous published state on any of the available state topics.
    */
   virtual void republishState() = 0;
+
+protected:
+  friend class HaBridge;
+
+  /**
+   * @brief Internal descriptor for an entity's MQTT discovery component payload (used for device-based discovery and
+   * migration).
+   */
+  struct ComponentConfig {
+    std::string component;
+    std::string object_id;
+    std::string child_object_id;
+    IJsonDocument doc;
+    HaBridge *bridge = nullptr;
+  };
+
+  /**
+   * @brief Populate this entity's component discovery descriptor.
+   * @return true if a valid component configuration was written to @p out.
+   */
+  virtual bool buildComponentConfiguration(ComponentConfig &out) {
+    (void)out;
+    return false;
+  }
+
+  /**
+   * @brief Helper allowing wrapper entities to delegate `buildComponentConfiguration` to an inner `HaEntity` member.
+   */
+  static bool buildChildComponentConfiguration(HaEntity &child, ComponentConfig &out) {
+    return child.buildComponentConfiguration(out);
+  }
 };
 
 #endif // __HA_ENTITY_H__

@@ -56,6 +56,7 @@ public:
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void unpublishConfiguration() override { _ha_entity_sensor.unpublishConfiguration(); }
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
@@ -73,6 +74,11 @@ public:
    * @param concentration the carbon dioxide concentration in ppm/parts per million.
    */
   void updateConcentration(double concentration) { _ha_entity_sensor.updateValue(concentration); }
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override {
+    return buildChildComponentConfiguration(_ha_entity_sensor, out);
+  }
 
 private:
   HaEntitySensor _ha_entity_sensor;

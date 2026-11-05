@@ -11,9 +11,19 @@ using namespace homeassistantentities;
 HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id,
                                const Configuration &configuration)
     : _name(trim(name)), _ha_bridge(ha_bridge), _object_id(configuration.device_class.objectId()),
-      _icon(configuration.icon), _options(configuration.options), _with_attributes(configuration.with_attributes),
-      _force_update(configuration.force_update) {
+      _icon(configuration.icon), _expire_after(configuration.expire_after), _options(configuration.options),
+      _with_attributes(configuration.with_attributes), _force_update(configuration.force_update) {
   _component = configuration.device_class.sensorType() == DeviceClass::SensorType::Sensor ? "sensor" : "binary_sensor";
+
+  if (configuration.entity_category) {
+    auto ec = trim(*configuration.entity_category);
+    if (!ec.empty()) {
+      _entity_category = ec;
+    }
+  }
+  if (_component == "binary_sensor" && configuration.off_delay) {
+    _off_delay = configuration.off_delay;
+  }
 
   if (child_object_id) {
     auto coid = trim(*child_object_id);
@@ -62,13 +72,17 @@ HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optio
   }
 }
 
-void HaEntitySensor::publishConfiguration() {
+bool HaEntitySensor::buildComponentConfiguration(ComponentConfig &out) {
   if (_device_class == "enum" && _options.empty()) {
-    return;
+    return false;
   }
 
-  IJsonDocument doc;
+  out.component = _component;
+  out.object_id = _object_id;
+  out.child_object_id = _child_object_id;
+  out.bridge = &_ha_bridge;
 
+  auto &doc = out.doc;
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
@@ -83,6 +97,15 @@ void HaEntitySensor::publishConfiguration() {
   }
   if (_icon) {
     doc["icon"] = *_icon;
+  }
+  if (_entity_category) {
+    doc["entity_category"] = *_entity_category;
+  }
+  if (_expire_after) {
+    doc["expire_after"] = *_expire_after;
+  }
+  if (_component == "binary_sensor" && _off_delay) {
+    doc["off_delay"] = *_off_delay;
   }
   doc["force_update"] = _force_update;
 
@@ -104,7 +127,18 @@ void HaEntitySensor::publishConfiguration() {
         _ha_bridge.getTopic(HaBridge::TopicType::Attributes, _component, _object_id, _child_object_id);
   }
 
-  _ha_bridge.publishConfiguration(_component, _object_id, _child_object_id, doc);
+  return true;
+}
+
+void HaEntitySensor::publishConfiguration() {
+  ComponentConfig cfg;
+  if (buildComponentConfiguration(cfg)) {
+    _ha_bridge.publishConfiguration(cfg.component, cfg.object_id, cfg.child_object_id, cfg.doc);
+  }
+}
+
+void HaEntitySensor::unpublishConfiguration() {
+  _ha_bridge.unpublishConfiguration(_component, _object_id, _child_object_id);
 }
 
 void HaEntitySensor::republishState() {

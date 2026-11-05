@@ -66,6 +66,7 @@ public:
 
 public:
   void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
+  void unpublishConfiguration() override { _ha_entity_sensor.unpublishConfiguration(); }
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
@@ -118,6 +119,11 @@ private:
                               .unit_of_measurement = homeassistantentities::Sensor::Pm10::Unit::ug_m3,
                               .force_update = configuration.force_update,
                           });
+  }
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override {
+    return buildChildComponentConfiguration(_ha_entity_sensor, out);
   }
 
 private:

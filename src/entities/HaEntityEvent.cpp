@@ -13,9 +13,17 @@ HaEntityEvent::HaEntityEvent(HaBridge &ha_bridge, std::string name, std::string 
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _object_id(std::move(object_id)),
       _configuration(std::move(configuration)) {}
 
-void HaEntityEvent::publishConfiguration() {
-  IJsonDocument doc;
+bool HaEntityEvent::buildComponentConfiguration(ComponentConfig &out) {
+  if (_configuration.event_types.empty()) {
+    return false;
+  }
 
+  out.component = COMPONENT;
+  out.object_id = _object_id;
+  out.child_object_id = "";
+  out.bridge = &_ha_bridge;
+
+  auto &doc = out.doc;
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
@@ -35,15 +43,32 @@ void HaEntityEvent::publishConfiguration() {
     break;
   }
 
+  auto icon = homeassistantentities::trim(_configuration.icon);
+  if (!icon.empty()) {
+    doc["icon"] = icon;
+  }
+  auto ec = homeassistantentities::trim(_configuration.entity_category);
+  if (!ec.empty()) {
+    doc["entity_category"] = ec;
+  }
+
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
 
   JsonArrayType event_types_array = createJsonArray(doc, "event_types");
   for (const std::string &event_type : _configuration.event_types) {
     addToJsonArray(event_types_array, event_type);
   }
-
-  _ha_bridge.publishConfiguration(COMPONENT, _object_id, "", doc);
+  return true;
 }
+
+void HaEntityEvent::publishConfiguration() {
+  ComponentConfig cfg;
+  if (buildComponentConfiguration(cfg)) {
+    _ha_bridge.publishConfiguration(cfg.component, cfg.object_id, cfg.child_object_id, cfg.doc);
+  }
+}
+
+void HaEntityEvent::unpublishConfiguration() { _ha_bridge.unpublishConfiguration(COMPONENT, _object_id, ""); }
 
 void HaEntityEvent::republishState() {
   // Events are never republished.

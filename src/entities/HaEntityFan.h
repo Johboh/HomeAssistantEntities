@@ -56,6 +56,16 @@ public:
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:fan").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
   };
 
   inline static Configuration _default = {.with_direction = false,
@@ -64,7 +74,9 @@ public:
                                           .speed_range_min = 1,
                                           .speed_range_max = 100,
                                           .presets = {},
-                                          .retain = false};
+                                          .retain = false,
+                                          .icon = "",
+                                          .entity_category = ""};
 
   /**
    * @brief Construct a new Ha Entity Fan object
@@ -91,6 +103,7 @@ public:
   };
 
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -232,6 +245,9 @@ public:
    * @brief Set callback for receiving callbacks when a new state should be set.
    */
   bool setOnState(std::function<void(bool)> callback);
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   uint32_t clampSpeed(uint32_t speed) const;

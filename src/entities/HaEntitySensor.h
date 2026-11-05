@@ -67,6 +67,23 @@ public:
      * sensors.
      */
     std::vector<std::string> options = {};
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::optional<std::string> entity_category = std::nullopt;
+
+    /**
+     * @brief Optional number of seconds after which the sensor's state expires if not updated (becomes "unavailable" in
+     * Home Assistant).
+     */
+    std::optional<uint32_t> expire_after = std::nullopt;
+
+    /**
+     * @brief For binary sensors only: number of seconds after turning on before Home Assistant automatically resets the
+     * binary sensor state back to off (useful for PIR motion sensors that only send ON events).
+     */
+    std::optional<uint32_t> off_delay = std::nullopt;
   };
 
   /**
@@ -93,6 +110,7 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -145,6 +163,9 @@ public:
    */
   void updateAttributes(const Attributes::Map &attributes);
 
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
+
 private:
   std::string _name;
   HaBridge &_ha_bridge;
@@ -155,6 +176,9 @@ private:
   std::optional<std::string> _unit_of_measurement;
   std::optional<std::string> _state_class;
   std::optional<std::string> _icon;
+  std::optional<std::string> _entity_category;
+  std::optional<uint32_t> _expire_after;
+  std::optional<uint32_t> _off_delay;
   std::vector<std::string> _options;
   bool _with_attributes;
   bool _force_update;

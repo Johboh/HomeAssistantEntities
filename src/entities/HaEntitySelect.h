@@ -29,6 +29,16 @@ public:
      * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
      */
     bool retain = false;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:format-list-bulleted").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
   };
 
   /**
@@ -49,6 +59,7 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -71,6 +82,9 @@ public:
    * @brief Set callback for receiving callbacks when there is a new option that should be set.
    */
   bool setOnSelected(std::function<void(std::string)> select_callback);
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   std::string _name;

@@ -21,13 +21,26 @@ HaEntityText::HaEntityText(HaBridge &ha_bridge, std::string name, std::string ch
   }
 }
 
-void HaEntityText::publishConfiguration() {
-  IJsonDocument doc;
+bool HaEntityText::buildComponentConfiguration(ComponentConfig &out) {
+  out.component = COMPONENT;
+  out.object_id = OBJECT_ID;
+  out.child_object_id = _child_object_id;
+  out.bridge = &_ha_bridge;
 
+  auto &doc = out.doc;
   if (!_name.empty()) {
     doc["name"] = _name;
   } else {
     doc["name"] = nullptr;
+  }
+
+  auto icon = homeassistantentities::trim(_configuration.icon);
+  if (!icon.empty()) {
+    doc["icon"] = icon;
+  }
+  auto ec = homeassistantentities::trim(_configuration.entity_category);
+  if (!ec.empty()) {
+    doc["entity_category"] = ec;
   }
 
   doc["min"] = _configuration.min_text_length;
@@ -50,7 +63,18 @@ void HaEntityText::publishConfiguration() {
 
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_TEXT);
 
-  _ha_bridge.publishConfiguration(COMPONENT, OBJECT_ID, _child_object_id, doc);
+  return true;
+}
+
+void HaEntityText::publishConfiguration() {
+  ComponentConfig cfg;
+  if (buildComponentConfiguration(cfg)) {
+    _ha_bridge.publishConfiguration(cfg.component, cfg.object_id, cfg.child_object_id, cfg.doc);
+  }
+}
+
+void HaEntityText::unpublishConfiguration() {
+  _ha_bridge.unpublishConfiguration(COMPONENT, OBJECT_ID, _child_object_id);
 }
 
 void HaEntityText::republishState() {

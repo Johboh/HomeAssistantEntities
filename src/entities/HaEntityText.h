@@ -47,6 +47,16 @@ public:
      * @brief Optional regular expression pattern that the text being set or received must match in Home Assistant.
      */
     std::string pattern = "";
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:form-textbox").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
   };
 
   inline static Configuration _default = {.min_text_length = 0,
@@ -54,7 +64,9 @@ public:
                                           .with_state_topic = false,
                                           .is_password = false,
                                           .retain = false,
-                                          .pattern = ""};
+                                          .pattern = "",
+                                          .icon = "",
+                                          .entity_category = ""};
 
   /**
    * @brief Construct a new Ha Entity Text object
@@ -76,6 +88,7 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -101,6 +114,9 @@ public:
    * @brief Set callback for receiving callbacks when there is a new text that should be set.
    */
   bool setOnText(std::function<void(std::string)> callback);
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   std::string _name;

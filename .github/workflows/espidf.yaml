@@ -25,6 +25,8 @@ jobs:
           - name: actuators
           - name: sensors
           - name: all
+          - name: child_devices
+          - name: gateway_and_lifecycle
 
     steps:
       - name: Checkout repo

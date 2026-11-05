@@ -17,6 +17,31 @@
  */
 class HaEntityButton : public HaEntity {
 public:
+  struct Configuration {
+    /**
+     * @brief Optional device class for this button (e.g. "identify", "restart", "update").
+     * See https://www.home-assistant.io/integrations/button/#device-class
+     */
+    std::string device_class = "";
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:gesture-tap-button").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
+
+    /**
+     * @brief If true, tells Home Assistant to publish the command message with retain set to true.
+     */
+    bool retain = false;
+  };
+
+  inline static Configuration _default = {.device_class = "", .icon = "", .entity_category = "", .retain = false};
+
   /**
    * @brief Construct a new Ha Entity Button object
    *
@@ -34,11 +59,14 @@ public:
    * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
    * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * @param configuration optional configuration for this button.
    */
-  HaEntityButton(HaBridge &ha_bridge, std::string name, std::string child_object_id);
+  HaEntityButton(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+                 Configuration configuration = _default);
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -46,10 +74,14 @@ public:
    */
   bool setOnPressed(std::function<void(void)> callback);
 
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
+
 private:
   std::string _name;
   HaBridge &_ha_bridge;
   std::string _child_object_id;
+  Configuration _configuration;
 };
 
 #endif // __HA_ENTITY_BUTTON_H__

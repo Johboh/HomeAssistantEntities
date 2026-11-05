@@ -36,6 +36,16 @@ public:
      * @brief the device class for this event. None to not specify (default).
      */
     DeviceClass device_class = DeviceClass::None;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:bell-ring").
+     */
+    std::string icon = "";
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::string entity_category = "";
   };
 
   /**
@@ -56,6 +66,7 @@ public:
 
 public:
   void publishConfiguration() override;
+  void unpublishConfiguration() override;
   void republishState() override;
 
   /**
@@ -65,6 +76,9 @@ public:
    * @param attributes optional attributes to send with the event.
    */
   void publishEvent(const std::string &event, const Attributes::Map &attributes = {});
+
+protected:
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   std::string _name;
