@@ -11,9 +11,14 @@ using namespace homeassistantentities;
 HaEntitySensor::HaEntitySensor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id,
                                const Configuration &configuration)
     : _name(trim(name)), _ha_bridge(ha_bridge), _object_id(configuration.device_class.objectId()),
-      _icon(configuration.icon), _expire_after(configuration.expire_after), _options(configuration.options),
+      _icon(configuration.icon), _expire_after(configuration.expire_after),
+      _enabled_by_default(configuration.enabled_by_default), _options(configuration.options),
       _with_attributes(configuration.with_attributes), _force_update(configuration.force_update) {
   _component = configuration.device_class.sensorType() == DeviceClass::SensorType::Sensor ? "sensor" : "binary_sensor";
+
+  if (_component == "sensor" && configuration.suggested_display_precision) {
+    _suggested_display_precision = configuration.suggested_display_precision;
+  }
 
   if (configuration.entity_category) {
     auto ec = trim(*configuration.entity_category);
@@ -106,6 +111,12 @@ bool HaEntitySensor::buildComponentConfiguration(ComponentConfig &out) {
   }
   if (_component == "binary_sensor" && _off_delay) {
     doc["off_delay"] = *_off_delay;
+  }
+  if (_component == "sensor" && _suggested_display_precision) {
+    doc["suggested_display_precision"] = *_suggested_display_precision;
+  }
+  if (_enabled_by_default) {
+    doc["enabled_by_default"] = *_enabled_by_default;
   }
   doc["force_update"] = _force_update;
 

@@ -19,9 +19,8 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Door (open/closed)
 - Humidity (%)
 - Json (raw "json"-sensor)
-- Lock (locked/unlocked)
+- Lock (binary sensor: locked/unlocked)
 - Motion (detected/not detected)
-- Number (with any unit and device class)
 - Particulate matter (μg/m³)
 - Power (mW, W, kW, MW, GW, TW)
 - Signal strength/RSSI (dB, dBm)
@@ -29,22 +28,23 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - String (raw "String"-sensor)
 - Temperature (°C, °F, K)
 - Timestamp
-- Text
 - Unit Concentration (parts per volume)
 - Volatile organic compounds (µg/m³, ppb)
 - Voltage (V, mV, µV)
 - Weight (kg, g, mg, ug, oz, lb, st)
 - Sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement using a device class from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
 
-### Currently supported actuators (and sensors)*
-- Cover (open/opening, close/closing, position)
+### Currently supported actuators (and controls)*
 - Button
+- Cover (open/opening, close/closing, position)
 - Device trigger
 - Event
 - Fan
 - Light (brightness, color temperature, rgb, effect)
-- Select
+- Number (value, slider/box, step, min/max, unit)
+- Select (options list)
 - Switch (on/off)
+- Text (text input, regex pattern, password mode)
 
 *_If you can't find a sensor/actuator you need, either use the generic sensor, create a pull request to add one or raise an issue on GitHub and we'll add it to this library._
 
@@ -58,7 +58,7 @@ In addition to standard single-component discovery (`entity.publishConfiguration
 - **Lifecycle, birth messages & MQTT Subentries**:
   - Subscribe to Home Assistant restarts (`homeassistant/status`) with `ha_bridge.onHomeAssistantBirth(...)` to re-publish discovery and live state (used alongside your MQTT connection callback, since Home Assistant's birth message is published with `retain: false` by default).
   - Dynamically remove entities or whole devices from Home Assistant with `entity.unpublishConfiguration()` / `ha_bridge.unpublishDeviceConfiguration()`.
-  - Customize discovery prefix (`setDiscoveryPrefix`), availability payloads (`setAvailabilityPayloads`), and entity metadata (`entity_category`, `icon`, `expire_after`, `off_delay`, `enabled_by_default`).
+  - Customize discovery prefix (`setDiscoveryPrefix`), availability payloads (`setAvailabilityPayloads`), and entity metadata (`entity_category`, `icon`, `expire_after`, `off_delay`, `suggested_display_precision`, `optimistic`, `enabled_by_default`).
   - Inspect exact state, command, availability, and discovery topics via `getTopic(...)`, `getAvailabilityTopic()`, `getDiscoveryTopic(...)`, and `getDeviceDiscoveryTopic()` when configuring Home Assistant MQTT Subentries manually.
 
 ### Installation

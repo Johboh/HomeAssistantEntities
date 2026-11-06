@@ -83,6 +83,12 @@ bool HaEntityLight::buildComponentConfiguration(ComponentConfig &out) {
   if (!ec.empty()) {
     doc["entity_category"] = ec;
   }
+  if (_configuration.optimistic) {
+    doc["optimistic"] = true;
+  }
+  if (_configuration.enabled_by_default) {
+    doc["enabled_by_default"] = *_configuration.enabled_by_default;
+  }
 
   doc["retain"] = _configuration.retain;
 

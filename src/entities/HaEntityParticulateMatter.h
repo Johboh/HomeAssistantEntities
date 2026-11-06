@@ -36,9 +36,41 @@ public:
      * message (not only when the sensor’s new state is different to the current one).
      */
     bool force_update = false;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:air-filter").
+     */
+    std::optional<std::string> icon = std::nullopt;
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::optional<std::string> entity_category = std::nullopt;
+
+    /**
+     * @brief Optional number of seconds after which the sensor's state expires if not updated.
+     */
+    std::optional<uint32_t> expire_after = std::nullopt;
+
+    /**
+     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying the value.
+     */
+    std::optional<uint8_t> suggested_display_precision = std::nullopt;
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
   };
 
-  inline static Configuration _default = {.size = Size::pm10, .force_update = false};
+  inline static Configuration _default = {.size = Size::pm10,
+                                          .force_update = false,
+                                          .icon = std::nullopt,
+                                          .entity_category = std::nullopt,
+                                          .expire_after = std::nullopt,
+                                          .suggested_display_precision = std::nullopt,
+                                          .enabled_by_default = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Particulate Matter object
@@ -88,37 +120,38 @@ private:
   static HaEntitySensor makeSensor(HaBridge &ha_bridge, const std::string &name,
                                    const std::optional<std::string> &child_object_id,
                                    const Configuration &configuration) {
+    auto makeConfig = [&](const homeassistantentities::DeviceClass &dc, homeassistantentities::UnitType unit) {
+      return HaEntitySensor::Configuration{
+          .device_class = dc,
+          .unit_of_measurement = unit,
+          .icon = configuration.icon,
+          .force_update = configuration.force_update,
+          .entity_category = configuration.entity_category,
+          .expire_after = configuration.expire_after,
+          .suggested_display_precision = configuration.suggested_display_precision,
+          .enabled_by_default = configuration.enabled_by_default,
+      };
+    };
+
     switch (configuration.size) {
     case Size::pm1:
-      return HaEntitySensor(ha_bridge, name, child_object_id,
-                            HaEntitySensor::Configuration{
-                                .device_class = homeassistantentities::Sensor::Pm1{},
-                                .unit_of_measurement = homeassistantentities::Sensor::Pm1::Unit::ug_m3,
-                                .force_update = configuration.force_update,
-                            });
+      return HaEntitySensor(
+          ha_bridge, name, child_object_id,
+          makeConfig(homeassistantentities::Sensor::Pm1{}, homeassistantentities::Sensor::Pm1::Unit::ug_m3));
     case Size::pm25:
-      return HaEntitySensor(ha_bridge, name, child_object_id,
-                            HaEntitySensor::Configuration{
-                                .device_class = homeassistantentities::Sensor::Pm25{},
-                                .unit_of_measurement = homeassistantentities::Sensor::Pm25::Unit::ug_m3,
-                                .force_update = configuration.force_update,
-                            });
+      return HaEntitySensor(
+          ha_bridge, name, child_object_id,
+          makeConfig(homeassistantentities::Sensor::Pm25{}, homeassistantentities::Sensor::Pm25::Unit::ug_m3));
     case Size::pm4:
-      return HaEntitySensor(ha_bridge, name, child_object_id,
-                            HaEntitySensor::Configuration{
-                                .device_class = homeassistantentities::Sensor::Pm4{},
-                                .unit_of_measurement = homeassistantentities::Sensor::Pm4::Unit::ug_m3,
-                                .force_update = configuration.force_update,
-                            });
+      return HaEntitySensor(
+          ha_bridge, name, child_object_id,
+          makeConfig(homeassistantentities::Sensor::Pm4{}, homeassistantentities::Sensor::Pm4::Unit::ug_m3));
     case Size::pm10:
       break;
     }
-    return HaEntitySensor(ha_bridge, name, child_object_id,
-                          HaEntitySensor::Configuration{
-                              .device_class = homeassistantentities::Sensor::Pm10{},
-                              .unit_of_measurement = homeassistantentities::Sensor::Pm10::Unit::ug_m3,
-                              .force_update = configuration.force_update,
-                          });
+    return HaEntitySensor(
+        ha_bridge, name, child_object_id,
+        makeConfig(homeassistantentities::Sensor::Pm10{}, homeassistantentities::Sensor::Pm10::Unit::ug_m3));
   }
 
 protected:

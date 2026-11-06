@@ -84,6 +84,18 @@ public:
      * binary sensor state back to off (useful for PIR motion sensors that only send ON events).
      */
     std::optional<uint32_t> off_delay = std::nullopt;
+
+    /**
+     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying the value.
+     * Only supported for sensors (not binary sensors).
+     */
+    std::optional<uint8_t> suggested_display_precision = std::nullopt;
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
   };
 
   /**
@@ -179,6 +191,8 @@ private:
   std::optional<std::string> _entity_category;
   std::optional<uint32_t> _expire_after;
   std::optional<uint32_t> _off_delay;
+  std::optional<uint8_t> _suggested_display_precision;
+  std::optional<bool> _enabled_by_default;
   std::vector<std::string> _options;
   bool _with_attributes;
   bool _force_update;

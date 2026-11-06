@@ -57,6 +57,17 @@ public:
      * @brief Optional entity category ("config" or "diagnostic").
      */
     std::string entity_category = "";
+
+    /**
+     * @brief Flag that defines if text works in optimistic mode.
+     */
+    bool optimistic = false;
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
   };
 
   inline static Configuration _default = {.min_text_length = 0,
@@ -66,7 +77,9 @@ public:
                                           .retain = false,
                                           .pattern = "",
                                           .icon = "",
-                                          .entity_category = ""};
+                                          .entity_category = "",
+                                          .optimistic = false,
+                                          .enabled_by_default = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Text object

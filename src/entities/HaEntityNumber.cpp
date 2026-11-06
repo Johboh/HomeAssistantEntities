@@ -73,6 +73,15 @@ bool HaEntityNumber::buildComponentConfiguration(ComponentConfig &out) {
   if (!ec.empty()) {
     doc["entity_category"] = ec;
   }
+  if (_configuration.optimistic) {
+    doc["optimistic"] = true;
+  }
+  if (_configuration.suggested_display_precision) {
+    doc["suggested_display_precision"] = *_configuration.suggested_display_precision;
+  }
+  if (_configuration.enabled_by_default) {
+    doc["enabled_by_default"] = *_configuration.enabled_by_default;
+  }
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
   doc["command_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id);

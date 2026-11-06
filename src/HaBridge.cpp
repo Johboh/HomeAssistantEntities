@@ -241,11 +241,11 @@ bool HaBridge::onHomeAssistantBirth(std::function<void()> callback, std::string 
   }
 
   if (need_subscribe) {
-    return _remote.subscribe(status_topic, [remote_ptr](std::string topic, std::string msg) {
+    _remote.subscribe(status_topic, [remote_ptr](std::string topic, std::string msg) {
       dispatchBirthMessage(remote_ptr, topic, msg);
     });
   }
-  return _remote.connected();
+  return true;
 }
 
 std::string HaBridge::getAvailabilityTopic() const {

@@ -30,9 +30,35 @@ public:
      * message (not only when the sensor’s new state is different to the current one).
      */
     bool force_update = false;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:clock").
+     */
+    std::optional<std::string> icon = std::nullopt;
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::optional<std::string> entity_category = std::nullopt;
+
+    /**
+     * @brief Optional number of seconds after which the sensor's state expires if not updated.
+     */
+    std::optional<uint32_t> expire_after = std::nullopt;
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
   };
 
-  inline static Configuration _default = {.with_attributes = false, .force_update = false};
+  inline static Configuration _default = {.with_attributes = false,
+                                          .force_update = false,
+                                          .icon = std::nullopt,
+                                          .entity_category = std::nullopt,
+                                          .expire_after = std::nullopt,
+                                          .enabled_by_default = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Timestamp object
@@ -60,7 +86,11 @@ public:
                               .device_class = homeassistantentities::Sensor::Timestamp{},
                               .state_class = std::nullopt,
                               .with_attributes = configuration.with_attributes,
+                              .icon = configuration.icon,
                               .force_update = configuration.force_update,
+                              .entity_category = configuration.entity_category,
+                              .expire_after = configuration.expire_after,
+                              .enabled_by_default = configuration.enabled_by_default,
                           }) {}
 
 public:

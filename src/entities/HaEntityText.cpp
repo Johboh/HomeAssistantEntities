@@ -42,6 +42,12 @@ bool HaEntityText::buildComponentConfiguration(ComponentConfig &out) {
   if (!ec.empty()) {
     doc["entity_category"] = ec;
   }
+  if (_configuration.optimistic) {
+    doc["optimistic"] = true;
+  }
+  if (_configuration.enabled_by_default) {
+    doc["enabled_by_default"] = *_configuration.enabled_by_default;
+  }
 
   doc["min"] = _configuration.min_text_length;
   doc["max"] = _configuration.max_text_length;

@@ -51,6 +51,9 @@ bool HaEntityEvent::buildComponentConfiguration(ComponentConfig &out) {
   if (!ec.empty()) {
     doc["entity_category"] = ec;
   }
+  if (_configuration.enabled_by_default) {
+    doc["enabled_by_default"] = *_configuration.enabled_by_default;
+  }
 
   doc["state_topic"] = _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _object_id);
 

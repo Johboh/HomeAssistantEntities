@@ -70,6 +70,22 @@ public:
      * @brief Optional entity category ("config" or "diagnostic").
      */
     std::string entity_category = "";
+
+    /**
+     * @brief Flag that defines if number works in optimistic mode.
+     */
+    bool optimistic = false;
+
+    /**
+     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying the value.
+     */
+    std::optional<uint8_t> suggested_display_precision = std::nullopt;
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
   };
 
   inline static Configuration _default = {.min_value = 1.0f,
@@ -80,7 +96,10 @@ public:
                                           .retain = false,
                                           .mode = Configuration::Mode::Auto,
                                           .icon = "",
-                                          .entity_category = ""};
+                                          .entity_category = "",
+                                          .optimistic = false,
+                                          .suggested_display_precision = std::nullopt,
+                                          .enabled_by_default = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Number object

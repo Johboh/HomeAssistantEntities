@@ -38,9 +38,25 @@ public:
      * @brief Optional entity category ("config" or "diagnostic").
      */
     std::string entity_category = "";
+
+    /**
+     * @brief Flag that defines if switch works in optimistic mode.
+     */
+    bool optimistic = false;
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
   };
 
-  inline static Configuration _default = {.retain = false, .device_class = "", .icon = "", .entity_category = ""};
+  inline static Configuration _default = {.retain = false,
+                                          .device_class = "",
+                                          .icon = "",
+                                          .entity_category = "",
+                                          .optimistic = false,
+                                          .enabled_by_default = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Switch object

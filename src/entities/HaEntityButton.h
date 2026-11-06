@@ -38,9 +38,16 @@ public:
      * @brief If true, tells Home Assistant to publish the command message with retain set to true.
      */
     bool retain = false;
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
   };
 
-  inline static Configuration _default = {.device_class = "", .icon = "", .entity_category = "", .retain = false};
+  inline static Configuration _default = {
+      .device_class = "", .icon = "", .entity_category = "", .retain = false, .enabled_by_default = std::nullopt};
 
   /**
    * @brief Construct a new Ha Entity Button object

@@ -17,6 +17,46 @@
  */
 class HaEntityDoor : public HaEntity {
 public:
+  struct Configuration {
+    /**
+     * In Home Assistant, trigger events even if the sensor's state hasn't changed.
+     */
+    bool force_update = false;
+
+    /**
+     * @brief Optional custom icon (e.g. "mdi:door").
+     */
+    std::optional<std::string> icon = std::nullopt;
+
+    /**
+     * @brief Optional entity category ("config" or "diagnostic").
+     */
+    std::optional<std::string> entity_category = std::nullopt;
+
+    /**
+     * @brief Optional number of seconds after which the sensor's state expires if not updated.
+     */
+    std::optional<uint32_t> expire_after = std::nullopt;
+
+    /**
+     * @brief Number of seconds after turning on before Home Assistant automatically resets back to off.
+     */
+    std::optional<uint32_t> off_delay = std::nullopt;
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
+  };
+
+  inline static Configuration _default = {.force_update = false,
+                                          .icon = std::nullopt,
+                                          .entity_category = std::nullopt,
+                                          .expire_after = std::nullopt,
+                                          .off_delay = std::nullopt,
+                                          .enabled_by_default = std::nullopt};
+
   /**
    * @brief Construct a new Ha Entity Door object
    *
@@ -30,12 +70,20 @@ public:
    * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
    * entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
+   * @param configuration the configuration for this entity.
    */
-  HaEntityDoor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt)
+  HaEntityDoor(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
+               Configuration configuration = _default)
       : _ha_entity_sensor(ha_bridge, name, child_object_id,
                           HaEntitySensor::Configuration{
                               .device_class = homeassistantentities::BinarySensor::Door{},
                               .state_class = std::nullopt,
+                              .icon = configuration.icon,
+                              .force_update = configuration.force_update,
+                              .entity_category = configuration.entity_category,
+                              .expire_after = configuration.expire_after,
+                              .off_delay = configuration.off_delay,
+                              .enabled_by_default = configuration.enabled_by_default,
                           }) {}
 
 public:

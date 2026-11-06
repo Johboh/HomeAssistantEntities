@@ -46,6 +46,12 @@ public:
      * @brief Optional entity category ("config" or "diagnostic").
      */
     std::string entity_category = "";
+
+    /**
+     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
+     * in Home Assistant when omitted.
+     */
+    std::optional<bool> enabled_by_default = std::nullopt;
   };
 
   /**
