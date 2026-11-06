@@ -77,9 +77,9 @@ public:
   void republishState() override;
 
   /**
-   * @brief Set callback for receiving callbacks when button is "pressed".
+   * @brief Set callback for receiving press commands from Home Assistant.
    */
-  bool setOnPressed(std::function<void(void)> callback);
+  bool onCommand(std::function<void(void)> callback);
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

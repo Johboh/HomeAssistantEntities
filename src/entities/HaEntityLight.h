@@ -122,18 +122,18 @@ public:
 
   /**
    * @brief Publish the current on state. This will publish to MQTT regardless if the value has changed. Also see
-   * updateIsOn().
+   * update().
    *
    * @param on if light is on or off.
    */
-  void publishIsOn(bool on);
+  void publish(bool on);
 
   /**
-   * @brief Publish the current on state, but only if the value has changed. Also see publishIsOn().
+   * @brief Publish the current on state, but only if the value has changed. Also see publish().
    *
    * @param on if light is on or off.
    */
-  void updateIsOn(bool on);
+  void update(bool on);
 
   /**
    * @brief Publish the current brightness. This will publish to MQTT regardless if the value has changed. Also see
@@ -236,32 +236,32 @@ public:
   /**
    * @brief Set callback for receiving callbacks when there is a new on state that should be set.
    */
-  bool setOnOn(std::function<void(bool)> on_state_callback);
+  bool onCommand(std::function<void(bool)> on_state_callback);
 
   /**
    * @brief Set callback for receiving callbacks when there is a new brightness that should be set. Will only be
    * respected if the light is setup with this capability.
    */
-  bool setOnBrightness(std::function<void(uint8_t)> brightness_callback);
+  bool onBrightness(std::function<void(uint8_t)> brightness_callback);
 
   /**
    * @brief Set callback for receiving callbacks when there is a new color temperature that should be set. Will only be
    * respected if the light is setup with this capability. In mireds or Kelvin, depending on what was selected in the
    * Configuration.
    */
-  bool setOnColorTemperature(std::function<void(uint16_t)> color_temperature_callback);
+  bool onColorTemperature(std::function<void(uint16_t)> color_temperature_callback);
 
   /**
    * @brief Set callback for receiving callbacks when there is a new effect that should be set. Will only be
    * respected if the light is setup with this capability.
    */
-  bool setOnEffect(std::function<void(std::string)> effect_callback);
+  bool onEffect(std::function<void(std::string)> effect_callback);
 
   /**
    * @brief Set callback for receiving callbacks when there is a new RGB value that should be set. Will only be
    * respected if the light is setup with this capability.
    */
-  bool setOnRgb(std::function<void(RGB)> rgb_callback);
+  bool onRgb(std::function<void(RGB)> rgb_callback);
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

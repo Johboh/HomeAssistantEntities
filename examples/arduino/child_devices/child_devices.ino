@@ -107,9 +107,9 @@ void setup() {
       HaDeviceInformation::detectOriginInfo("SmartPowerStrip", "https://github.com/Johboh/HomeAssistantEntities"));
 
   // Register command and Home Assistant birth subscriptions once before starting MQTT.
-  _restart_button.setOnPressed([]() { ESP.restart(); });
-  _outlet_1_switch.setOnState([](bool on) { _outlet_1_switch.publishSwitch(on); });
-  _outlet_2_switch.setOnState([](bool on) { _outlet_2_switch.publishSwitch(on); });
+  _restart_button.onCommand([]() { ESP.restart(); });
+  _outlet_1_switch.onCommand([](bool on) { _outlet_1_switch.publish(on); });
+  _outlet_2_switch.onCommand([](bool on) { _outlet_2_switch.publish(on); });
 
   // Re-publish discovery and live states whenever Home Assistant restarts (homeassistant/status -> "online").
   // Because Home Assistant's birth message is not retained by default, we also publish on MQTT (re)connection below.
@@ -137,10 +137,10 @@ void loop() {
 
   auto now = millis();
   if (now - _last_publish_ms > 10000) {
-    _board_temperature.updateTemperature(38.5);
-    _wifi_rssi.updateValue(WiFi.RSSI());
-    _outlet_1_power.updatePower(42.0);
-    _outlet_2_power.updatePower(0.0);
+    _board_temperature.update(38.5);
+    _wifi_rssi.update(WiFi.RSSI());
+    _outlet_1_power.update(42.0);
+    _outlet_2_power.update(0.0);
     _last_publish_ms = now;
   }
 }

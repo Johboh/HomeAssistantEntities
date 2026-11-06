@@ -169,13 +169,13 @@ void HaEntityCover::update(std::optional<State> state, std::optional<uint8_t> po
   }
 }
 
-bool HaEntityCover::setOnState(std::function<void(Action)> state_callback) {
-  if (_configuration.read_only || !_configuration.with_state_topic || !state_callback) {
+bool HaEntityCover::onCommand(std::function<void(Action)> callback) {
+  if (_configuration.read_only || !_configuration.with_state_topic || !callback) {
     return false;
   }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_STATE),
-      [state_callback](std::string, std::string message) {
+      [callback](std::string, std::string message) {
         Action state = Action::Unknown;
         if (message == "OPEN") {
           state = Action::Open;
@@ -186,13 +186,13 @@ bool HaEntityCover::setOnState(std::function<void(Action)> state_callback) {
         }
 
         if (state != Action::Unknown) {
-          state_callback(state);
+          callback(state);
         }
       });
 }
 
-bool HaEntityCover::setOnPosition(std::function<void(uint8_t)> position_callback) {
-  if (_configuration.read_only || !_configuration.with_position || !position_callback) {
+bool HaEntityCover::onPosition(std::function<void(uint8_t)> callback) {
+  if (_configuration.read_only || !_configuration.with_position || !callback) {
     return false;
   }
   uint8_t lo = _configuration.position_closed;
@@ -202,7 +202,7 @@ bool HaEntityCover::setOnPosition(std::function<void(uint8_t)> position_callback
   }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION),
-      [position_callback, lo, hi](std::string, std::string message) {
+      [callback, lo, hi](std::string, std::string message) {
         char *end = nullptr;
         long pos = std::strtol(message.c_str(), &end, 10);
         if (end != message.c_str() && *end == '\0' && pos >= lo && pos <= hi) {

@@ -95,18 +95,18 @@ public:
 
   /**
    * @brief Publish the humidity. This will publish to MQTT regardless if the value has changed. Also see
-   * updateHumidity().
+   * update().
    *
    * @param humidity humidity in %.
    */
-  void publishHumidity(double humidity) { _ha_entity_sensor.publishValue(humidity); }
+  void publish(double humidity) { _ha_entity_sensor.publish(humidity); }
 
   /**
-   * @brief Publish the humidity, but only if the value has changed. Also see publishHumidity().
+   * @brief Publish the humidity, but only if the value has changed. Also see publish().
    *
    * @param humidity humidity in %.
    */
-  void updateHumidity(double humidity) { _ha_entity_sensor.updateValue(humidity); }
+  void update(double humidity) { _ha_entity_sensor.update(humidity); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

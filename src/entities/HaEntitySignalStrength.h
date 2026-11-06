@@ -105,18 +105,18 @@ public:
 
   /**
    * @brief Publish the signal strength. This will publish to MQTT regardless if the value has changed. Also see
-   * updateSignalStrength().
+   * update().
    *
    * @param signal_strength signal strength in the unit specified in the configuration.
    */
-  void publishSignalStrength(double signal_strength) { _ha_entity_sensor.publishValue(signal_strength); }
+  void publish(double signal_strength) { _ha_entity_sensor.publish(signal_strength); }
 
   /**
-   * @brief Publish the signal strength, but only if the value has changed. Also see publishSignalStrength().
+   * @brief Publish the signal strength, but only if the value has changed. Also see publish().
    *
    * @param signal_strength signal strength in the unit specified in the configuration.
    */
-  void updateSignalStrength(double signal_strength) { _ha_entity_sensor.updateValue(signal_strength); }
+  void update(double signal_strength) { _ha_entity_sensor.update(signal_strength); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

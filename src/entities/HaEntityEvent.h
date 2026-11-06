@@ -81,7 +81,7 @@ public:
    * @param event the event.
    * @param attributes optional attributes to send with the event.
    */
-  void publishEvent(const std::string &event, const Attributes::Map &attributes = {});
+  void publish(const std::string &event, const Attributes::Map &attributes = {});
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

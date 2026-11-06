@@ -145,12 +145,11 @@ public:
   }
 
   /**
-   * @brief Set callback for receiving callbacks when there is a new direction that should be set ("forward" or
-   * "reverse").
+   * @brief Set callback for receiving direction commands ("forward" or "reverse") from Home Assistant.
    *
    * with_direction in Configuration must be set.
    */
-  bool setOnDirection(std::function<void(std::string)> callback);
+  bool onDirection(std::function<void(std::string)> callback);
 
   //--------------------------------------
 
@@ -174,11 +173,11 @@ public:
   void updateOscillation(bool oscillation);
 
   /**
-   * @brief Set callback for receiving callbacks when oscillation should be turned on or off.
+   * @brief Set callback for receiving oscillation commands from Home Assistant.
    *
    * with_oscillation in Configuration must be set.
    */
-  bool setOnOscillation(std::function<void(bool)> callback);
+  bool onOscillation(std::function<void(bool)> callback);
 
   //--------------------------------------
 
@@ -202,12 +201,12 @@ public:
   void updateSpeed(uint32_t speed);
 
   /**
-   * @brief Set callback for receiving callbacks when a new speed should be set. Value between speed_range_min - 1
+   * @brief Set callback for receiving speed commands from Home Assistant. Value between speed_range_min - 1
    * (representing 0%) and speed_range_max set in the Configuration.
    *
    * with_speed in Configuration must be set.
    */
-  bool setOnSpeed(std::function<void(uint32_t)> callback);
+  bool onSpeed(std::function<void(uint32_t)> callback);
 
   //--------------------------------------
 
@@ -231,33 +230,33 @@ public:
   void updatePreset(const std::string &preset);
 
   /**
-   * @brief Set callback for receiving callbacks when a new preset should be set.
+   * @brief Set callback for receiving preset commands from Home Assistant.
    *
    * presets in Configuration must be set to a non empty list.
    */
-  bool setOnPreset(std::function<void(std::string)> callback);
+  bool onPreset(std::function<void(std::string)> callback);
 
   //--------------------------------------
 
   /**
    * @brief Publish the fan state. This will publish to MQTT regardless if the value has changed. Also see
-   * updateIsOn().
+   * update().
    *
    * @param on if the fan is on or off.
    */
-  void publishIsOn(bool on);
+  void publish(bool on);
 
   /**
-   * @brief Publish the fan state, but only if the value has changed. Also see publishIsOn().
+   * @brief Publish the fan state, but only if the value has changed. Also see publish().
    *
    * @param on if the fan is on or off.
    */
-  void updateIsOn(bool on);
+  void update(bool on);
 
   /**
-   * @brief Set callback for receiving callbacks when a new state should be set.
+   * @brief Set callback for receiving on/off state commands from Home Assistant.
    */
-  bool setOnState(std::function<void(bool)> callback);
+  bool onCommand(std::function<void(bool)> callback);
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

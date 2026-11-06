@@ -69,7 +69,7 @@ void HaEntityButton::unpublishConfiguration() {
 
 void HaEntityButton::republishState() {}
 
-bool HaEntityButton::setOnPressed(std::function<void(void)> callback) {
+bool HaEntityButton::onCommand(std::function<void(void)> callback) {
   if (!callback) {
     return false;
   }

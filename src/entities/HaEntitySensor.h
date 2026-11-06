@@ -127,37 +127,37 @@ public:
 
   /**
    * @brief Publish the value for this sensor. This will publish to MQTT regardless if the value has changed. Also see
-   * updateValue().
+   * update().
    *
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void publishValue(double value, const Attributes::Map &attributes = {});
+  void publish(double value, const Attributes::Map &attributes = {});
 
   /**
-   * @brief Publish the value for this sensor, but only if the value has changed. Also see publishValue().
+   * @brief Publish the value for this sensor, but only if the value has changed. Also see publish().
    *
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void updateValue(double value, const Attributes::Map &attributes = {});
+  void update(double value, const Attributes::Map &attributes = {});
 
   /**
    * @brief Publish the value for this sensor. This will publish to MQTT regardless if the value has changed. Also see
-   * updateValue().
+   * update().
    *
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void publishValue(const std::string &value, const Attributes::Map &attributes = {});
+  void publish(const std::string &value, const Attributes::Map &attributes = {});
 
   /**
-   * @brief Publish the value for this sensor, but only if the value has changed. Also see publishValue().
+   * @brief Publish the value for this sensor, but only if the value has changed. Also see publish().
    *
    * @param value value in unit you specified during object creation.
    * @param attributes optional attributes to send with the value. with_attributes in configuration must be set.
    */
-  void updateValue(const std::string &value, const Attributes::Map &attributes = {});
+  void update(const std::string &value, const Attributes::Map &attributes = {});
 
   /**
    * @brief Publish attributes only. with_attributes in configuration must be set. This will publish to MQTT regardless

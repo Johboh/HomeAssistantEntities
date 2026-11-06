@@ -66,11 +66,11 @@ void HaEntitySelect::unpublishConfiguration() { _ha_bridge.unpublishConfiguratio
 
 void HaEntitySelect::republishState() {
   if (_selection) {
-    publishSelection(*_selection);
+    publish(*_selection);
   }
 }
 
-void HaEntitySelect::publishSelection(const std::string &option) {
+void HaEntitySelect::publish(const std::string &option) {
   const auto &options = _configuration.options;
   if (std::find(options.begin(), options.end(), option) == options.end()) {
     return;
@@ -79,21 +79,20 @@ void HaEntitySelect::publishSelection(const std::string &option) {
   _selection = option;
 }
 
-void HaEntitySelect::updateSelection(const std::string &option) {
+void HaEntitySelect::update(const std::string &option) {
   if (!_selection || *_selection != option) {
-    publishSelection(option);
+    publish(option);
   }
 }
 
-bool HaEntitySelect::setOnSelected(std::function<void(std::string)> select_callback) {
-  if (!select_callback) {
+bool HaEntitySelect::onCommand(std::function<void(std::string)> callback) {
+  if (!callback) {
     return false;
   }
-  return _ha_bridge.remote().subscribe(
-      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
-      [select_callback, options = _configuration.options](std::string, std::string message) {
-        if (std::find(options.begin(), options.end(), message) != options.end()) {
-          select_callback(message);
-        }
-      });
+  return _ha_bridge.remote().subscribe(_ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _object_id),
+                                       [callback, options = _configuration.options](std::string, std::string message) {
+                                         if (std::find(options.begin(), options.end(), message) != options.end()) {
+                                           callback(message);
+                                         }
+                                       });
 }

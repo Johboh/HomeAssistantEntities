@@ -65,7 +65,7 @@ public:
   /**
    * @brief Publish a trigger event.
    */
-  void publishTrigger();
+  void publish();
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

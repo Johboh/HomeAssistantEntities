@@ -106,27 +106,27 @@ public:
 
   /**
    * @brief Publish the text. This will publish to MQTT regardless if the text has changed. Also see
-   * updateText().
+   * update().
    *
    * with_state_topic in Configuration must be set.
    *
    * @param str the text to publish.
    */
-  void publishText(const std::string &str);
+  void publish(const std::string &str);
 
   /**
-   * @brief Publish the text, but only if the text has changed. Also see publishText().
+   * @brief Publish the text, but only if the text has changed. Also see publish().
    *
    * with_state_topic in Configuration must be set.
    *
    * @param str the text to publish.
    */
-  void updateText(const std::string &str);
+  void update(const std::string &str);
 
   /**
-   * @brief Set callback for receiving callbacks when there is a new text that should be set.
+   * @brief Set callback for receiving commands from Home Assistant.
    */
-  bool setOnText(std::function<void(std::string)> callback);
+  bool onCommand(std::function<void(std::string)> callback);
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

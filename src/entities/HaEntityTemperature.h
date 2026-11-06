@@ -103,18 +103,18 @@ public:
 
   /**
    * @brief Publish the temperature. This will publish to MQTT regardless if the value has changed. Also see
-   * updateTemperature().
+   * update().
    *
    * @param temperature temperature in the unit specified in the configuration.
    */
-  void publishTemperature(double temperature) { _ha_entity_sensor.publishValue(temperature); }
+  void publish(double temperature) { _ha_entity_sensor.publish(temperature); }
 
   /**
-   * @brief Publish the temperature, but only if the value has changed. Also see publishTemperature().
+   * @brief Publish the temperature, but only if the value has changed. Also see publish().
    *
    * @param temperature temperature in the unit specified in the configuration.
    */
-  void updateTemperature(double temperature) { _ha_entity_sensor.updateValue(temperature); }
+  void update(double temperature) { _ha_entity_sensor.update(temperature); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

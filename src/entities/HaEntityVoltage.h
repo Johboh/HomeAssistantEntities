@@ -103,18 +103,18 @@ public:
 
   /**
    * @brief Publish the voltage. This will publish to MQTT regardless if the value has changed. Also see
-   * updateVoltage().
+   * update().
    *
    * @param voltage voltage in the unit specified in the configuration.
    */
-  void publishVoltage(double voltage) { _ha_entity_sensor.publishValue(voltage); }
+  void publish(double voltage) { _ha_entity_sensor.publish(voltage); }
 
   /**
-   * @brief Publish the voltage, but only if the value has changed. Also see publishVoltage().
+   * @brief Publish the voltage, but only if the value has changed. Also see publish().
    *
    * @param voltage voltage in the unit specified in the configuration.
    */
-  void updateVoltage(double voltage) { _ha_entity_sensor.updateValue(voltage); }
+  void update(double voltage) { _ha_entity_sensor.update(voltage); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

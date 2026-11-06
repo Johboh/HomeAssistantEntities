@@ -52,7 +52,7 @@ void HaEntityDeviceTrigger::republishState() {
   // Device triggers are never republished.
 }
 
-void HaEntityDeviceTrigger::publishTrigger() {
+void HaEntityDeviceTrigger::publish() {
   if (_configuration.type.empty() || _configuration.subtype.empty()) {
     return;
   }

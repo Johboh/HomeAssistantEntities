@@ -100,50 +100,50 @@ public:
 
   /**
    * @brief Publish the timestamp. This will publish to MQTT regardless if the string has changed. Also see
-   * updateTimestamp().
+   * update().
    *
    * @param time the timestamp to publish.
    * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
    */
-  void publishTimestamp(const struct tm *time, const Attributes::Map &attributes = {}) {
+  void publish(const struct tm *time, const Attributes::Map &attributes = {}) {
     auto formatted = formatTimestamp(time);
     if (formatted) {
-      publishTimestamp(*formatted, attributes);
+      publish(*formatted, attributes);
     }
   }
 
   /**
    * @brief Publish the timestamp. This will publish to MQTT regardless if the string has changed. Also see
-   * updateTimestamp().
+   * update().
    *
    * @param time the timestamp to publish, ISO 8601 UTC
    * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
    */
-  void publishTimestamp(const std::string &time, const Attributes::Map &attributes = {}) {
-    _ha_entity_sensor.publishValue(time, attributes);
+  void publish(const std::string &time, const Attributes::Map &attributes = {}) {
+    _ha_entity_sensor.publish(time, attributes);
   }
 
   /**
-   * @brief Publish the timestamp, but only if the timestamp has changed. Also see publishTimestamp().
+   * @brief Publish the timestamp, but only if the timestamp has changed. Also see publish().
    *
    * @param time the timestamp to publish.
    * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
    */
-  void updateTimestamp(const struct tm *time, const Attributes::Map &attributes = {}) {
+  void update(const struct tm *time, const Attributes::Map &attributes = {}) {
     auto formatted = formatTimestamp(time);
     if (formatted) {
-      _ha_entity_sensor.updateValue(*formatted, attributes);
+      _ha_entity_sensor.update(*formatted, attributes);
     }
   }
 
   /**
-   * @brief Publish the timestamp, but only if the timestamp has changed. Also see publishTimestamp().
+   * @brief Publish the timestamp, but only if the timestamp has changed. Also see publish().
    *
    * @param time the timestamp to publish, ISO 8601 UTC
    * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
    */
-  void updateTimestamp(const std::string &time, const Attributes::Map &attributes = {}) {
-    _ha_entity_sensor.updateValue(time, attributes);
+  void update(const std::string &time, const Attributes::Map &attributes = {}) {
+    _ha_entity_sensor.update(time, attributes);
   }
 
   /**

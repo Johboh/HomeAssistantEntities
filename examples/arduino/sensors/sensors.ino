@@ -128,10 +128,10 @@ void loop() {
   // Publish temperature and brightness status every 10 seconds.
   auto now = millis();
   if (now - _last_publish_ms > 10000) {
-    _ha_entity_brightness.publishBrightness(128);
-    _ha_entity_generic_sensor.publishValue(100.0);
-    _ha_entity_temperature_inside.publishTemperature(22.5);
-    _ha_entity_temperature_outside.publishTemperature(6.8);
+    _ha_entity_brightness.publish(128);
+    _ha_entity_generic_sensor.publish(100.0);
+    _ha_entity_temperature_inside.publish(22.5);
+    _ha_entity_temperature_outside.publish(6.8);
     _last_publish_ms = now;
   }
 }

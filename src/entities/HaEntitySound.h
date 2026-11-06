@@ -94,18 +94,18 @@ public:
 
   /**
    * @brief Publish the sound. This will publish to MQTT regardless if the value has changed. Also see
-   * updateSound().
+   * update().
    *
    * @param detected true if sound was detected, false if not.
    */
-  void publishSound(bool detected) { _ha_entity_sensor.publishValue(detected ? "ON" : "OFF"); }
+  void publish(bool detected) { _ha_entity_sensor.publish(detected ? "ON" : "OFF"); }
 
   /**
-   * @brief Publish the sound, but only if the value has changed. Also see publishSound().
+   * @brief Publish the sound, but only if the value has changed. Also see publish().
    *
    * @param detected true if sound was detected, false if not.
    */
-  void updateSound(bool detected) { _ha_entity_sensor.updateValue(detected ? "ON" : "OFF"); }
+  void update(bool detected) { _ha_entity_sensor.update(detected ? "ON" : "OFF"); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

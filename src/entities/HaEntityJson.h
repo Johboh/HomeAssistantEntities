@@ -93,23 +93,23 @@ public:
 
   /**
    * @brief Publish the JSON. This will publish to MQTT regardless if the value has changed. Also see
-   * updateJson().
+   * update().
    *
    * @param json_doc the JSON document to publish.
    */
-  void publishJson(const IJsonDocument &json_doc) {
+  void publish(const IJsonDocument &json_doc) {
     auto message = toJsonString(json_doc);
-    _ha_entity_sensor.publishValue(message);
+    _ha_entity_sensor.publish(message);
   }
 
   /**
-   * @brief Publish the JSON, but only if the value has changed. Also see publishJson().
+   * @brief Publish the JSON, but only if the value has changed. Also see publish().
    *
    * @param json_doc the JSON document to publish.
    */
-  void updateJson(const IJsonDocument &json_doc) {
+  void update(const IJsonDocument &json_doc) {
     auto message = toJsonString(json_doc);
-    _ha_entity_sensor.updateValue(message);
+    _ha_entity_sensor.update(message);
   }
 
 protected:

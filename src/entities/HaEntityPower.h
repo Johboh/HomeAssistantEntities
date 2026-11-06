@@ -103,18 +103,18 @@ public:
 
   /**
    * @brief Publish the power. This will publish to MQTT regardless if the value has changed. Also see
-   * updatePower().
+   * update().
    *
    * @param power power in the unit specified in the configuration.
    */
-  void publishPower(double power) { _ha_entity_sensor.publishValue(power); }
+  void publish(double power) { _ha_entity_sensor.publish(power); }
 
   /**
-   * @brief Publish the power, but only if the value has changed. Also see publishPower().
+   * @brief Publish the power, but only if the value has changed. Also see publish().
    *
    * @param power power in the unit specified in the configuration.
    */
-  void updatePower(double power) { _ha_entity_sensor.updateValue(power); }
+  void update(double power) { _ha_entity_sensor.update(power); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

@@ -103,18 +103,18 @@ public:
 
   /**
    * @brief Publish the weight. This will publish to MQTT regardless if the value has changed. Also see
-   * updateWeight().
+   * update().
    *
    * @param weight weight in the unit specified in the configuration.
    */
-  void publishWeight(double weight) { _ha_entity_sensor.publishValue(weight); }
+  void publish(double weight) { _ha_entity_sensor.publish(weight); }
 
   /**
-   * @brief Publish the weight, but only if the value has changed. Also see publishWeight().
+   * @brief Publish the weight, but only if the value has changed. Also see publish().
    *
    * @param weight weight in the unit specified in the configuration.
    */
-  void updateWeight(double weight) { _ha_entity_sensor.updateValue(weight); }
+  void update(double weight) { _ha_entity_sensor.update(weight); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

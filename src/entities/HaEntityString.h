@@ -101,23 +101,23 @@ public:
 
   /**
    * @brief Publish the string. This will publish to MQTT regardless if the string has changed. Also see
-   * updateString().
+   * update().
    *
    * @param str the string to publish.
    * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
    */
-  void publishString(const std::string &str, const Attributes::Map &attributes = {}) {
-    _ha_entity_sensor.publishValue(str, attributes);
+  void publish(const std::string &str, const Attributes::Map &attributes = {}) {
+    _ha_entity_sensor.publish(str, attributes);
   }
 
   /**
-   * @brief Publish the string, but only if the string has changed. Also see publishString().
+   * @brief Publish the string, but only if the string has changed. Also see publish().
    *
    * @param str the string to publish.
    * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
    */
-  void updateString(const std::string &str, const Attributes::Map &attributes = {}) {
-    _ha_entity_sensor.updateValue(str, attributes);
+  void update(const std::string &str, const Attributes::Map &attributes = {}) {
+    _ha_entity_sensor.update(str, attributes);
   }
 
   /**

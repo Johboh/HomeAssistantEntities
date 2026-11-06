@@ -105,18 +105,18 @@ public:
 
   /**
    * @brief Publish the pressure. This will publish to MQTT regardless if the value has changed. Also see
-   * updateAtmosphericPressure().
+   * update().
    *
    * @param pressure pressure in the unit specified in the configuration.
    */
-  void publishAtmosphericPressure(double pressure) { _ha_entity_sensor.publishValue(pressure); }
+  void publish(double pressure) { _ha_entity_sensor.publish(pressure); }
 
   /**
-   * @brief Publish the pressure, but only if the value has changed. Also see publishAtmosphericPressure().
+   * @brief Publish the pressure, but only if the value has changed. Also see publish().
    *
    * @param pressure pressure in the unit specified in the configuration.
    */
-  void updateAtmosphericPressure(double pressure) { _ha_entity_sensor.updateValue(pressure); }
+  void update(double pressure) { _ha_entity_sensor.update(pressure); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

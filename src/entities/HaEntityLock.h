@@ -93,18 +93,18 @@ public:
 
   /**
    * @brief Publish the lock. This will publish to MQTT regardless if the value has changed. Also see
-   * updateLock().
+   * update().
    *
    * @param locked true if lock is locked, or false if unlocked.
    */
-  void publishLock(bool locked) { _ha_entity_sensor.publishValue(locked ? "OFF" : "ON"); } // locked == OFF
+  void publish(bool locked) { _ha_entity_sensor.publish(locked ? "OFF" : "ON"); } // locked == OFF
 
   /**
-   * @brief Publish the lock, but only if the value has changed. Also see publishLock().
+   * @brief Publish the lock, but only if the value has changed. Also see publish().
    *
    * @param locked true if lock is locked, or false if unlocked.
    */
-  void updateLock(bool locked) { _ha_entity_sensor.updateValue(locked ? "OFF" : "ON"); } // locked == OFF
+  void update(bool locked) { _ha_entity_sensor.update(locked ? "OFF" : "ON"); } // locked == OFF
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

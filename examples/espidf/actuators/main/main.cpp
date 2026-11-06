@@ -48,9 +48,9 @@ void haStateTask(void *pvParameters) {
     bool on = gpio_get_level(PIN_LED);
     // Left light is state of LED, and we publish brightness as well as we "know" it at this time.
     // Right light is inverse state of LED, but we don't publish brightness as we don't "know" it at this time.
-    _ha_entity_light_left_bench.publishIsOn(on);
+    _ha_entity_light_left_bench.publish(on);
     _ha_entity_light_left_bench.publishBrightness(255);
-    _ha_entity_light_right_bench.publishIsOn(!on);
+    _ha_entity_light_right_bench.publish(!on);
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }
@@ -81,8 +81,8 @@ void app_main(void) {
     // Connected to WIFI.
 
     // Subscribe once before starting MQTT; MQTTRemote automatically re-subscribes on reconnect.
-    _ha_entity_light_left_bench.setOnOn([&](bool on) { gpio_set_level(PIN_LED, on); });
-    _ha_entity_light_right_bench.setOnBrightness(
+    _ha_entity_light_left_bench.onCommand([&](bool on) { gpio_set_level(PIN_LED, on); });
+    _ha_entity_light_right_bench.onBrightness(
         [&](uint8_t brightness) { ESP_LOGI(TAG, "Got brightness %d for right light", brightness); });
 
     // Re-publish discovery and known state if Home Assistant restarts while we stay connected to the MQTT broker.

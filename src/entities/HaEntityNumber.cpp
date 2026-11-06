@@ -100,11 +100,11 @@ void HaEntityNumber::unpublishConfiguration() { _ha_bridge.unpublishConfiguratio
 
 void HaEntityNumber::republishState() {
   if (_number) {
-    publishNumber(*_number);
+    publish(*_number);
   }
 }
 
-void HaEntityNumber::publishNumber(float number) {
+void HaEntityNumber::publish(float number) {
   if (!std::isfinite(number)) {
     return;
   }
@@ -114,17 +114,17 @@ void HaEntityNumber::publishNumber(float number) {
   _number = clamped;
 }
 
-void HaEntityNumber::updateNumber(float number) {
+void HaEntityNumber::update(float number) {
   if (!std::isfinite(number)) {
     return;
   }
   float clamped = std::clamp(number, _configuration.min_value, _configuration.max_value);
   if (!_number || *_number != clamped) {
-    publishNumber(clamped);
+    publish(clamped);
   }
 }
 
-bool HaEntityNumber::setOnNumber(std::function<void(float)> callback) {
+bool HaEntityNumber::onCommand(std::function<void(float)> callback) {
   if (!callback) {
     return false;
   }

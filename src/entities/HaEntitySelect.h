@@ -75,24 +75,24 @@ public:
 
   /**
    * @brief Publish the current selected option. Must be one of the options in the options list. This will publish to
-   * MQTT regardless if the value has changed. Also see updateSelection().
+   * MQTT regardless if the value has changed. Also see update().
    *
    * @param option the option selected.
    */
-  void publishSelection(const std::string &option);
+  void publish(const std::string &option);
 
   /**
-   * @brief Publish the current selected option, but only if the value has changed. Also see publishSelection(). Must be
+   * @brief Publish the current selected option, but only if the value has changed. Also see publish(). Must be
    * one of the options in the options list.
    *
    * @param option the option selected.
    */
-  void updateSelection(const std::string &option);
+  void update(const std::string &option);
 
   /**
-   * @brief Set callback for receiving callbacks when there is a new option that should be set.
+   * @brief Set callback for receiving commands from Home Assistant.
    */
-  bool setOnSelected(std::function<void(std::string)> select_callback);
+  bool onCommand(std::function<void(std::string)> callback);
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

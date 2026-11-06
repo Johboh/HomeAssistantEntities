@@ -56,10 +56,10 @@ HaEntitySensor
 
 void haStateTask(void *pvParameters) {
   while (1) {
-    _ha_entity_brightness.publishBrightness(128);
-    _ha_entity_generic_sensor.publishValue(100.0);
-    _ha_entity_temperature_inside.publishTemperature(22.5);
-    _ha_entity_temperature_outside.publishTemperature(6.8);
+    _ha_entity_brightness.publish(128);
+    _ha_entity_generic_sensor.publish(100.0);
+    _ha_entity_temperature_inside.publish(22.5);
+    _ha_entity_temperature_outside.publish(6.8);
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }

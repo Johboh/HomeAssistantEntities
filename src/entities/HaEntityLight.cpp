@@ -157,7 +157,7 @@ void HaEntityLight::unpublishConfiguration() {
 
 void HaEntityLight::republishState() {
   if (_on) {
-    publishIsOn(*_on);
+    publish(*_on);
   }
   if (_brightness) {
     publishBrightness(*_brightness);
@@ -173,7 +173,7 @@ void HaEntityLight::republishState() {
   }
 }
 
-void HaEntityLight::publishIsOn(bool on) {
+void HaEntityLight::publish(bool on) {
   _ha_bridge.publishMessage(
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF), on ? "ON" : "OFF");
   _on = on;
@@ -223,9 +223,9 @@ void HaEntityLight::publishEffect(const std::string &effect) {
   _effect = effect;
 }
 
-void HaEntityLight::updateIsOn(bool on) {
+void HaEntityLight::update(bool on) {
   if (!_on || *_on != on) {
-    publishIsOn(on);
+    publish(on);
   }
 }
 
@@ -257,7 +257,7 @@ void HaEntityLight::updateEffect(const std::string &effect) {
   }
 }
 
-bool HaEntityLight::setOnOn(std::function<void(bool)> state_callback) {
+bool HaEntityLight::onCommand(std::function<void(bool)> state_callback) {
   if (!state_callback) {
     return false;
   }
@@ -266,7 +266,7 @@ bool HaEntityLight::setOnOn(std::function<void(bool)> state_callback) {
       [state_callback](std::string, std::string message) { state_callback(message == "ON"); });
 }
 
-bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
+bool HaEntityLight::onBrightness(std::function<void(uint8_t)> callback) {
   if (!_configuration.with_brightness || !callback) {
     return false;
   }
@@ -282,7 +282,7 @@ bool HaEntityLight::setOnBrightness(std::function<void(uint8_t)> callback) {
       });
 }
 
-bool HaEntityLight::setOnColorTemperature(std::function<void(uint16_t)> callback) {
+bool HaEntityLight::onColorTemperature(std::function<void(uint16_t)> callback) {
   if (_configuration.with_color_temperature == Configuration::ColorTemperature::None || !callback) {
     return false;
   }
@@ -300,7 +300,7 @@ bool HaEntityLight::setOnColorTemperature(std::function<void(uint16_t)> callback
       });
 }
 
-bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
+bool HaEntityLight::onRgb(std::function<void(RGB)> callback) {
   if (!_configuration.with_rgb_color || !callback) {
     return false;
   }
@@ -315,7 +315,7 @@ bool HaEntityLight::setOnRgb(std::function<void(RGB)> callback) {
       });
 }
 
-bool HaEntityLight::setOnEffect(std::function<void(std::string)> callback) {
+bool HaEntityLight::onEffect(std::function<void(std::string)> callback) {
   if (_configuration.effects.empty() || !callback) {
     return false;
   }

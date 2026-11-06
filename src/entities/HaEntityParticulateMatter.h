@@ -103,18 +103,18 @@ public:
 
   /**
    * @brief Publish the particle concentration. This will publish to MQTT regardless if the value has changed. Also see
-   * updateConcentration().
+   * update().
    *
    * @param concentration concentration of particles.
    */
-  void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
+  void publish(double concentration) { _ha_entity_sensor.publish(concentration); }
 
   /**
-   * @brief Publish the particle concentration, but only if the value has changed. Also see publishConcentration().
+   * @brief Publish the particle concentration, but only if the value has changed. Also see publish().
    *
    * @param concentration concentration of particles.
    */
-  void updateConcentration(double concentration) { _ha_entity_sensor.updateValue(concentration); }
+  void update(double concentration) { _ha_entity_sensor.update(concentration); }
 
 private:
   static HaEntitySensor makeSensor(HaBridge &ha_bridge, const std::string &name,

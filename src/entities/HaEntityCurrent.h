@@ -103,18 +103,18 @@ public:
 
   /**
    * @brief Publish the current. This will publish to MQTT regardless if the value has changed. Also see
-   * updateCurrent().
+   * update().
    *
    * @param current current in the unit specified in the configuration.
    */
-  void publishCurrent(double current) { _ha_entity_sensor.publishValue(current); }
+  void publish(double current) { _ha_entity_sensor.publish(current); }
 
   /**
-   * @brief Publish the current, but only if the value has changed. Also see publishCurrent().
+   * @brief Publish the current, but only if the value has changed. Also see publish().
    *
    * @param current current in the unit specified in the configuration.
    */
-  void updateCurrent(double current) { _ha_entity_sensor.updateValue(current); }
+  void update(double current) { _ha_entity_sensor.update(current); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

@@ -108,24 +108,24 @@ public:
 
   /**
    * @brief Publish the boolean value for the binary sensor. This will publish to MQTT regardless if the value has
-   * changed. Also see updateBoolean().
+   * changed. Also see update().
    *
    * @param value the value to publish.
    * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
    */
-  void publishBoolean(bool value, const Attributes::Map &attributes = {}) {
-    _ha_entity_sensor.publishValue(value ? "ON" : "OFF", attributes);
+  void publish(bool value, const Attributes::Map &attributes = {}) {
+    _ha_entity_sensor.publish(value ? "ON" : "OFF", attributes);
   }
 
   /**
    * @brief Publish the boolean value for the binary sensor, but only if the value has changed. Also see
-   * publishBoolean().
+   * publish().
    *
    * @param value the value to publish.
    * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
    */
-  void updateBoolean(bool value, const Attributes::Map &attributes = {}) {
-    _ha_entity_sensor.updateValue(value ? "ON" : "OFF", attributes);
+  void update(bool value, const Attributes::Map &attributes = {}) {
+    _ha_entity_sensor.update(value ? "ON" : "OFF", attributes);
   }
 
   /**

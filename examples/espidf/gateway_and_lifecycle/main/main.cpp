@@ -68,9 +68,9 @@ HaEntityTemperature _deprecated_sensor(garden_sensor_bridge, "Legacy Probe", "le
 
 void haStateTask(void *pvParameters) {
   while (1) {
-    _garden_temperature.updateTemperature(18.4);
-    _garden_pir.publishValue("ON");
-    _energy_cost.updateValue(1.42);
+    _garden_temperature.update(18.4);
+    _garden_pir.publish("ON");
+    _energy_cost.update(1.42);
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }
@@ -107,7 +107,7 @@ extern "C" void app_main(void) {
   // Multiple bridges sharing the same MQTTRemote can each register an onHomeAssistantBirth handler.
   gateway_bridge.onHomeAssistantBirth([]() {
     gateway_bridge.publishDeviceConfiguration({_gateway_state});
-    _gateway_state.publishValue("scanning");
+    _gateway_state.publish("scanning");
   });
   garden_sensor_bridge.onHomeAssistantBirth([]() {
     garden_sensor_bridge.publishDeviceConfiguration({_garden_temperature, _garden_pir, _energy_cost});
@@ -120,7 +120,7 @@ extern "C" void app_main(void) {
       return;
     }
     gateway_bridge.publishDeviceConfiguration({_gateway_state});
-    _gateway_state.publishValue("scanning");
+    _gateway_state.publish("scanning");
 
     // Migrate active entities from single-component discovery to unified device-based discovery,
     // and remove a deprecated entity's retained discovery message.

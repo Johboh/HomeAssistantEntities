@@ -94,18 +94,18 @@ public:
 
   /**
    * @brief Publish the motion. This will publish to MQTT regardless if the value has changed. Also see
-   * updateMotion().
+   * update().
    *
    * @param detected true or false if motion is detected.
    */
-  void publishMotion(bool detected) { _ha_entity_sensor.publishValue(detected ? "ON" : "OFF"); }
+  void publish(bool detected) { _ha_entity_sensor.publish(detected ? "ON" : "OFF"); }
 
   /**
-   * @brief Publish the motion, but only if the value has changed. Also see publishMotion().
+   * @brief Publish the motion, but only if the value has changed. Also see publish().
    *
    * @param detected true or false if motion is detected.
    */
-  void updateMotion(bool detected) { _ha_entity_sensor.updateValue(detected ? "ON" : "OFF"); }
+  void update(bool detected) { _ha_entity_sensor.update(detected ? "ON" : "OFF"); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

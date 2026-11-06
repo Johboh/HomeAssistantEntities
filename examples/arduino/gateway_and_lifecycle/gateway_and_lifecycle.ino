@@ -76,7 +76,7 @@ unsigned long _last_publish_ms = 0;
 
 void publishGatewayDiscoveryAndState() {
   gateway_bridge.publishDeviceConfiguration({_gateway_state});
-  _gateway_state.publishValue("scanning");
+  _gateway_state.publish("scanning");
 }
 
 void publishGardenNodeDiscoveryAndState() {
@@ -147,8 +147,8 @@ void loop() {
 
   auto now = millis();
   if (now - _last_publish_ms > 10000) {
-    _garden_temperature.updateTemperature(18.4);
-    _garden_pir.publishValue("ON");
+    _garden_temperature.update(18.4);
+    _garden_pir.publish("ON");
     _last_publish_ms = now;
   }
 }

@@ -85,11 +85,11 @@ void HaEntityText::unpublishConfiguration() {
 
 void HaEntityText::republishState() {
   if (_str) {
-    publishText(*_str);
+    publish(*_str);
   }
 }
 
-void HaEntityText::publishText(const std::string &str) {
+void HaEntityText::publish(const std::string &str) {
   if (!_configuration.with_state_topic) {
     return;
   }
@@ -102,17 +102,17 @@ void HaEntityText::publishText(const std::string &str) {
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_TEXT), str);
 }
 
-void HaEntityText::updateText(const std::string &str) {
+void HaEntityText::update(const std::string &str) {
   auto len = homeassistantentities::utf8CodePointCount(str);
   if (len < _configuration.min_text_length || len > _configuration.max_text_length) {
     return;
   }
   if (!_str || *_str != str) {
-    publishText(str);
+    publish(str);
   }
 }
 
-bool HaEntityText::setOnText(std::function<void(std::string)> callback) {
+bool HaEntityText::onCommand(std::function<void(std::string)> callback) {
   if (!callback) {
     return false;
   }

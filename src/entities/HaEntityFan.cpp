@@ -112,7 +112,7 @@ void HaEntityFan::unpublishConfiguration() {
 
 void HaEntityFan::republishState() {
   if (_on) {
-    publishIsOn(*_on);
+    publish(*_on);
   }
   if (_speed) {
     publishSpeed(*_speed);
@@ -151,7 +151,7 @@ void HaEntityFan::updateDirection(const std::string &direction) {
   }
 }
 
-bool HaEntityFan::setOnDirection(std::function<void(std::string)> callback) {
+bool HaEntityFan::onDirection(std::function<void(std::string)> callback) {
   if (!_configuration.with_direction || !callback) {
     return false;
   }
@@ -183,7 +183,7 @@ void HaEntityFan::updateOscillation(bool oscillation) {
   }
 }
 
-bool HaEntityFan::setOnOscillation(std::function<void(bool)> callback) {
+bool HaEntityFan::onOscillation(std::function<void(bool)> callback) {
   if (!_configuration.with_oscillation || !callback) {
     return false;
   }
@@ -228,7 +228,7 @@ void HaEntityFan::updateSpeed(uint32_t speed) {
   }
 }
 
-bool HaEntityFan::setOnSpeed(std::function<void(uint32_t)> callback) {
+bool HaEntityFan::onSpeed(std::function<void(uint32_t)> callback) {
   if (!_configuration.with_speed || !callback) {
     return false;
   }
@@ -267,7 +267,7 @@ void HaEntityFan::updatePreset(const std::string &preset) {
   }
 }
 
-bool HaEntityFan::setOnPreset(std::function<void(std::string)> callback) {
+bool HaEntityFan::onPreset(std::function<void(std::string)> callback) {
   if (_configuration.presets.empty() || !callback) {
     return false;
   }
@@ -282,19 +282,19 @@ bool HaEntityFan::setOnPreset(std::function<void(std::string)> callback) {
 
 //--------------------------------------
 
-void HaEntityFan::publishIsOn(bool on) {
+void HaEntityFan::publish(bool on) {
   _on = on;
   _ha_bridge.publishMessage(
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF), on ? "ON" : "OFF");
 }
 
-void HaEntityFan::updateIsOn(bool on) {
+void HaEntityFan::update(bool on) {
   if (!_on || *_on != on) {
-    publishIsOn(on);
+    publish(on);
   }
 }
 
-bool HaEntityFan::setOnState(std::function<void(bool)> callback) {
+bool HaEntityFan::onCommand(std::function<void(bool)> callback) {
   if (!callback) {
     return false;
   }

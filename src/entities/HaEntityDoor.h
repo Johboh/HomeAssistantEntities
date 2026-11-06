@@ -93,18 +93,18 @@ public:
 
   /**
    * @brief Publish the door. This will publish to MQTT regardless if the value has changed. Also see
-   * updateDoor().
+   * update().
    *
    * @param open true or false if door is open or not.
    */
-  void publishDoor(bool open) { _ha_entity_sensor.publishValue(open ? "ON" : "OFF"); }
+  void publish(bool open) { _ha_entity_sensor.publish(open ? "ON" : "OFF"); }
 
   /**
-   * @brief Publish the door, but only if the value has changed. Also see publishDoor().
+   * @brief Publish the door, but only if the value has changed. Also see publish().
    *
    * @param open true or false if door is open or not.
    */
-  void updateDoor(bool open) { _ha_entity_sensor.updateValue(open ? "ON" : "OFF"); }
+  void update(bool open) { _ha_entity_sensor.update(open ? "ON" : "OFF"); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

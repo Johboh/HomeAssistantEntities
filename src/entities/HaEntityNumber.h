@@ -124,19 +124,19 @@ public:
 
   /**
    * @brief Publish the number. This will publish to MQTT regardless if the value has changed. Also see
-   * updateNumber().
+   * update().
    */
-  void publishNumber(float number);
+  void publish(float number);
 
   /**
-   * @brief Publish the number, but only if the value has changed. Also see publishNumber().
+   * @brief Publish the number, but only if the value has changed. Also see publish().
    */
-  void updateNumber(float number);
+  void update(float number);
 
   /**
-   * @brief Set callback for receiving callbacks when there is a new number.
+   * @brief Set callback for receiving commands from Home Assistant.
    */
-  bool setOnNumber(std::function<void(float)> callback);
+  bool onCommand(std::function<void(float)> callback);
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

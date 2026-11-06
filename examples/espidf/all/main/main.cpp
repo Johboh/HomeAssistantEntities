@@ -150,45 +150,45 @@ void haStateTask(void *pvParameters) {
   jsn["hello"] = "world";
 
   while (1) {
-    _ha_entity_atm.publishAtmosphericPressure(1001.5);
-    _ha_entity_bool.publishBoolean(true);
+    _ha_entity_atm.publish(1001.5);
+    _ha_entity_bool.publish(true);
     _ha_entity_bool.publishAttributes({{"attr1", "value1"}, {"attr2", "value2"}});
-    _ha_entity_bright.publishBrightness(55.0);
-    _ha_entity_carbon_dioxide.publishConcentration(55.0);
+    _ha_entity_bright.publish(55.0);
+    _ha_entity_carbon_dioxide.publish(55.0);
     _ha_entity_cover.publish(HaEntityCover::State::Opening, 50);
-    _ha_entity_current.publishCurrent(10);
-    _ha_entity_device_trigger.publishTrigger();
-    _ha_entity_door.publishDoor(true);
-    _ha_entity_event.publishEvent("button_press", {{"attr1", "value1"}, {"attr2", "value2"}});
-    _ha_entity_fan.publishIsOn(true);
+    _ha_entity_current.publish(10);
+    _ha_entity_device_trigger.publish();
+    _ha_entity_door.publish(true);
+    _ha_entity_event.publish("button_press", {{"attr1", "value1"}, {"attr2", "value2"}});
+    _ha_entity_fan.publish(true);
     _ha_entity_fan.publishSpeed(50);
     _ha_entity_fan.publishPreset("eco");
     _ha_entity_fan.publishDirection("forward");
     _ha_entity_fan.publishOscillation(true);
-    _ha_entity_humidity.publishHumidity(55.0);
-    _ha_entity_json.publishJson(jsn);
-    _ha_entity_light.publishIsOn(true);
+    _ha_entity_humidity.publish(55.0);
+    _ha_entity_json.publish(jsn);
+    _ha_entity_light.publish(true);
     _ha_entity_light.publishBrightness(255);
     _ha_entity_light.publishEffect("colorloop");
     _ha_entity_light.publishRgb(255, 255, 255);
-    _ha_entity_lock.publishLock(true);
-    _ha_entity_motion.publishMotion(true);
-    _ha_entity_number.publishNumber(55.0f);
-    _ha_entity_particulate_matter.publishConcentration(55.0);
-    _ha_entity_power.publishPower(10);
-    _ha_entity_select.publishSelection("option1");
-    _ha_entity_sensor.publishValue(55.0);
-    _ha_entity_sound.publishSound(true);
-    _ha_entity_string.publishString("string", {{"attr1", "value1"}, {"attr2", "value2"}});
-    _ha_entity_switch.publishSwitch(true);
-    _ha_entity_temperature.publishTemperature(55.0);
-    _ha_entity_text.publishText("text");
-    _ha_entity_timestamp.publishTimestamp("2025-05-06T15:43:00Z");
-    _ha_entity_unit_concentration.publishConcentration(55.0);
-    _ha_entity_volatile_organic_compounds.publishConcentration(55.0);
-    _ha_entity_voltage.publishVoltage(55.0);
-    _ha_entity_weight.publishWeight(55.0);
-    _ha_entity_signal_strength.publishSignalStrength(-67);
+    _ha_entity_lock.publish(true);
+    _ha_entity_motion.publish(true);
+    _ha_entity_number.publish(55.0f);
+    _ha_entity_particulate_matter.publish(55.0);
+    _ha_entity_power.publish(10);
+    _ha_entity_select.publish("option1");
+    _ha_entity_sensor.publish(55.0);
+    _ha_entity_sound.publish(true);
+    _ha_entity_string.publish("string", {{"attr1", "value1"}, {"attr2", "value2"}});
+    _ha_entity_switch.publish(true);
+    _ha_entity_temperature.publish(55.0);
+    _ha_entity_text.publish("text");
+    _ha_entity_timestamp.publish("2025-05-06T15:43:00Z");
+    _ha_entity_unit_concentration.publish(55.0);
+    _ha_entity_volatile_organic_compounds.publish(55.0);
+    _ha_entity_voltage.publish(55.0);
+    _ha_entity_weight.publish(55.0);
+    _ha_entity_signal_strength.publish(-67);
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }
@@ -245,23 +245,23 @@ void app_main(void) {
     // Connected to WIFI.
 
     // Register for callbacks.
-    _ha_entity_button.setOnPressed([]() {});
-    _ha_entity_cover.setOnState([](HaEntityCover::Action action) {});
-    _ha_entity_cover.setOnPosition([](uint8_t position) {});
-    _ha_entity_fan.setOnState([](bool on) {});
-    _ha_entity_fan.setOnSpeed([](uint32_t speed) {});
-    _ha_entity_fan.setOnPreset([](std::string preset) {});
-    _ha_entity_fan.setOnDirection([](std::string direction) {});
-    _ha_entity_fan.setOnOscillation([](bool oscillation) {});
-    _ha_entity_light.setOnOn([](bool on) {});
-    _ha_entity_light.setOnBrightness([](uint8_t brightness) {});
-    _ha_entity_light.setOnColorTemperature([](uint16_t color_temp) {});
-    _ha_entity_light.setOnRgb([](HaEntityLight::RGB rgb) {});
-    _ha_entity_light.setOnEffect([](std::string effect) {});
-    _ha_entity_number.setOnNumber([](float number) {});
-    _ha_entity_select.setOnSelected([](std::string selected) {});
-    _ha_entity_text.setOnText([](std::string text) {});
-    _ha_entity_switch.setOnState([](bool on) {});
+    _ha_entity_button.onCommand([]() {});
+    _ha_entity_cover.onCommand([](HaEntityCover::Action action) {});
+    _ha_entity_cover.onPosition([](uint8_t position) {});
+    _ha_entity_fan.onCommand([](bool on) {});
+    _ha_entity_fan.onSpeed([](uint32_t speed) {});
+    _ha_entity_fan.onPreset([](std::string preset) {});
+    _ha_entity_fan.onDirection([](std::string direction) {});
+    _ha_entity_fan.onOscillation([](bool oscillation) {});
+    _ha_entity_light.onCommand([](bool on) {});
+    _ha_entity_light.onBrightness([](uint8_t brightness) {});
+    _ha_entity_light.onColorTemperature([](uint16_t color_temp) {});
+    _ha_entity_light.onRgb([](HaEntityLight::RGB rgb) {});
+    _ha_entity_light.onEffect([](std::string effect) {});
+    _ha_entity_number.onCommand([](float number) {});
+    _ha_entity_select.onCommand([](std::string selected) {});
+    _ha_entity_text.onCommand([](std::string text) {});
+    _ha_entity_switch.onCommand([](bool on) {});
 
     // Re-publish configurations if Home Assistant restarts while we stay connected to MQTT.
     ha_bridge.onHomeAssistantBirth([]() { publishAllConfigurations(); });

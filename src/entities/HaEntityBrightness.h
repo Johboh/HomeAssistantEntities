@@ -99,19 +99,19 @@ public:
 
   /**
    * @brief Publish the brightness. This will publish to MQTT regardless if the value has changed.
-   * Also see updateBrightness().
+   * Also see update().
    *
    * @param brightness brightness in %.
    */
-  void publishBrightness(double brightness) { _ha_entity_sensor.publishValue(brightness); }
+  void publish(double brightness) { _ha_entity_sensor.publish(brightness); }
 
   /**
    * @brief Publish the brightness, but only if the value has changed. Also see
-   * publishBrightness().
+   * publish().
    *
    * @param brightness brightness in %.
    */
-  void updateBrightness(double brightness) { _ha_entity_sensor.updateValue(brightness); }
+  void update(double brightness) { _ha_entity_sensor.update(brightness); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

@@ -154,18 +154,18 @@ void HaEntitySensor::unpublishConfiguration() {
 
 void HaEntitySensor::republishState() {
   if (_value) {
-    publishValue(*_value);
+    publish(*_value);
   }
   if (_attributes) {
     publishAttributes(*_attributes);
   }
 }
 
-void HaEntitySensor::publishValue(double value, const Attributes::Map &attributes) {
-  publishValue(formatNumber(value), attributes);
+void HaEntitySensor::publish(double value, const Attributes::Map &attributes) {
+  publish(formatNumber(value), attributes);
 }
 
-void HaEntitySensor::publishValue(const std::string &value, const Attributes::Map &attributes) {
+void HaEntitySensor::publish(const std::string &value, const Attributes::Map &attributes) {
   if (_device_class == "enum" && !_options.empty() && value != "None" &&
       std::find(_options.begin(), _options.end(), value) == _options.end()) {
     return;
@@ -193,13 +193,13 @@ void HaEntitySensor::publishAttributes(const Attributes::Map &attributes) {
   }
 }
 
-void HaEntitySensor::updateValue(double value, const Attributes::Map &attributes) {
-  updateValue(formatNumber(value), attributes);
+void HaEntitySensor::update(double value, const Attributes::Map &attributes) {
+  update(formatNumber(value), attributes);
 }
 
-void HaEntitySensor::updateValue(const std::string &value, const Attributes::Map &attributes) {
+void HaEntitySensor::update(const std::string &value, const Attributes::Map &attributes) {
   if (!_value || *_value != value) {
-    publishValue(value, {});
+    publish(value, {});
   }
 
   if (!attributes.empty()) {

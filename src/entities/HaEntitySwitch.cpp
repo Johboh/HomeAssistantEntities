@@ -71,27 +71,27 @@ void HaEntitySwitch::unpublishConfiguration() {
 
 void HaEntitySwitch::republishState() {
   if (_on) {
-    publishSwitch(*_on);
+    publish(*_on);
   }
 }
 
-void HaEntitySwitch::publishSwitch(bool on) {
+void HaEntitySwitch::publish(bool on) {
   _ha_bridge.publishMessage(
       _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_ONOFF), on ? "ON" : "OFF");
   _on = on;
 }
 
-void HaEntitySwitch::updateSwitch(bool on) {
+void HaEntitySwitch::update(bool on) {
   if (!_on || *_on != on) {
-    publishSwitch(on);
+    publish(on);
   }
 }
 
-bool HaEntitySwitch::setOnState(std::function<void(bool)> state_callback) {
-  if (!state_callback) {
+bool HaEntitySwitch::onCommand(std::function<void(bool)> callback) {
+  if (!callback) {
     return false;
   }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_ONOFF),
-      [state_callback](std::string, std::string message) { state_callback(message == "ON"); });
+      [callback](std::string, std::string message) { callback(message == "ON"); });
 }

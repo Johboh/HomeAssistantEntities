@@ -163,17 +163,17 @@ public:
   };
 
   /**
-   * @brief Set callback for receiving callbacks when there is a new state that should be set.
+   * @brief Set callback for receiving state commands (Open, Close, Stop) from Home Assistant.
    * Will not be called if read_only is true in Configuration.
    */
-  bool setOnState(std::function<void(Action)> state_callback);
+  bool onCommand(std::function<void(Action)> callback);
 
   /**
-   * @brief Set callback for receiving callbacks when there is a new position that should be set, value between
+   * @brief Set callback for receiving position commands from Home Assistant, value between
    * Configuration::position_closed (default 0) and Configuration::position_open (default 100). Will not be called if
    * read_only is true in Configuration.
    */
-  bool setOnPosition(std::function<void(uint8_t)> position_callback);
+  bool onPosition(std::function<void(uint8_t)> callback);
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

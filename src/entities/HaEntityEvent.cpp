@@ -77,7 +77,7 @@ void HaEntityEvent::republishState() {
   // Events are never republished.
 }
 
-void HaEntityEvent::publishEvent(const std::string &event, const Attributes::Map &attributes) {
+void HaEntityEvent::publish(const std::string &event, const Attributes::Map &attributes) {
   const auto &event_types = _configuration.event_types;
   if (std::find(event_types.begin(), event_types.end(), event) == event_types.end()) {
     return;

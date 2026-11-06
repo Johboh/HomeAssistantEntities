@@ -102,19 +102,19 @@ public:
 
   /**
    * @brief Publish the volatile organic compounds concentration or parts, depending on Unit selected in configuration.
-   * This will publish to MQTT regardless if the value has changed. Also see updateConcentration().
+   * This will publish to MQTT regardless if the value has changed. Also see update().
    *
    * @param concentration concentration/parts in µg/m³ or ppb, depending on what was selected in the configuration.
    */
-  void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
+  void publish(double concentration) { _ha_entity_sensor.publish(concentration); }
 
   /**
    * @brief Publish the volatile organic compounds concentration or parts, depending on Unit selected in configuration,
-   * but only if the value has changed. Also see publishConcentration().
+   * but only if the value has changed. Also see publish().
    *
    * @param concentration concentration/parts in µg/m³ or ppb, depending on what was selected in the configuration.
    */
-  void updateConcentration(double concentration) { _ha_entity_sensor.updateValue(concentration); }
+  void update(double concentration) { _ha_entity_sensor.update(concentration); }
 
 private:
   static HaEntitySensor makeSensor(HaBridge &ha_bridge, const std::string &name,

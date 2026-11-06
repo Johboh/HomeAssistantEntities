@@ -86,24 +86,24 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the switch state This will publish to MQTT regardless if the state has changed. Also see
-   * updateSwitch().
+   * @brief Publish the switch state. This will publish to MQTT regardless if the state has changed. Also see
+   * update().
    *
    * @param on if switch is on or off.
    */
-  void publishSwitch(bool on);
+  void publish(bool on);
 
   /**
-   * @brief Publish the switch state, but only if the state has changed. Also see publishSwitch().
+   * @brief Publish the switch state, but only if the state has changed. Also see publish().
    *
    * @param on if switch is on or off.
    */
-  void updateSwitch(bool on);
+  void update(bool on);
 
   /**
-   * @brief Set callback for receiving callbacks when there is a new state that should be set.
+   * @brief Set callback for receiving commands from Home Assistant.
    */
-  bool setOnState(std::function<void(bool)> state_callback);
+  bool onCommand(std::function<void(bool)> callback);
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;

@@ -97,19 +97,18 @@ public:
 
   /**
    * @brief Publish the carbon dioxide concentration. This will publish to MQTT regardless if the value has changed.
-   * Also see updateConcentration().
+   * Also see update().
    *
    * @param concentration the carbon dioxide concentration in ppm/parts per million.
    */
-  void publishConcentration(double concentration) { _ha_entity_sensor.publishValue(concentration); }
+  void publish(double concentration) { _ha_entity_sensor.publish(concentration); }
 
   /**
-   * @brief Publish the carbon dioxide concentration, but only if the value has changed. Also see
-   * publishConcentration().
+   * @brief Publish the carbon dioxide concentration, but only if the value has changed. Also see publish().
    *
    * @param concentration the carbon dioxide concentration in ppm/parts per million.
    */
-  void updateConcentration(double concentration) { _ha_entity_sensor.updateValue(concentration); }
+  void update(double concentration) { _ha_entity_sensor.update(concentration); }
 
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override {

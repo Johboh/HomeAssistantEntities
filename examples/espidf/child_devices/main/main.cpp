@@ -81,10 +81,10 @@ void publishAllDiscoveryAndStates() {
 
 void haStateTask(void *pvParameters) {
   while (1) {
-    _board_temperature.updateTemperature(39.2);
-    _wifi_rssi.updateValue(-61);
-    _outlet_1_power.updatePower(48.5);
-    _outlet_2_power.updatePower(0.0);
+    _board_temperature.update(39.2);
+    _wifi_rssi.update(-61);
+    _outlet_1_power.update(48.5);
+    _outlet_2_power.update(0.0);
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }
@@ -104,9 +104,9 @@ extern "C" void app_main(void) {
   ha_bridge.setOrigin(
       HaDeviceInformation::detectOriginInfo("SmartPowerStrip", "https://github.com/Johboh/HomeAssistantEntities"));
 
-  _restart_button.setOnPressed([]() { esp_restart(); });
-  _outlet_1_switch.setOnState([](bool on) { _outlet_1_switch.publishSwitch(on); });
-  _outlet_2_switch.setOnState([](bool on) { _outlet_2_switch.publishSwitch(on); });
+  _restart_button.onCommand([]() { esp_restart(); });
+  _outlet_1_switch.onCommand([](bool on) { _outlet_1_switch.publish(on); });
+  _outlet_2_switch.onCommand([](bool on) { _outlet_2_switch.publish(on); });
 
   // Subscribe once to Home Assistant's birth topic (homeassistant/status) before starting MQTT so discovery and live
   // states are re-published whenever Home Assistant restarts. Also publish on MQTT (re)connection below since Home
