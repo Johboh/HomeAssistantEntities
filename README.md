@@ -65,7 +65,7 @@ In addition to standard single-component discovery (`entity.publishConfiguration
 #### PlatformIO (Arduino or ESP-IDF):
 Add the following to `lib_deps`:
 ```
-   Johboh/HomeAssistantEntities@^9.0.0
+   Johboh/HomeAssistantEntities@^10.0.0
 ```
 You also need a MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
@@ -81,7 +81,7 @@ In your existing `idf_component.yml` or in a new `idf_component.yml` next to you
 ```
 dependencies:
   johboh/homeassistantentities:
-    version: ">=9.0.0"
+    version: ">=10.0.0"
 ```
 
 You also need a MQTT library. See Dependencies section. Suggestion:
