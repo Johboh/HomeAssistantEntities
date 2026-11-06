@@ -259,7 +259,7 @@ std::string getLocalIpAddress() {
   }
   return std::string(ip.toString().c_str());
 #else
-  struct ip_info info{};
+  struct ip_info info = {};
   if (wifi_get_ip_info(STATION_IF, &info) && info.ip.addr != 0) {
     uint32_t addr = info.ip.addr;
     char ip_str[16];
