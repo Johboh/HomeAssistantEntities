@@ -12,13 +12,21 @@ Builds all Arduino examples (`actuators`, `sensors`, `child_devices`, `gateway_a
 docker build -f dockerfiles/arduino/Dockerfile .
 ```
 
-### 2. ESP-IDF
+### 2. ESP-IDF (Lowest Supported 5.x: release-v5.3)
 Builds all 5 ESP-IDF examples (`actuators`, `sensors`, `all`, `child_devices`, `gateway_and_lifecycle`) targeting `esp32c6` on ESP-IDF v5.3:
 ```bash
-docker build -f dockerfiles/espidf/Dockerfile .
+docker build -f dockerfiles/espidf_v5/Dockerfile .
+# or: docker build -f dockerfiles/espidf/v5/Dockerfile .
 ```
 
-### 3. PlatformIO
+### 3. ESP-IDF (Highest Supported 6.x: release-v6.1)
+Builds all 5 ESP-IDF examples (`actuators`, `sensors`, `all`, `child_devices`, `gateway_and_lifecycle`) targeting `esp32c6` on ESP-IDF v6.1:
+```bash
+docker build -f dockerfiles/espidf_v6/Dockerfile .
+# or: docker build -f dockerfiles/espidf/v6/Dockerfile .
+```
+
+### 4. PlatformIO
 Builds matrix targets (ESP8266 `d1_mini` with `ArduinoJson`, and ESP32 `lolin_c3_mini` with `nlohmann-json`) across all Arduino examples:
 ```bash
 docker build -f dockerfiles/platformio/Dockerfile .

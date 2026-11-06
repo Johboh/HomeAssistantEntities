@@ -1,4 +1,4 @@
-# Official ESP-IDF image for release-v5.3
+# Official ESP-IDF image for release-v5.3 (lowest supported 5.x)
 FROM espressif/idf:release-v5.3
 
 WORKDIR /HomeAssistantEntities
@@ -17,4 +17,4 @@ RUN for ex in sensors actuators all child_devices gateway_and_lifecycle; do \
       idf.py build || exit 1; \
     done
 
-CMD ["echo", "All ESP-IDF examples built successfully!"]
+CMD ["echo", "All ESP-IDF v5.3 examples built successfully!"]
