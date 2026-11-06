@@ -206,7 +206,7 @@ bool HaEntityCover::onPosition(std::function<void(uint8_t)> callback) {
         char *end = nullptr;
         long pos = std::strtol(message.c_str(), &end, 10);
         if (end != message.c_str() && *end == '\0' && pos >= lo && pos <= hi) {
-          position_callback(static_cast<uint8_t>(pos));
+          callback(static_cast<uint8_t>(pos));
         }
       });
 }
