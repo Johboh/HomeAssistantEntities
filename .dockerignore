@@ -1,0 +1,6 @@
+**/.git
+**/build/
+**/.pio/
+**/sdkconfig*
+**/dependencies.lock
+**/managed_components/
