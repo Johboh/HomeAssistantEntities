@@ -3,6 +3,7 @@
 
 #include "credentials.h"
 #include <HaBridge.h>
+#include <HaDeviceInformation.h>
 #include <MQTTRemote.h>
 #include <driver/gpio.h>
 #include <esp_log.h>
@@ -52,11 +53,9 @@
 // We call setupJsonForThisDevice() from app_main() to populate the Json document.
 nlohmann::json _json_this_device_doc;
 void setupJsonForThisDevice() {
-  _json_this_device_doc["identifiers"] = "my_hardware_" + std::string(mqtt_client_id);
-  _json_this_device_doc["name"] = "Livingroom";
-  _json_this_device_doc["sw_version"] = "1.0.0";
-  _json_this_device_doc["model"] = "my_hardware";
-  _json_this_device_doc["manufacturer"] = "custom inc.";
+  HaDeviceInformation::populateDeviceJson(_json_this_device_doc, "Livingroom",
+                                          "my_hardware_" + std::string(mqtt_client_id),
+                                          {.configuration_http_port = 80, .include_serial_number = true});
 }
 
 // Setup MQTT
@@ -169,6 +168,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_json.publish(jsn);
     _ha_entity_light.publish(true);
     _ha_entity_light.publishBrightness(255);
+    _ha_entity_light.publishColorTemperature(3000);
     _ha_entity_light.publishEffect("colorloop");
     _ha_entity_light.publishRgb(255, 255, 255);
     _ha_entity_lock.publish(true);
@@ -234,6 +234,8 @@ void publishAllConfigurations() {
 
 void app_main(void) {
   setupJsonForThisDevice();
+  ha_bridge.setOrigin(
+      HaDeviceInformation::detectOriginInfo("AllEntitiesExample", "https://github.com/Johboh/HomeAssistantEntities"));
 
   // TODO (you): You need to connect to WiFi here first.
   // For a simple one line utility, see https://github.com/johboh/ConnectionHelper
