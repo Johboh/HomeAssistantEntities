@@ -9,6 +9,9 @@ SHELL ["/opt/esp/entrypoint.sh", "bash", "-c"]
 # Copy workspace last so code changes do not invalidate toolchain layers
 COPY . /HomeAssistantEntities
 
+# Cap build concurrency to prevent OOM in constrained Docker environments
+ENV IDF_PY_BUILD_JOBS=4
+
 # Build all 5 ESP-IDF examples targeting esp32c6
 RUN for ex in sensors actuators all child_devices gateway_and_lifecycle; do \
       echo "=== Building ESP-IDF example: ${ex} ===" && \
