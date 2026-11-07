@@ -27,12 +27,12 @@
             "files": ["sensors.ino"]
         },
         {
-            "name": "Child Devices & Device Discovery",
+            "name": "Child Devices and Device Discovery",
             "base": "examples/arduino/child_devices",
             "files": ["child_devices.ino"]
         },
         {
-            "name": "Gateway (via_device) & Discovery Lifecycle",
+            "name": "Gateway via_device and Discovery Lifecycle",
             "base": "examples/arduino/gateway_and_lifecycle",
             "files": ["gateway_and_lifecycle.ino"]
         }
