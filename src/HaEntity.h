@@ -20,7 +20,7 @@ class HaBridge;
  * Each `HaEntity` provides typed methods to publish/update state values, register callbacks for incoming commands,
  * and publish discovery configuration to Home Assistant.
  *
- * @section discovery_modes Per-Entity Discovery vs. Unified Device Discovery
+ * ## Per-Entity Discovery vs. Unified Device Discovery
  * This library supports two Home Assistant discovery workflows:
  *
  * ### 1. Per-Entity Discovery (Classic, Default)

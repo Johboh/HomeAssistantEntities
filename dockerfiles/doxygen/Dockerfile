@@ -1,5 +1,5 @@
-# Small debian-slim base image (~74MB) avoiding heavy ubuntu:latest images
-FROM debian:bookworm-slim AS build
+# Match GitHub Actions ubuntu-latest (Ubuntu 24.04 / Noble) environment and Doxygen version
+FROM ubuntu:24.04 AS build
 
 # Pre-install Doxygen and Graphviz in an early layer for fast rebuilds
 RUN apt-get update && apt-get install -y --no-install-recommends \
