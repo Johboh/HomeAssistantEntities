@@ -205,31 +205,33 @@ bool HaEntityAlarmControlPanel::onCommand(std::function<void(Command command, co
   if (!callback) {
     return false;
   }
+  // Payload could be raw command string (e.g. "DISARM") or JSON formatted object `{"action": "...", "code": "..."}`
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_COMMAND),
       [callback](std::string, std::string message) {
-        // Payload could be raw command string (e.g. "DISARM") or JSON formatted object `{"action": "...", "code":
-        // "..."}`
         std::string cmd_str = message;
         std::string code_str = "";
         if (!message.empty() && message.front() == '{') {
-// Parse JSON if needed
 #if __has_include("nlohmann/json.hpp")
           auto j = nlohmann::json::parse(message, nullptr, false);
           if (!j.is_discarded()) {
-            if (j.contains("action") && j["action"].is_string())
+            if (j.contains("action") && j["action"].is_string()) {
               cmd_str = j["action"].get<std::string>();
-            if (j.contains("code") && j["code"].is_string())
+            }
+            if (j.contains("code") && j["code"].is_string()) {
               code_str = j["code"].get<std::string>();
+            }
           }
 #elif __has_include(<ArduinoJson.h>)
-      JsonDocument jdoc;
-      if (deserializeJson(jdoc, message) == DeserializationError::Ok) {
-        if (jdoc["action"].is<const char *>())
-          cmd_str = jdoc["action"].as<std::string>();
-        if (jdoc["code"].is<const char *>())
-          code_str = jdoc["code"].as<std::string>();
-      }
+          JsonDocument jdoc;
+          if (deserializeJson(jdoc, message) == DeserializationError::Ok) {
+            if (jdoc["action"].is<const char *>()) {
+              cmd_str = jdoc["action"].as<std::string>();
+            }
+            if (jdoc["code"].is<const char *>()) {
+              code_str = jdoc["code"].as<std::string>();
+            }
+          }
 #endif
         }
         callback(stringToCommand(cmd_str), code_str);
