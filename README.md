@@ -4,64 +4,67 @@
 [![Arduino IDE](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/arduino_cli.yaml/badge.svg)](https://downloads.arduino.cc/libraries/logs/github.com/Johboh/HomeAssistantEntities/)
 [![GitHub release](https://img.shields.io/github/release/Johboh/HomeAssistantEntities.svg)](https://github.com/Johboh/HomeAssistantEntities/releases)
 [![Clang-format](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/clang-format.yaml/badge.svg)](https://github.com/Johboh/HomeAssistantEntities)
+[![Documentation](https://github.com/Johboh/HomeAssistantEntities/actions/workflows/pages.yaml/badge.svg)](https://homeassistantentities.johboh.dev/)
 
 Arduino (using Arduino IDE or PlatformIO) and ESP-IDF (using Espressif IoT Development Framework or PlatformIO) compatible library for providing sensors and actuators to Home Assistant using MQTT.
 
 Home Assistant has a well-defined way of defining sensors and actuators using MQTT. This library registers a device with one or multiple sensors and actuators and provides a way to publish new values for them, as well as listen for commands from Home Assistant.
 
+Generated class and API documentation (with usage examples for each entity) is available at [homeassistantentities.johboh.dev](https://homeassistantentities.johboh.dev/).
+
 ### Currently supported sensors*
-- [Atmospheric Pressure](./src/entities/HaEntityAtmosphericPressure.h) (cbar, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi, mPa, inH₂O, atm)
-- Binary sensor (generic composable binary sensor via [HaEntitySensor.h](./src/entities/HaEntitySensor.h), with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class) from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
-- [Boolean](./src/entities/HaEntityBoolean.h) (generic on/off binary sensor)
-- [Brightness](./src/entities/HaEntityBrightness.h) (%)
-- [Carbon Dioxide](./src/entities/HaEntityCarbonDioxide.h) (ppm)
-- [Carbon Monoxide](./src/entities/HaEntityCarbonMonoxide.h) (ppm, ppb, mg/m³, μg/m³)
-- [Current](./src/entities/HaEntityCurrent.h) (A, mA, μA)
-- [Distance](./src/entities/HaEntityDistance.h) (km, m, cm, mm, mi, nmi, yd, in, ft)
-- [Door](./src/entities/HaEntityDoor.h) (open/closed binary sensor)
-- [Energy](./src/entities/HaEntityEnergy.h) (J, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal, thm)
-- [Humidity](./src/entities/HaEntityHumidity.h) (%)
-- [Illuminance](./src/entities/HaEntityIlluminance.h) (lx)
-- [Json](./src/entities/HaEntityJson.h) (raw JSON sensor)
-- [Motion](./src/entities/HaEntityMotion.h) (detected/clear binary sensor)
-- [Particulate Matter](./src/entities/HaEntityParticulateMatter.h) (PM1, PM2.5, PM4, PM10 in µg/m³)
-- [Power](./src/entities/HaEntityPower.h) (mW, W, kW, MW, GW, TW)
-- [Sensor](./src/entities/HaEntitySensor.h) (generic composable sensor with optional JSON attributes and any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
-- [Signal Strength / RSSI](./src/entities/HaEntitySignalStrength.h) (dB, dBm)
-- [Sound](./src/entities/HaEntitySound.h) (detected/clear binary sensor)
-- [String](./src/entities/HaEntityString.h) (raw string sensor)
-- [Temperature](./src/entities/HaEntityTemperature.h) (°C, °F, K)
-- [Timestamp](./src/entities/HaEntityTimestamp.h) (ISO 8601 timestamp)
-- [Unit Concentration](./src/entities/HaEntityUnitConcentration.h) (parts per volume: /mL, /dL, /L)
-- [Volatile Organic Compounds](./src/entities/HaEntityVolatileOrganicCompounds.h) (µg/m³, ppb)
-- [Voltage](./src/entities/HaEntityVoltage.h) (V, mV, µV, kV, MV)
-- [Weight](./src/entities/HaEntityWeight.h) (kg, g, mg, µg, oz, lb, st)
+- [Atmospheric Pressure](src/entities/HaEntityAtmosphericPressure.h) (cbar, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi, mPa, inH₂O, atm)
+- Binary sensor (generic composable binary sensor via [HaEntitySensor.h](src/entities/HaEntitySensor.h), with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class) from [HaDeviceClasses.h](src/entities/HaDeviceClasses.h))
+- [Boolean](src/entities/HaEntityBoolean.h) (generic on/off binary sensor)
+- [Brightness](src/entities/HaEntityBrightness.h) (%)
+- [Carbon Dioxide](src/entities/HaEntityCarbonDioxide.h) (ppm)
+- [Carbon Monoxide](src/entities/HaEntityCarbonMonoxide.h) (ppm, ppb, mg/m³, μg/m³)
+- [Current](src/entities/HaEntityCurrent.h) (A, mA, μA)
+- [Distance](src/entities/HaEntityDistance.h) (km, m, cm, mm, mi, nmi, yd, in, ft)
+- [Door](src/entities/HaEntityDoor.h) (open/closed binary sensor)
+- [Energy](src/entities/HaEntityEnergy.h) (J, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal, thm)
+- [Humidity](src/entities/HaEntityHumidity.h) (%)
+- [Illuminance](src/entities/HaEntityIlluminance.h) (lx)
+- [Json](src/entities/HaEntityJson.h) (raw JSON sensor)
+- [Motion](src/entities/HaEntityMotion.h) (detected/clear binary sensor)
+- [Particulate Matter](src/entities/HaEntityParticulateMatter.h) (PM1, PM2.5, PM4, PM10 in µg/m³)
+- [Power](src/entities/HaEntityPower.h) (mW, W, kW, MW, GW, TW)
+- [Sensor](src/entities/HaEntitySensor.h) (generic composable sensor with optional JSON attributes and any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement from [HaDeviceClasses.h](src/entities/HaDeviceClasses.h))
+- [Signal Strength / RSSI](src/entities/HaEntitySignalStrength.h) (dB, dBm)
+- [Sound](src/entities/HaEntitySound.h) (detected/clear binary sensor)
+- [String](src/entities/HaEntityString.h) (raw string sensor)
+- [Temperature](src/entities/HaEntityTemperature.h) (°C, °F, K)
+- [Timestamp](src/entities/HaEntityTimestamp.h) (ISO 8601 timestamp)
+- [Unit Concentration](src/entities/HaEntityUnitConcentration.h) (parts per volume: /mL, /dL, /L)
+- [Volatile Organic Compounds](src/entities/HaEntityVolatileOrganicCompounds.h) (µg/m³, ppb)
+- [Voltage](src/entities/HaEntityVoltage.h) (V, mV, µV, kV, MV)
+- [Weight](src/entities/HaEntityWeight.h) (kg, g, mg, µg, oz, lb, st)
 
 ### Currently supported actuators (and controls)*
-- [Actuator](./src/entities/HaEntityActuator.h) (generic composable actuator with optional state topic, JSON attributes, and typed device classes from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
-- [Button](./src/entities/HaEntityButton.h) (stateless press command; device classes `identify`, `restart`, `update`)
-- [Cover](./src/entities/HaEntityCover.h) (open/opening, close/closing, stop/stopped, position, slat tilt, optional read-only mode; device classes `awning`, `blind`, `curtain`, `damper`, `door`, `garage`, `gate`, `shade`, `shutter`, `window`)
-- [Device Trigger](./src/entities/HaEntityDeviceTrigger.h) (stateless automation triggers such as `button_short_press`, `button_double_press`, `button_long_press`, etc.)
-- [Event](./src/entities/HaEntityEvent.h) (discrete typed events with optional attributes; device classes `button`, `motion`, `doorbell`)
-- [Fan](./src/entities/HaEntityFan.h) (on/off, numeric speed range mapped to percentage, preset modes, forward/reverse direction, oscillation)
-- [Light](./src/entities/HaEntityLight.h) (on/off, brightness, color temperature in Kelvin or mireds, RGB color, effects)
-- [Lock](./src/entities/HaEntityLock.h) (`LOCK`/`UNLOCK`/optional `OPEN` commands; `LOCKED`, `UNLOCKED`, `LOCKING`, `UNLOCKING`, `JAMMED`, `OPENING`, `OPEN` states; optional PIN `code_format`)
-- [Number](./src/entities/HaEntityNumber.h) (numeric value control, `auto`/`slider`/`box` mode, `min`/`max`/`step`, unit of measurement, device class)
-- [Select](./src/entities/HaEntitySelect.h) (selectable options list with active option state)
-- [Switch](./src/entities/HaEntitySwitch.h) (bidirectional on/off control; device classes `outlet`, `switch`)
-- [Text](./src/entities/HaEntityText.h) (free-form text input with optional state reporting, `min`/`max` length, regex `pattern`, password mode)
-- [Update](./src/entities/HaEntityUpdate.h) (installed/latest firmware or software version, release summary/URL, progress reporting, optional OTA `INSTALL` command; device class `firmware`)
-- [Valve](./src/entities/HaEntityValve.h) (open/opening, close/closing, optional stop/stopped, discrete or numeric position control; device classes `water`, `gas`)
+- [Actuator](src/entities/HaEntityActuator.h) (generic composable actuator with optional state topic, JSON attributes, and typed device classes from [HaDeviceClasses.h](src/entities/HaDeviceClasses.h))
+- [Button](src/entities/HaEntityButton.h) (stateless press command; device classes `identify`, `restart`, `update`)
+- [Cover](src/entities/HaEntityCover.h) (open/opening, close/closing, stop/stopped, position, slat tilt, optional read-only mode; device classes `awning`, `blind`, `curtain`, `damper`, `door`, `garage`, `gate`, `shade`, `shutter`, `window`)
+- [Device Trigger](src/entities/HaEntityDeviceTrigger.h) (stateless automation triggers such as `button_short_press`, `button_double_press`, `button_long_press`, etc.)
+- [Event](src/entities/HaEntityEvent.h) (discrete typed events with optional attributes; device classes `button`, `motion`, `doorbell`)
+- [Fan](src/entities/HaEntityFan.h) (on/off, numeric speed range mapped to percentage, preset modes, forward/reverse direction, oscillation)
+- [Light](src/entities/HaEntityLight.h) (on/off, brightness, color temperature in Kelvin or mireds, RGB color, effects)
+- [Lock](src/entities/HaEntityLock.h) (`LOCK`/`UNLOCK`/optional `OPEN` commands; `LOCKED`, `UNLOCKED`, `LOCKING`, `UNLOCKING`, `JAMMED`, `OPENING`, `OPEN` states; optional PIN `code_format`)
+- [Number](src/entities/HaEntityNumber.h) (numeric value control, `auto`/`slider`/`box` mode, `min`/`max`/`step`, unit of measurement, device class)
+- [Select](src/entities/HaEntitySelect.h) (selectable options list with active option state)
+- [Switch](src/entities/HaEntitySwitch.h) (bidirectional on/off control; device classes `outlet`, `switch`)
+- [Text](src/entities/HaEntityText.h) (free-form text input with optional state reporting, `min`/`max` length, regex `pattern`, password mode)
+- [Update](src/entities/HaEntityUpdate.h) (installed/latest firmware or software version, release summary/URL, progress reporting, optional OTA `INSTALL` command; device class `firmware`)
+- [Valve](src/entities/HaEntityValve.h) (open/opening, close/closing, optional stop/stopped, discrete or numeric position control; device classes `water`, `gas`)
 
 *_If you can't find a sensor/actuator you need, either use the generic composable `HaEntitySensor` / `HaEntityActuator`, create a pull request to add one, or raise an issue on GitHub and we'll add it to this library._
 
 ### Device Topologies & Home Assistant MQTT Discovery
-In addition to standard single-component discovery (`entity.publishConfiguration()`), [HaBridge.h](./src/HaBridge.h) and [HaDeviceInformation.h](./src/HaDeviceInformation.h) support the full [Home Assistant MQTT Discovery specification](https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery):
+In addition to standard single-component discovery (`entity.publishConfiguration()`), [HaBridge.h](src/HaBridge.h) and [HaDeviceInformation.h](src/HaDeviceInformation.h) support the full [Home Assistant MQTT Discovery specification](https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery):
 
 - **Child devices (`child_device` / `child_devices`)**: Create logical sub-units on a single physical device (e.g., individual outlets on a smart power strip or multi-channel relays) with `ha_bridge.childDevice(child_node_id, child_identifier, child_name)`. Entities bound to a child bridge scope their state/command topics under the child while linking to the parent device in Home Assistant.
 - **Gateways & sub-devices (`via_device`)**: Model separate physical sub-devices (BLE/Zigbee/RF nodes) routed through a hub by setting `HaBridge::DeviceInfo::via_device` to the hub's identifier (plus `connections`, `suggested_area`, `configuration_url`, `serial_number`, etc.) via `HaBridge::populateDeviceJson(...)`.
 - **Unified device-based discovery & migration**: Publish an entire device (including all components and `child_devices`) in a single MQTT discovery payload (`<prefix>/device/<node_id>/config`) with `ha_bridge.publishDeviceConfiguration({sensor_a, switch_b, ...})`. Existing deployments using per-entity discovery can migrate without losing entity IDs or history via `ha_bridge.migrateToDeviceConfiguration(...)`.
-- **Automatic ESP hardware & firmware metadata**: Populate `sw_version`, `hw_version` (chip model & silicon revision), MAC `connections`, `configuration_url` (local IPv4), and `HaBridge::OriginInfo` automatically on ESP-IDF, Arduino ESP32, and ESP8266 using `HaDeviceInformation::populateDeviceJson(...)` and `HaDeviceInformation::detectOriginInfo(...)` from [HaDeviceInformation.h](./src/HaDeviceInformation.h).
+- **Automatic ESP hardware & firmware metadata**: Populate `sw_version`, `hw_version` (chip model & silicon revision), MAC `connections`, `configuration_url` (local IPv4), and `HaBridge::OriginInfo` automatically on ESP-IDF, Arduino ESP32, and ESP8266 using `HaDeviceInformation::populateDeviceJson(...)` and `HaDeviceInformation::detectOriginInfo(...)` from [HaDeviceInformation.h](src/HaDeviceInformation.h).
 - **Lifecycle, birth messages & MQTT Subentries**:
   - Subscribe to Home Assistant restarts (`homeassistant/status`) with `ha_bridge.onHomeAssistantBirth(...)` to re-publish discovery and live state (used alongside your MQTT connection callback, since Home Assistant's birth message is published with `retain: false` by default).
   - Dynamically remove entities or whole devices from Home Assistant with `entity.unpublishConfiguration()` / `ha_bridge.unpublishDeviceConfiguration()`.
@@ -115,7 +118,7 @@ You also need an MQTT library. See Dependencies section. Suggestion:
 Newer versions most probably work too, but they have not been verified.
 
 ### Dependencies
-- For ESP-IDF: https://github.com/Johboh/nlohmann-json @^3.12.0, for Arduino: https://github.com/Johboh/nlohmann-json @^3.12.0 OR https://github.com/bblanchon/ArduinoJson@^7.4.3
+- For ESP-IDF: [Johboh/nlohmann-json](https://github.com/Johboh/nlohmann-json) `@^3.12.0`, for Arduino: [Johboh/nlohmann-json](https://github.com/Johboh/nlohmann-json) `@^3.12.0` OR [bblanchon/ArduinoJson](https://github.com/bblanchon/ArduinoJson) `@^7.4.3`
 - *An MQTT implementation is required.* There is a copy of [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) in this library from [Johboh/MQTTRemote](https://github.com/Johboh/MQTTRemote). You can either add a dependency on [MQTTRemote](https://github.com/Johboh/MQTTRemote) to get a fully working MQTT client (the examples are using this dependency), or you can implement/adapt/forward to your own MQTT implementation. This library only depends on the [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) interface.
 - Needs C++17 for `std::optional`.
   - For PlatformIO in `platformio.ini`:

@@ -1,0 +1,26 @@
+PROJECT_NAME           = "HomeAssistantEntities"
+PROJECT_BRIEF          = "Home Assistant MQTT sensors and actuators for Arduino and ESP-IDF"
+INPUT                  = README.md src/
+FILE_PATTERNS          = *.h *.md
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+STRIP_FROM_PATH        = src
+STRIP_FROM_INC_PATH    = src
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_TREEVIEW      = YES
+GENERATE_LATEX         = NO
+
+EXTRACT_ALL            = YES
+JAVADOC_AUTOBRIEF      = YES
+MACRO_EXPANSION        = YES
+
+# Fail the documentation build on any Doxygen warning (broken @param, invalid tag, broken link, etc.)
+WARN_AS_ERROR          = YES
+
+# Enable visual dependency and inheritance graphs via Graphviz
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+DOT_GRAPH_MAX_NODES    = 150
