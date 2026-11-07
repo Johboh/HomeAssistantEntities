@@ -13,68 +13,98 @@
 #include <vector>
 
 /**
- * @brief Represent a fan with speed, direction, oscillation, and presets.
+ * @brief Represents an MQTT Fan (`fan.mqtt`) supporting on/off control and optional speed, airflow direction,
+ * oscillation, and preset modes.
+ *
  * See https://www.home-assistant.io/integrations/fan.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntityFan ceiling_fan(ha_bridge, "Ceiling Fan", "ceiling", {
+ *     .with_direction = true,
+ *     .with_speed = true,
+ *     .speed_range_min = 1,
+ *     .speed_range_max = 3,
+ *     .presets = {"eco", "boost"},
+ * });
+ *
+ * ceiling_fan.onCommand([&](bool on) {
+ *   setFanPower(on);
+ *   ceiling_fan.publish(on);
+ * });
+ * ceiling_fan.onSpeed([&](uint32_t speed) {
+ *   setFanSpeed(speed);
+ *   ceiling_fan.publishSpeed(speed);
+ * });
+ * ceiling_fan.onPreset([&](std::string preset) {
+ *   ceiling_fan.publishPreset(preset);
+ * });
+ *
+ * // Once MQTT is connected:
+ * ceiling_fan.publishConfiguration();
+ * ceiling_fan.publish(false);
+ * ceiling_fan.publishSpeed(0);
+ * ceiling_fan.publishDirection(HaEntityFan::Direction::Forward);
+ * @endcode
  */
 class HaEntityFan : public HaEntity {
 public:
   struct Configuration {
 
     /**
-     * @brief If this fan can change direction of flow.
+     * @brief If `true`, this fan supports changing airflow direction (`"forward"` / `"reverse"`).
      */
     bool with_direction = false;
 
     /**
-     * @brief If this fan supports oscillation (back and forth movements).
+     * @brief If `true`, this fan supports oscillation (sweeping back and forth).
      */
     bool with_oscillation = false;
 
     /**
-     * @brief If this fan supports controlling the speed, compared to being only an on/off fan.
+     * @brief If `true`, this fan supports numeric speed control in addition to on/off control.
      */
     bool with_speed = false;
 
     /**
-     * @brief If with_speed is set, the minimum of numeric output range (off not included, so speed_range_min - 1
-     * represents 0 %). The percentage_step is defined by 100 / the number of speeds within the speed range.
+     * @brief When `with_speed` is `true`, the minimum active speed value (`speed_range_min - 1` represents `0%` / off).
+     * Home Assistant computes `percentage_step` as `100 / (speed_range_max - speed_range_min + 1)`.
      */
     uint32_t speed_range_min = 1;
 
     /**
-     * @brief If with_speed is set, the maximum of numeric output range (representing 100 %). The percentage_step is
-     * defined by 100 / the number of speeds within the speed range.
+     * @brief When `with_speed` is `true`, the maximum speed value (representing `100%`).
      */
     uint32_t speed_range_max = 100;
 
     /**
-     * @brief If non empty, the presets this fan supports (order preserved in Home Assistant UI).
+     * @brief If non-empty, list of preset mode names supported by this fan (order is preserved in Home Assistant UI).
      */
     std::vector<std::string> presets = {};
 
     /**
-     * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
+     * @brief If `true`, tells Home Assistant to publish command messages with the MQTT retain flag set.
      */
     bool retain = false;
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:fan").
+     * @brief Optional custom icon (e.g. `"mdi:fan"`).
      */
     std::string icon = "";
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::string entity_category = "";
 
     /**
-     * @brief Flag that defines if fan works in optimistic mode.
+     * @brief Defines whether the fan works in optimistic mode in Home Assistant.
      */
     bool optimistic = false;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -92,19 +122,16 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Fan object
+   * @brief Construct a new HaEntityFan object.
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
-   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "fan", friendly name will be "Bathroom fan". If no
-   * device, friendly name will be just "fan". If a device is set, this name can be left empty if this entity is the
-   * one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information.
-   * @param child_object_id child identifier for this entity in case there are several fans of the same
-   * entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
-   * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param configuration the configuration for this entity.
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Bathroom"` + name `"Fan"` ->
+   * `"Bathroom Fan"`). Can be empty if a device is set and this is the main (or only) entity of the device. See
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several fans on the
+   * same node ID. Pass `""` when there is only one fan on the node.
+   * @param configuration Configuration for this fan.
    */
   HaEntityFan(HaBridge &ha_bridge, std::string name, std::string child_object_id,
               Configuration configuration = _default);
@@ -120,141 +147,153 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the direction. This will publish to MQTT regardless if the value has changed. Also see
-   * updateDirection().
+   * @brief Publish the airflow direction regardless of whether the value has changed (`Configuration::with_direction`
+   * must be `true`). Also see `updateDirection()`.
    *
-   * with_direction in Configuration must be set.
-   *
-   * @param direction the direction to publish ("forward" or "reverse").
+   * @param direction Direction string (`"forward"` or `"reverse"`).
    */
   void publishDirection(const std::string &direction);
+
+  /**
+   * @brief Publish the airflow direction regardless of whether the value has changed (`Configuration::with_direction`
+   * must be `true`). Also see `updateDirection()`.
+   *
+   * @param direction Typed `Direction::Forward` or `Direction::Reverse`.
+   */
   void publishDirection(Direction direction) {
     publishDirection(direction == Direction::Forward ? "forward" : "reverse");
   }
 
   /**
-   * @brief Publish the direction, but only if the value has changed. Also see publishDirection().
+   * @brief Publish the airflow direction only if the value has changed (`Configuration::with_direction` must be
+   * `true`). Also see `publishDirection()`.
    *
-   * with_direction in Configuration must be set.
-   *
-   * @param direction the direction to publish ("forward" or "reverse").
+   * @param direction Direction string (`"forward"` or `"reverse"`).
    */
   void updateDirection(const std::string &direction);
+
+  /**
+   * @brief Publish the airflow direction only if the value has changed (`Configuration::with_direction` must be
+   * `true`). Also see `publishDirection()`.
+   *
+   * @param direction Typed `Direction::Forward` or `Direction::Reverse`.
+   */
   void updateDirection(Direction direction) {
     updateDirection(direction == Direction::Forward ? "forward" : "reverse");
   }
 
   /**
-   * @brief Set callback for receiving direction commands ("forward" or "reverse") from Home Assistant.
+   * @brief Set callback for receiving direction commands (`"forward"` or `"reverse"`) from Home Assistant.
+   * Requires `Configuration::with_direction` to be `true`.
    *
-   * with_direction in Configuration must be set.
+   * @param callback Callback invoked with the requested direction string.
+   * @return true if the subscription succeeded, false otherwise.
    */
   bool onDirection(std::function<void(std::string)> callback);
 
   //--------------------------------------
 
   /**
-   * @brief Publish the oscillation. This will publish to MQTT regardless if the value has changed. Also see
-   * updateOscillation().
+   * @brief Publish the oscillation state regardless of whether the value has changed
+   * (`Configuration::with_oscillation` must be `true`). Also see `updateOscillation()`.
    *
-   * with_oscillation in Configuration must be set.
-   *
-   * @param oscillation if oscillation should be on or off.
+   * @param oscillation `true` if oscillating, `false` otherwise.
    */
   void publishOscillation(bool oscillation);
 
   /**
-   * @brief Publish the oscillation, but only if the value has changed. Also see publishOscillation().
+   * @brief Publish the oscillation state only if the value has changed (`Configuration::with_oscillation` must be
+   * `true`). Also see `publishOscillation()`.
    *
-   * with_oscillation in Configuration must be set.
-   *
-   * @param oscillation if oscillation should be on or off.
+   * @param oscillation `true` if oscillating, `false` otherwise.
    */
   void updateOscillation(bool oscillation);
 
   /**
    * @brief Set callback for receiving oscillation commands from Home Assistant.
+   * Requires `Configuration::with_oscillation` to be `true`.
    *
-   * with_oscillation in Configuration must be set.
+   * @param callback Callback invoked with `true` to enable oscillation or `false` to disable.
+   * @return true if the subscription succeeded, false otherwise.
    */
   bool onOscillation(std::function<void(bool)> callback);
 
   //--------------------------------------
 
   /**
-   * @brief Publish the speed. This will publish to MQTT regardless if the value has changed. Also see
-   * updateSpeed().
+   * @brief Publish the current speed regardless of whether the value has changed (`Configuration::with_speed` must be
+   * `true`). Also see `updateSpeed()`.
    *
-   * with_speed in Configuration must be set.
-   *
-   * @param speed the speed, value between speed_range_min - 1 (representing 0%) and speed_range_max.
+   * @param speed Speed value clamped between `speed_range_min - 1` (`0%` / off) and `speed_range_max` (`100%`).
    */
   void publishSpeed(uint32_t speed);
 
   /**
-   * @brief Publish the speed, but only if the value has changed. Also see publishSpeed().
+   * @brief Publish the current speed only if the value has changed (`Configuration::with_speed` must be `true`). Also
+   * see `publishSpeed()`.
    *
-   * with_speed in Configuration must be set.
-   *
-   * @param speed the speed, value between speed_range_min - 1 (representing 0%) and speed_range_max.
+   * @param speed Speed value clamped between `speed_range_min - 1` (`0%` / off) and `speed_range_max` (`100%`).
    */
   void updateSpeed(uint32_t speed);
 
   /**
-   * @brief Set callback for receiving speed commands from Home Assistant. Value between speed_range_min - 1
-   * (representing 0%) and speed_range_max set in the Configuration.
+   * @brief Set callback for receiving speed commands from Home Assistant.
+   * Requires `Configuration::with_speed` to be `true`.
    *
-   * with_speed in Configuration must be set.
+   * @param callback Callback invoked with the requested speed between `speed_range_min - 1` (`0%`) and
+   * `speed_range_max` (`100%`).
+   * @return true if the subscription succeeded, false otherwise.
    */
   bool onSpeed(std::function<void(uint32_t)> callback);
 
   //--------------------------------------
 
   /**
-   * @brief Publish a preset. This will publish to MQTT regardless if the value has changed. Also see
-   * updatePreset().
+   * @brief Publish the active preset mode regardless of whether the value has changed (`Configuration::presets` must be
+   * non-empty). Also see `updatePreset()`.
    *
-   * presets in Configuration must be set to a non empty list.
-   *
-   * @param preset the preset.
+   * @param preset Active preset name (should be one of `Configuration::presets` or `"None"`).
    */
   void publishPreset(const std::string &preset);
 
   /**
-   * @brief Publish a preset, but only if the value has changed. Also see publishPreset().
+   * @brief Publish the active preset mode only if the value has changed (`Configuration::presets` must be non-empty).
+   * Also see `publishPreset()`.
    *
-   * presets in Configuration must be set to a non empty list.
-   *
-   * @param preset the preset.
+   * @param preset Active preset name (should be one of `Configuration::presets` or `"None"`).
    */
   void updatePreset(const std::string &preset);
 
   /**
-   * @brief Set callback for receiving preset commands from Home Assistant.
+   * @brief Set callback for receiving preset mode commands from Home Assistant.
+   * Requires `Configuration::presets` to be non-empty.
    *
-   * presets in Configuration must be set to a non empty list.
+   * @param callback Callback invoked with the requested preset name.
+   * @return true if the subscription succeeded, false otherwise.
    */
   bool onPreset(std::function<void(std::string)> callback);
 
   //--------------------------------------
 
   /**
-   * @brief Publish the fan state. This will publish to MQTT regardless if the value has changed. Also see
-   * update().
+   * @brief Publish the fan on/off state regardless of whether the value has changed. Also see `update()`.
    *
-   * @param on if the fan is on or off.
+   * @param on `true` if the fan is on, `false` if off.
    */
   void publish(bool on);
 
   /**
-   * @brief Publish the fan state, but only if the value has changed. Also see publish().
+   * @brief Publish the fan on/off state only if the value has changed. Also see `publish()`.
    *
-   * @param on if the fan is on or off.
+   * @param on `true` if the fan is on, `false` if off.
    */
   void update(bool on);
 
   /**
-   * @brief Set callback for receiving on/off state commands from Home Assistant.
+   * @brief Set callback for receiving on/off commands from Home Assistant.
+   *
+   * @param callback Callback invoked with `true` for `"ON"` or `false` for `"OFF"`.
+   * @return true if the subscription succeeded, false otherwise.
    */
   bool onCommand(std::function<void(bool)> callback);
 

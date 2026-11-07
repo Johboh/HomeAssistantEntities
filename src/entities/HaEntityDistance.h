@@ -13,8 +13,23 @@
 #include <string>
 
 /**
- * @brief Represent a Distance / ultrasonic / ToF range sensor (default m; see
- * homeassistantentities::Sensor::Distance::Unit in HaDeviceClasses.h).
+ * @brief Represents a Distance / ultrasonic / ToF range MQTT Sensor (`sensor.mqtt` with `device_class: "distance"`).
+ *
+ * Defaults to `Unit::m`; see `homeassistantentities::Sensor::Distance::Unit` in `HaDeviceClasses.h` (`km`, `m`, `cm`,
+ * `mm`, `mi`, `nmi`, `yd`, `in`, `ft`).
+ * See https://www.home-assistant.io/integrations/sensor.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntityDistance tank_distance(ha_bridge, "Tank Level Distance", "tank", {
+ *     .unit = HaEntityDistance::Unit::cm,
+ *     .suggested_display_precision = 1,
+ * });
+ *
+ * // Once MQTT is connected:
+ * tank_distance.publishConfiguration();
+ * tank_distance.update(42.5); // 42.5 cm
+ * @endcode
  */
 class HaEntityDistance : public HaEntity {
 public:
@@ -22,22 +37,23 @@ public:
 
   struct Configuration {
     /**
-     * @brief Unit of measurement reported for this distance sensor (default `Unit::m`).
+     * @brief Unit of measurement reported for this distance sensor (default `Unit::m`). Ensure published values match
+     * this unit.
      */
     Unit unit = Unit::m;
 
     /**
-     * @brief In Home Assistant, trigger events even if the sensor's state hasn't changed.
+     * @brief In Home Assistant, trigger state events even if the sensor's state has not changed.
      */
     bool force_update = false;
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:arrow-expand-horizontal").
+     * @brief Optional custom icon (e.g. `"mdi:arrow-expand-horizontal"`).
      */
     std::optional<std::string> icon = std::nullopt;
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::optional<std::string> entity_category = std::nullopt;
 
@@ -47,13 +63,13 @@ public:
     std::optional<uint32_t> expire_after = std::nullopt;
 
     /**
-     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying the value.
+     * @brief Number of decimals to use in the Home Assistant frontend when displaying the value.
      */
     std::optional<uint8_t> suggested_display_precision = std::nullopt;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -67,7 +83,16 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Distance object.
+   * @brief Construct a new HaEntityDistance object.
+   *
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Cistern"` + name `"Distance"` ->
+   * `"Cistern Distance"`). Can be empty if a device is set and this is the main (or only) entity of the device. See
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several
+   * distance sensors on the same node ID. Pass `std::nullopt` or `""` when not needed.
+   * @param configuration Configuration for this sensor.
    */
   HaEntityDistance(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                    Configuration configuration = _default)
@@ -89,12 +114,16 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish distance in the configured unit regardless of whether it changed.
+   * @brief Publish the distance regardless of whether the value has changed. Also see `update()`.
+   *
+   * @param distance Distance in the unit specified in `Configuration::unit`.
    */
   void publish(double distance) { _ha_entity_sensor.publish(distance); }
 
   /**
-   * @brief Publish distance in the configured unit only if changed.
+   * @brief Publish the distance only if the value has changed. Also see `publish()`.
+   *
+   * @param distance Distance in the unit specified in `Configuration::unit`.
    */
   void update(double distance) { _ha_entity_sensor.update(distance); }
 

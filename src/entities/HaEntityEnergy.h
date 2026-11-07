@@ -13,8 +13,24 @@
 #include <string>
 
 /**
- * @brief Represent an Energy consumption/production sensor (default kWh, `total_increasing`) compatible with the Home
- * Assistant Energy Dashboard (see homeassistantentities::Sensor::Energy::Unit in HaDeviceClasses.h).
+ * @brief Represents an Energy consumption/production MQTT Sensor (`sensor.mqtt` with `device_class: "energy"`, default
+ * `Unit::kWh` and `state_class: "total_increasing"`) compatible with the Home Assistant Energy Dashboard.
+ *
+ * See `homeassistantentities::Sensor::Energy::Unit` in `HaDeviceClasses.h` (`J`, `kJ`, `MJ`, `GJ`, `mWh`, `Wh`,
+ * `kWh`, `MWh`, `GWh`, `TWh`, `cal`, `kcal`, `Mcal`, `Gcal`, `thm`) and
+ * https://www.home-assistant.io/integrations/sensor.mqtt/.
+ *
+ * @par Example
+ * @code
+ * HaEntityEnergy total_energy(ha_bridge, "Total Energy", "import", {
+ *     .unit = HaEntityEnergy::Unit::kWh,
+ *     .suggested_display_precision = 3,
+ * });
+ *
+ * // Once MQTT is connected:
+ * total_energy.publishConfiguration();
+ * total_energy.update(142.375);
+ * @endcode
  */
 class HaEntityEnergy : public HaEntity {
 public:
@@ -22,27 +38,29 @@ public:
 
   struct Configuration {
     /**
-     * @brief Unit of measurement reported for this energy sensor (default `Unit::kWh`).
+     * @brief Unit of measurement reported for this energy sensor (default `Unit::kWh`). Ensure published values match
+     * this unit.
      */
     Unit unit = Unit::kWh;
 
     /**
-     * @brief State class for this energy sensor (`"total_increasing"` by default, or `"total"`).
+     * @brief State class for this energy sensor (`"total_increasing"` by default for monotonically increasing meters,
+     * or `"total"` for net meters).
      */
     std::optional<std::string> state_class = "total_increasing";
 
     /**
-     * @brief In Home Assistant, trigger events even if the sensor's state hasn't changed.
+     * @brief In Home Assistant, trigger state events even if the sensor's state has not changed.
      */
     bool force_update = false;
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:lightning-bolt").
+     * @brief Optional custom icon (e.g. `"mdi:lightning-bolt"`).
      */
     std::optional<std::string> icon = std::nullopt;
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::optional<std::string> entity_category = std::nullopt;
 
@@ -52,13 +70,13 @@ public:
     std::optional<uint32_t> expire_after = std::nullopt;
 
     /**
-     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying the value.
+     * @brief Number of decimals to use in the Home Assistant frontend when displaying the value.
      */
     std::optional<uint8_t> suggested_display_precision = std::nullopt;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -73,7 +91,16 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Energy object.
+   * @brief Construct a new HaEntityEnergy object.
+   *
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Meter"` + name `"Energy"` ->
+   * `"Meter Energy"`). Can be empty if a device is set and this is the main (or only) entity of the device. See
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several
+   * energy sensors on the same node ID (e.g. `"import"` / `"export"`). Pass `std::nullopt` or `""` when not needed.
+   * @param configuration Configuration for this sensor.
    */
   HaEntityEnergy(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                  Configuration configuration = _default)
@@ -96,12 +123,16 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish energy in the configured unit regardless of whether it changed.
+   * @brief Publish the energy reading regardless of whether the value has changed. Also see `update()`.
+   *
+   * @param energy Energy value in the unit specified in `Configuration::unit`.
    */
   void publish(double energy) { _ha_entity_sensor.publish(energy); }
 
   /**
-   * @brief Publish energy in the configured unit only if changed.
+   * @brief Publish the energy reading only if the value has changed. Also see `publish()`.
+   *
+   * @param energy Energy value in the unit specified in `Configuration::unit`.
    */
   void update(double energy) { _ha_entity_sensor.update(energy); }
 

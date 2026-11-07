@@ -48,6 +48,7 @@ public:
    * Don't do heavy operations in the callback or delays as this will block the MQTT callback.
    * If not connected, will subscribe to this topic once connected.
    *
+   * @param topic the topic to subscribe to.
    * @param message_callback a message callback with the topic and the message. The topic is repeated for convenience,
    * but it will always be for the subscribed topic.
    */

@@ -14,60 +14,82 @@
 #include <string>
 
 /**
- * @brief Represent a raw Text sensor/actuator that can be written and read from Home Assistant.
- * Also see [HaEntityString].
+ * @brief Represents a controllable MQTT Text input entity (`text.mqtt`) that accepts free-form text from Home Assistant
+ * and optionally reports its current text state (`Configuration::with_state_topic = true`).
+ *
+ * For a read-only string sensor, use `HaEntityString` instead.
+ * See https://www.home-assistant.io/integrations/text.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntityText display_msg(ha_bridge, "Display Message", "display_msg", {
+ *     .max_text_length = 64,
+ *     .with_state_topic = true,
+ * });
+ *
+ * display_msg.onCommand([&](std::string text) {
+ *   showOnDisplay(text);
+ *   display_msg.publish(text);
+ * });
+ *
+ * // Once MQTT is connected:
+ * display_msg.publishConfiguration();
+ * display_msg.publish("Ready");
+ * @endcode
  */
 class HaEntityText : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief The minimum size of a text being set or received.
+     * @brief Minimum length (in characters) of text being set or received (default `0`).
      */
     uint8_t min_text_length = 0;
 
     /**
-     * @brief The maximum size of a text being set or received (maximum is 255).
+     * @brief Maximum length (in characters) of text being set or received (default and Home Assistant maximum is
+     * `255`).
      */
     uint8_t max_text_length = 255;
 
     /**
-     * @brief if true, supports publishing the state. Else, write only text.
+     * @brief If `true`, configures `state_topic` so the entity can publish its current text state back to Home
+     * Assistant. If `false` (default), the text entity is write-only.
      */
     bool with_state_topic = false;
 
     /**
-     * @brief true to indicate to HA that this is a password.
+     * @brief If `true`, sets `mode: "password"` so Home Assistant masks the text input in the UI.
      */
     bool is_password = false;
 
     /**
-     * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
+     * @brief If `true`, tells Home Assistant to publish command messages with the MQTT retain flag set.
      */
     bool retain = false;
 
     /**
-     * @brief Optional regular expression pattern that the text being set or received must match in Home Assistant.
+     * @brief Optional regular expression pattern that text set or received must match in Home Assistant.
      */
     std::string pattern = "";
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:form-textbox").
+     * @brief Optional custom icon (e.g. `"mdi:form-textbox"`).
      */
     std::string icon = "";
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::string entity_category = "";
 
     /**
-     * @brief Flag that defines if text works in optimistic mode.
+     * @brief Defines whether the text entity works in optimistic mode in Home Assistant.
      */
     bool optimistic = false;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -84,19 +106,16 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Text object
+   * @brief Construct a new HaEntityText object.
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
-   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "text", friendly name will be "Bathroom text". If no
-   * device, friendly name will be just "text". If a device is set, this name can be left empty if this entity is the
-   * one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information.
-   * @param child_object_id optional child identifier for this entity in case there are several text entities of the
-   * same entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
-   * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param configuration the configuration for this entity.
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Hallway"` + name `"Message"` ->
+   * `"Hallway Message"`). Can be empty if a device is set and this is the main (or only) entity of the device. See
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several text
+   * entities on the same node ID. Leave empty (`""`) when not needed.
+   * @param configuration Configuration for this text entity.
    */
   HaEntityText(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                Configuration configuration = _default);
@@ -107,26 +126,26 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the text. This will publish to MQTT regardless if the text has changed. Also see
-   * update().
+   * @brief Publish the current text regardless of whether it has changed (`Configuration::with_state_topic` must be
+   * `true`). Also see `update()`.
    *
-   * with_state_topic in Configuration must be set.
-   *
-   * @param str the text to publish.
+   * @param str Text string to publish.
    */
   void publish(const std::string &str);
 
   /**
-   * @brief Publish the text, but only if the text has changed. Also see publish().
+   * @brief Publish the current text only if it has changed (`Configuration::with_state_topic` must be `true`). Also see
+   * `publish()`.
    *
-   * with_state_topic in Configuration must be set.
-   *
-   * @param str the text to publish.
+   * @param str Text string to publish.
    */
   void update(const std::string &str);
 
   /**
-   * @brief Set callback for receiving commands from Home Assistant.
+   * @brief Set callback for receiving text commands from Home Assistant.
+   *
+   * @param callback Callback invoked with the submitted text string.
+   * @return true if the subscription succeeded, false otherwise.
    */
   bool onCommand(std::function<void(std::string)> callback);
 

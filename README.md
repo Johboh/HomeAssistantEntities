@@ -7,51 +7,51 @@
 
 Arduino (using Arduino IDE or PlatformIO) and ESP-IDF (using Espressif IoT Development Framework or PlatformIO) compatible library for providing sensors and actuators to Home Assistant using MQTT.
 
-Home Assistant has a well defined way of defining sensors and actuators using MQTT. This library registers a device with one or multiple sensors and provides a way to publish new values for them, as well as listen for commands from Home Assistant.
+Home Assistant has a well-defined way of defining sensors and actuators using MQTT. This library registers a device with one or multiple sensors and actuators and provides a way to publish new values for them, as well as listen for commands from Home Assistant.
 
 ### Currently supported sensors*
-- Atmospheric Pressure (cbar, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi)
-- Boolean
-- Binary sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class) using a device class from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
-- Brightness (%)
-- Carbon Dioxide (ppm)
-- Carbon Monoxide (ppm, ppb, mg/m³, μg/m³)
-- Current (A, mA, μA)
-- Distance (km, m, cm, mm, mi, nmi, yd, in, ft)
-- Door (open/closed)
-- Energy (J, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal, thm)
-- Humidity (%)
-- Illuminance (lx)
-- Json (raw "json"-sensor)
-- Motion (detected/not detected)
-- Particulate matter (μg/m³)
-- Power (mW, W, kW, MW, GW, TW)
-- Signal strength/RSSI (dB, dBm)
-- Sound (detected/not detected)
-- String (raw "String"-sensor)
-- Temperature (°C, °F, K)
-- Timestamp
-- Unit Concentration (parts per volume)
-- Volatile organic compounds (µg/m³, ppb)
-- Voltage (V, mV, µV)
-- Weight (kg, g, mg, ug, oz, lb, st)
-- Sensor (Generic composable sensor via [HaEntitySensor.h](./src/entities/HaEntitySensor.h), with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
+- [Atmospheric Pressure](./src/entities/HaEntityAtmosphericPressure.h) (cbar, bar, hPa, mmHg, inHg, kPa, mbar, Pa, psi, mPa, inH₂O, atm)
+- Binary sensor (generic composable binary sensor via [HaEntitySensor.h](./src/entities/HaEntitySensor.h), with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class) from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
+- [Boolean](./src/entities/HaEntityBoolean.h) (generic on/off binary sensor)
+- [Brightness](./src/entities/HaEntityBrightness.h) (%)
+- [Carbon Dioxide](./src/entities/HaEntityCarbonDioxide.h) (ppm)
+- [Carbon Monoxide](./src/entities/HaEntityCarbonMonoxide.h) (ppm, ppb, mg/m³, μg/m³)
+- [Current](./src/entities/HaEntityCurrent.h) (A, mA, μA)
+- [Distance](./src/entities/HaEntityDistance.h) (km, m, cm, mm, mi, nmi, yd, in, ft)
+- [Door](./src/entities/HaEntityDoor.h) (open/closed binary sensor)
+- [Energy](./src/entities/HaEntityEnergy.h) (J, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal, thm)
+- [Humidity](./src/entities/HaEntityHumidity.h) (%)
+- [Illuminance](./src/entities/HaEntityIlluminance.h) (lx)
+- [Json](./src/entities/HaEntityJson.h) (raw JSON sensor)
+- [Motion](./src/entities/HaEntityMotion.h) (detected/clear binary sensor)
+- [Particulate Matter](./src/entities/HaEntityParticulateMatter.h) (PM1, PM2.5, PM4, PM10 in µg/m³)
+- [Power](./src/entities/HaEntityPower.h) (mW, W, kW, MW, GW, TW)
+- [Sensor](./src/entities/HaEntitySensor.h) (generic composable sensor with optional JSON attributes and any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
+- [Signal Strength / RSSI](./src/entities/HaEntitySignalStrength.h) (dB, dBm)
+- [Sound](./src/entities/HaEntitySound.h) (detected/clear binary sensor)
+- [String](./src/entities/HaEntityString.h) (raw string sensor)
+- [Temperature](./src/entities/HaEntityTemperature.h) (°C, °F, K)
+- [Timestamp](./src/entities/HaEntityTimestamp.h) (ISO 8601 timestamp)
+- [Unit Concentration](./src/entities/HaEntityUnitConcentration.h) (parts per volume: /mL, /dL, /L)
+- [Volatile Organic Compounds](./src/entities/HaEntityVolatileOrganicCompounds.h) (µg/m³, ppb)
+- [Voltage](./src/entities/HaEntityVoltage.h) (V, mV, µV, kV, MV)
+- [Weight](./src/entities/HaEntityWeight.h) (kg, g, mg, µg, oz, lb, st)
 
 ### Currently supported actuators (and controls)*
-- Actuator (Generic composable actuator via [HaEntityActuator.h](./src/entities/HaEntityActuator.h), with typed device classes from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
-- Button (press, device classes `identify`, `restart`, `update`)
-- Cover (open/opening, close/closing, stop/stopped, position, tilt, typed cover device classes)
-- Device trigger
-- Event
-- Fan (on/off, speed percentage, presets, direction, oscillation)
-- Light (brightness, color temperature in Kelvin/mireds, rgb, effect)
-- Lock (lock/unlock/open commands, locked/unlocked/locking/unlocking/jammed/opening/open states, PIN `code_format`)
-- Number (value, slider/box, step, min/max, unit, device class)
-- Select (options list)
-- Switch (on/off, device classes `outlet`, `switch`)
-- Text (text input, regex pattern, password mode)
-- Update (installed/latest firmware or software version, release notes, progress, OTA `INSTALL` command)
-- Valve (open/opening, close/closing, stop/stopped, position, device classes `water`, `gas`)
+- [Actuator](./src/entities/HaEntityActuator.h) (generic composable actuator with optional state topic, JSON attributes, and typed device classes from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
+- [Button](./src/entities/HaEntityButton.h) (stateless press command; device classes `identify`, `restart`, `update`)
+- [Cover](./src/entities/HaEntityCover.h) (open/opening, close/closing, stop/stopped, position, slat tilt, optional read-only mode; device classes `awning`, `blind`, `curtain`, `damper`, `door`, `garage`, `gate`, `shade`, `shutter`, `window`)
+- [Device Trigger](./src/entities/HaEntityDeviceTrigger.h) (stateless automation triggers such as `button_short_press`, `button_double_press`, `button_long_press`, etc.)
+- [Event](./src/entities/HaEntityEvent.h) (discrete typed events with optional attributes; device classes `button`, `motion`, `doorbell`)
+- [Fan](./src/entities/HaEntityFan.h) (on/off, numeric speed range mapped to percentage, preset modes, forward/reverse direction, oscillation)
+- [Light](./src/entities/HaEntityLight.h) (on/off, brightness, color temperature in Kelvin or mireds, RGB color, effects)
+- [Lock](./src/entities/HaEntityLock.h) (`LOCK`/`UNLOCK`/optional `OPEN` commands; `LOCKED`, `UNLOCKED`, `LOCKING`, `UNLOCKING`, `JAMMED`, `OPENING`, `OPEN` states; optional PIN `code_format`)
+- [Number](./src/entities/HaEntityNumber.h) (numeric value control, `auto`/`slider`/`box` mode, `min`/`max`/`step`, unit of measurement, device class)
+- [Select](./src/entities/HaEntitySelect.h) (selectable options list with active option state)
+- [Switch](./src/entities/HaEntitySwitch.h) (bidirectional on/off control; device classes `outlet`, `switch`)
+- [Text](./src/entities/HaEntityText.h) (free-form text input with optional state reporting, `min`/`max` length, regex `pattern`, password mode)
+- [Update](./src/entities/HaEntityUpdate.h) (installed/latest firmware or software version, release summary/URL, progress reporting, optional OTA `INSTALL` command; device class `firmware`)
+- [Valve](./src/entities/HaEntityValve.h) (open/opening, close/closing, optional stop/stopped, discrete or numeric position control; device classes `water`, `gas`)
 
 *_If you can't find a sensor/actuator you need, either use the generic composable `HaEntitySensor` / `HaEntityActuator`, create a pull request to add one, or raise an issue on GitHub and we'll add it to this library._
 
@@ -74,14 +74,14 @@ Add the following to `lib_deps`:
 ```
    Johboh/HomeAssistantEntities@^10.0.0
 ```
-You also need a MQTT library and a JSON library. See Dependencies section. Suggestion:
+You also need an MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
    johboh/MQTTRemote@^6.0.5
    bblanchon/ArduinoJson@^7.4.3
 ```
 
 ### Arduino IDE
-Search for `HomeAssistantEntities` by johboh in the library manager. You also need a MQTT library and a JSON library. See Dependencies section. Suggestion: `MQTTRemote` by `johboh` and `ArduinoJson` by `bblanchon`.
+Search for `HomeAssistantEntities` by johboh in the library manager. You also need an MQTT library and a JSON library. See Dependencies section. Suggestion: `MQTTRemote` by `johboh` and `ArduinoJson` by `bblanchon`.
 
 #### Espressif IoT Development Framework:
 In your existing `idf_component.yml` or in a new `idf_component.yml` next to your main component:
@@ -91,7 +91,7 @@ dependencies:
     version: ">=10.0.0"
 ```
 
-You also need a MQTT library. See Dependencies section. Suggestion:
+You also need an MQTT library. See Dependencies section. Suggestion:
 ```
   johboh/mqttremote:
     version: ">=6.0.5"
@@ -109,7 +109,7 @@ You also need a MQTT library. See Dependencies section. Suggestion:
 - [ESP-IDF: Gateway (`via_device`) & Discovery Lifecycle](examples/espidf/gateway_and_lifecycle/main/main.cpp)
 
 ### Functionality verified on the following platforms and frameworks
-- ESP32 (tested with PlatformIO [espressif32@6.4.0](https://github.com/platformio/platform-espressif32) / [arduino-esp32@2.0.11](https://github.com/espressif/arduino-esp32) / [ESP-IDF@4.4.6](https://github.com/espressif/esp-idf) / [ESP-IDF@5.1.2](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C3), [ESP-IDF@5.4.1](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C6)
+- ESP32 (tested with PlatformIO [espressif32@6.4.0](https://github.com/platformio/platform-espressif32) / [arduino-esp32@2.0.11](https://github.com/espressif/arduino-esp32) / [arduino-esp32@3.3.12](https://github.com/espressif/arduino-esp32) / [ESP-IDF@4.4.6](https://github.com/espressif/esp-idf) / [ESP-IDF@5.1.2](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C3, [ESP-IDF@5.3](https://github.com/espressif/esp-idf) / [ESP-IDF@5.4.1](https://github.com/espressif/esp-idf) / [ESP-IDF@6.1](https://github.com/espressif/esp-idf) on ESP32-S2 and ESP32-C6)
 - ESP8266 (tested with PlatformIO [espressif8266@4.2.1](https://github.com/platformio/platform-espressif8266) / [arduino-core@3.2.0](https://github.com/esp8266/Arduino))
 
 Newer versions most probably work too, but they have not been verified.

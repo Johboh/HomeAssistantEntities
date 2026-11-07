@@ -13,7 +13,23 @@
 #include <string>
 
 /**
- * @brief Represent an Illuminance light-level sensor in lux (lx) (e.g. BH1750, TSL2561, VEML7700).
+ * @brief Represents an Illuminance light-level MQTT Sensor (`sensor.mqtt` with `device_class: "illuminance"`, unit
+ * `"lx"`).
+ *
+ * Suitable for ambient light sensors such as BH1750, TSL2561, or VEML7700. For relative brightness in `%`, see
+ * `HaEntityBrightness`.
+ * See https://www.home-assistant.io/integrations/sensor.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntityIlluminance lux_sensor(ha_bridge, "Illuminance", std::nullopt, {
+ *     .suggested_display_precision = 0,
+ * });
+ *
+ * // Once MQTT is connected:
+ * lux_sensor.publishConfiguration();
+ * lux_sensor.update(340.0); // 340 lx
+ * @endcode
  */
 class HaEntityIlluminance : public HaEntity {
 public:
@@ -21,17 +37,17 @@ public:
 
   struct Configuration {
     /**
-     * @brief In Home Assistant, trigger events even if the sensor's state hasn't changed.
+     * @brief In Home Assistant, trigger state events even if the sensor's state has not changed.
      */
     bool force_update = false;
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:brightness-5").
+     * @brief Optional custom icon (e.g. `"mdi:brightness-5"`).
      */
     std::optional<std::string> icon = std::nullopt;
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::optional<std::string> entity_category = std::nullopt;
 
@@ -41,13 +57,13 @@ public:
     std::optional<uint32_t> expire_after = std::nullopt;
 
     /**
-     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying the value.
+     * @brief Number of decimals to use in the Home Assistant frontend when displaying the value.
      */
     std::optional<uint8_t> suggested_display_precision = std::nullopt;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -60,7 +76,16 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Illuminance object.
+   * @brief Construct a new HaEntityIlluminance object.
+   *
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Garden"` + name `"Illuminance"`
+   * -> `"Garden Illuminance"`). Can be empty if a device is set and this is the main (or only) entity of the device.
+   * See https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several
+   * illuminance sensors on the same node ID. Pass `std::nullopt` or `""` when not needed.
+   * @param configuration Configuration for this sensor.
    */
   HaEntityIlluminance(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                       Configuration configuration = _default)
@@ -82,12 +107,16 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish illuminance in lux (`lx`) regardless of whether it changed.
+   * @brief Publish the illuminance in lux (`lx`) regardless of whether the value has changed. Also see `update()`.
+   *
+   * @param illuminance_lx Illuminance in lux (`lx`).
    */
   void publish(double illuminance_lx) { _ha_entity_sensor.publish(illuminance_lx); }
 
   /**
-   * @brief Publish illuminance in lux (`lx`) only if changed.
+   * @brief Publish the illuminance in lux (`lx`) only if the value has changed. Also see `publish()`.
+   *
+   * @param illuminance_lx Illuminance in lux (`lx`).
    */
   void update(double illuminance_lx) { _ha_entity_sensor.update(illuminance_lx); }
 

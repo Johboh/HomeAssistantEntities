@@ -10,34 +10,55 @@
 class HaBridge;
 
 /**
- * @brief Abstract for a HaEntity.
+ * @brief Abstract base class for all Home Assistant MQTT entities.
  *
- * An entity is the sensor, binary sensor, actuator etc that will show up in Home Assistant. If a sensor, Home Assistant
- * can show/use the sensor value. If an actuator, Home Assistant can send states to the entity.
- * An entity has a configuration published to the Home Assistant MQTT topic (directly under MQTT "homeassistant/") which
- * Home Assistant is subscribed to, and where it collect all its MQTT Sensors, Binary Sensors, Actuators and so on. A
- * configuration always have a setup phase to publish to the above mentioned topic, but also a specific method for
- * publishing value to the state topic, if any. Or to read from a state topic.
+ * An entity represents a sensor, binary sensor, actuator, or event source exposed to Home Assistant over MQTT
+ * discovery (https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery).
+ * - For **sensors**, Home Assistant subscribes to the entity's state topic to display and record telemetry.
+ * - For **actuators**, Home Assistant publishes commands to command topics and optionally tracks the entity's state.
  *
- * A HaEntity is only an Home Assistant abstraction, and does not interact with any hardware layer. an HaEntity should
- * only provide a method to setup and publish any values, or callbacks one can subscribe to to receive values.
+ * Each `HaEntity` publishes its discovery configuration under the Home Assistant discovery prefix (default
+ * `homeassistant/`) and provides typed methods to publish/update state values or register callbacks for incoming
+ * commands. `HaEntity` is purely an MQTT/Home Assistant protocol abstraction and does not interact directly with
+ * hardware.
+ *
+ * @par Example
+ * Concrete entities (such as `HaEntityTemperature` or `HaEntitySwitch`) inherit from `HaEntity` and can be managed
+ * individually or grouped in a device discovery bundle via `HaBridge::publishDeviceConfiguration()`:
+ * @code
+ * HaBridge ha_bridge(mqtt_client, "living_room", device_doc);
+ * HaEntityTemperature temperature(ha_bridge, "Temperature");
+ * HaEntitySwitch relay(ha_bridge, "Relay", "main");
+ *
+ * relay.onCommand([&](bool on) {
+ *   setRelayHardware(on);
+ *   relay.publish(on);
+ * });
+ *
+ * // Once MQTT is connected:
+ * temperature.publishConfiguration();
+ * relay.publishConfiguration();
+ * temperature.publish(21.5);
+ * relay.publish(false);
+ * @endcode
  */
 class HaEntity {
 public:
   virtual ~HaEntity() = default;
 
   /**
-   * @brief Publish the Home Assistant configuration (single-component discovery).
+   * @brief Publish the Home Assistant MQTT discovery configuration for this entity.
    */
   virtual void publishConfiguration() = 0;
 
   /**
-   * @brief Remove the Home Assistant configuration by publishing an empty retained payload to the discovery topic.
+   * @brief Remove the Home Assistant discovery configuration by publishing an empty retained payload to the discovery
+   * topic.
    */
   virtual void unpublishConfiguration() {}
 
   /**
-   * @brief Republish any previous published state on any of the available state topics.
+   * @brief Republish the most recently published state (and attributes, if any) to MQTT.
    */
   virtual void republishState() = 0;
 

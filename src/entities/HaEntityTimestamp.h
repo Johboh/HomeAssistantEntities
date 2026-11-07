@@ -13,31 +13,44 @@
 #include <string>
 
 /**
- * @brief Represent a timestamp
+ * @brief Represents a Timestamp MQTT Sensor (`sensor.mqtt` with `device_class: "timestamp"`).
+ *
+ * Accepts either an ISO 8601 timestamp string (with timezone offset or `'Z'`) or a `const struct tm *`.
+ * See https://www.home-assistant.io/integrations/sensor.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntityTimestamp last_boot(ha_bridge, "Last Boot", "boot", {
+ *     .entity_category = "diagnostic",
+ * });
+ *
+ * // Once MQTT is connected:
+ * last_boot.publishConfiguration();
+ * last_boot.publish("2026-05-06T15:43:00Z");
+ * @endcode
  */
 class HaEntityTimestamp : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief if true, setup an attribute topic attributes will be published to. With this set, attributes
-     * can be published when the message is published, or using a separate call.
+     * @brief If `true`, set up a JSON attributes topic (`json_attributes_topic`) so attributes can be published along
+     * with the timestamp or separately.
      */
     bool with_attributes = false;
 
     /**
-     * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-     * message (not only when the sensor’s new state is different to the current one).
+     * @brief In Home Assistant, trigger state events even if the sensor's state has not changed. Useful for triggering
+     * automations on every incoming state message.
      */
     bool force_update = false;
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:clock").
+     * @brief Optional custom icon (e.g. `"mdi:clock"`).
      */
     std::optional<std::string> icon = std::nullopt;
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::optional<std::string> entity_category = std::nullopt;
 
@@ -47,8 +60,8 @@ public:
     std::optional<uint32_t> expire_after = std::nullopt;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -61,23 +74,18 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Timestamp object
+   * @brief Construct a new HaEntityTimestamp object.
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
-   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "timestamp", friendly name will be "Bathroom timestamp". If
-   * no device, friendly name will be just "timestamp". If a device is set, this name can be left empty if this entity
-   * is the one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information.
-   * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
-   * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param configuration the configuration for this entity.
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Gateway"` + name `"Last Boot"`
+   * -> `"Gateway Last Boot"`). Can be empty if a device is set and this is the main (or only) entity of the device. See
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several
+   * timestamp sensors on the same node ID. For example, for node `"gateway"`, the default discovery topic is
+   * `"homeassistant/sensor/gateway/timestamp/config"`; setting `child_object_id` to `"boot"` yields
+   * `"homeassistant/sensor/gateway/timestamp_boot/config"`. Pass `std::nullopt` or `""` when not needed.
+   * @param configuration Configuration for this timestamp sensor.
    */
   HaEntityTimestamp(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                     Configuration configuration = _default)
@@ -99,11 +107,11 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the timestamp. This will publish to MQTT regardless if the string has changed. Also see
-   * update().
+   * @brief Format and publish a `struct tm` timestamp regardless of whether the value has changed. Also see `update()`.
    *
-   * @param time the timestamp to publish.
-   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
+   * @param time Pointer to the `struct tm` timestamp to format as ISO 8601 (`nullptr` is ignored).
+   * @param attributes Optional JSON attributes to send with the timestamp (`Configuration::with_attributes` must be
+   * `true`).
    */
   void publish(const struct tm *time, const Attributes::Map &attributes = {}) {
     auto formatted = formatTimestamp(time);
@@ -113,21 +121,24 @@ public:
   }
 
   /**
-   * @brief Publish the timestamp. This will publish to MQTT regardless if the string has changed. Also see
-   * update().
+   * @brief Publish an ISO 8601 timestamp string regardless of whether the value has changed. Also see `update()`.
    *
-   * @param time the timestamp to publish, ISO 8601 UTC
-   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
+   * @param time ISO 8601 timestamp string with timezone (e.g. `"2026-05-06T15:43:00Z"` or
+   * `"2026-05-06T17:43:00+0200"`).
+   * @param attributes Optional JSON attributes to send with the timestamp (`Configuration::with_attributes` must be
+   * `true`).
    */
   void publish(const std::string &time, const Attributes::Map &attributes = {}) {
     _ha_entity_sensor.publish(time, attributes);
   }
 
   /**
-   * @brief Publish the timestamp, but only if the timestamp has changed. Also see publish().
+   * @brief Format and publish a `struct tm` timestamp only if the formatted timestamp (or `attributes`) has changed.
+   * Also see `publish()`.
    *
-   * @param time the timestamp to publish.
-   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
+   * @param time Pointer to the `struct tm` timestamp to format as ISO 8601 (`nullptr` is ignored).
+   * @param attributes Optional JSON attributes to send with the timestamp (`Configuration::with_attributes` must be
+   * `true`).
    */
   void update(const struct tm *time, const Attributes::Map &attributes = {}) {
     auto formatted = formatTimestamp(time);
@@ -137,27 +148,31 @@ public:
   }
 
   /**
-   * @brief Publish the timestamp, but only if the timestamp has changed. Also see publish().
+   * @brief Publish an ISO 8601 timestamp string only if the timestamp (or `attributes`) has changed. Also see
+   * `publish()`.
    *
-   * @param time the timestamp to publish, ISO 8601 UTC
-   * @param attributes optional attributes to send with the string. with_attributes in constructor must be set.
+   * @param time ISO 8601 timestamp string with timezone (e.g. `"2026-05-06T15:43:00Z"` or
+   * `"2026-05-06T17:43:00+0200"`).
+   * @param attributes Optional JSON attributes to send with the timestamp (`Configuration::with_attributes` must be
+   * `true`).
    */
   void update(const std::string &time, const Attributes::Map &attributes = {}) {
     _ha_entity_sensor.update(time, attributes);
   }
 
   /**
-   * @brief Publish attributes only. with_attributes in constructor must be set.
+   * @brief Publish JSON attributes only (`Configuration::with_attributes` must be `true`), regardless of whether they
+   * have changed. Also see `updateAttributes()`.
    *
-   * @param attributes attributes to publish.
+   * @param attributes Attributes map to publish.
    */
   void publishAttributes(const Attributes::Map &attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
   /**
-   * @brief Publish attributes only, but only if the value has changed. Also see
-   * publishAttributes(). with_attributes in constructor must be set.
+   * @brief Publish JSON attributes only if they have changed (`Configuration::with_attributes` must be `true`). Also
+   * see `publishAttributes()`.
    *
-   * @param attributes attributes to publish.
+   * @param attributes Attributes map to publish.
    */
   void updateAttributes(const Attributes::Map &attributes) { _ha_entity_sensor.updateAttributes(attributes); }
 

@@ -12,25 +12,37 @@
 #include <string>
 
 /**
- * @brief Represent a Brightness sensor (%).
+ * @brief Represents a relative Brightness percentage MQTT Sensor (`sensor.mqtt`, unit `"%"`, default icon
+ * `"mdi:brightness-percent"`).
+ *
+ * For absolute light level in lux (`lx`), see `HaEntityIlluminance`.
+ * See https://www.home-assistant.io/integrations/sensor.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntityBrightness brightness(ha_bridge, "Brightness");
+ *
+ * // Once MQTT is connected:
+ * brightness.publishConfiguration();
+ * brightness.update(75.0); // 75 %
+ * @endcode
  */
 class HaEntityBrightness : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-     * message (not only when the sensor’s new state is different to the current one).
+     * @brief In Home Assistant, trigger state events even if the sensor's state has not changed. Useful for graphing
+     * repeated identical measurements or triggering automations on every incoming state message.
      */
     bool force_update = false;
 
     /**
-     * @brief Optional custom icon (defaults to "mdi:brightness-percent").
+     * @brief Optional custom icon (defaults to `"mdi:brightness-percent"` when unset).
      */
     std::optional<std::string> icon = std::nullopt;
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::optional<std::string> entity_category = std::nullopt;
 
@@ -40,13 +52,13 @@ public:
     std::optional<uint32_t> expire_after = std::nullopt;
 
     /**
-     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying the value.
+     * @brief Number of decimals to use in the Home Assistant frontend when displaying the value.
      */
     std::optional<uint8_t> suggested_display_precision = std::nullopt;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -59,23 +71,18 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Brightness object
+   * @brief Construct a new HaEntityBrightness object.
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
-   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "brightness", friendly name will be "Bathroom brightness". If
-   * no device, friendly name will be just "brightness". If a device is set, this name can be left empty if this entity
-   * is the one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information.
-   * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
-   * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param configuration the configuration for this entity.
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Living Room"` + name
+   * `"Brightness"` -> `"Living Room Brightness"`). Can be empty if a device is set and this is the main (or only)
+   * entity of the device. See https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several
+   * brightness sensors on the same node ID. For example, for node `"room"`, the default discovery topic is
+   * `"homeassistant/sensor/room/brightness/config"`; setting `child_object_id` to `"window"` yields
+   * `"homeassistant/sensor/room/brightness_window/config"`. Pass `std::nullopt` or `""` when not needed.
+   * @param configuration Configuration for this sensor.
    */
   HaEntityBrightness(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                      Configuration configuration = _default)
@@ -98,18 +105,16 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the brightness. This will publish to MQTT regardless if the value has changed.
-   * Also see update().
+   * @brief Publish the brightness percentage regardless of whether the value has changed. Also see `update()`.
    *
-   * @param brightness brightness in %.
+   * @param brightness Brightness in `%`.
    */
   void publish(double brightness) { _ha_entity_sensor.publish(brightness); }
 
   /**
-   * @brief Publish the brightness, but only if the value has changed. Also see
-   * publish().
+   * @brief Publish the brightness percentage only if the value has changed. Also see `publish()`.
    *
-   * @param brightness brightness in %.
+   * @param brightness Brightness in `%`.
    */
   void update(double brightness) { _ha_entity_sensor.update(brightness); }
 

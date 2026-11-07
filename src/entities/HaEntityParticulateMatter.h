@@ -13,7 +13,23 @@
 #include <string>
 
 /**
- * @brief Represent a particulate matter sensor (e.g. PMS5003), μg/m³.
+ * @brief Represents a Particulate Matter (PM1 / PM2.5 / PM4 / PM10) mass concentration MQTT Sensor (`sensor.mqtt`, unit
+ * `"µg/m³"`).
+ *
+ * Suitable for air-quality sensors such as PMS5003, SDS011, or SEN55.
+ * See https://www.home-assistant.io/integrations/sensor.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntityParticulateMatter pm25(ha_bridge, "PM2.5", std::nullopt, {
+ *     .size = HaEntityParticulateMatter::Size::pm25,
+ *     .suggested_display_precision = 1,
+ * });
+ *
+ * // Once MQTT is connected:
+ * pm25.publishConfiguration();
+ * pm25.update(8.4); // 8.4 µg/m³
+ * @endcode
  */
 class HaEntityParticulateMatter : public HaEntity {
 public:
@@ -26,24 +42,23 @@ public:
 
   struct Configuration {
     /**
-     * @brief particulate matter size.
+     * @brief Particulate matter size threshold (`pm1`, `pm25`, `pm4`, or `pm10`; default `Size::pm10`).
      */
     Size size = Size::pm10;
 
     /**
-     * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-     * message (not only when the sensor’s new state is different to the current one).
+     * @brief In Home Assistant, trigger state events even if the sensor's state has not changed. Useful for graphing
+     * repeated identical measurements or triggering automations on every incoming state message.
      */
     bool force_update = false;
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:air-filter").
+     * @brief Optional custom icon (e.g. `"mdi:air-filter"`).
      */
     std::optional<std::string> icon = std::nullopt;
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::optional<std::string> entity_category = std::nullopt;
 
@@ -53,13 +68,13 @@ public:
     std::optional<uint32_t> expire_after = std::nullopt;
 
     /**
-     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying the value.
+     * @brief Number of decimals to use in the Home Assistant frontend when displaying the value.
      */
     std::optional<uint8_t> suggested_display_precision = std::nullopt;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -73,23 +88,17 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Particulate Matter object
+   * @brief Construct a new HaEntityParticulateMatter object.
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
-   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "particles", friendly name will be "Bathroom particles".
-   * If no device, friendly name will be just "particles". If a device is set, this name can be left empty if this
-   * entity is the one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information.
-   * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
-   * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param configuration the configuration for this entity.
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Air Monitor"` + name `"PM2.5"`
+   * -> `"Air Monitor PM2.5"`). Can be empty if a device is set and this is the main (or only) entity of the device. See
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several
+   * particulate matter sensors of the same `Size` on the same node ID. Note that each `Size` already uses a distinct
+   * discovery object ID (`pm1`, `pm25`, `pm4`, `pm10`). Pass `std::nullopt` or `""` when not needed.
+   * @param configuration Configuration for this sensor.
    */
   HaEntityParticulateMatter(HaBridge &ha_bridge, std::string name,
                             std::optional<std::string> child_object_id = std::nullopt,
@@ -102,17 +111,17 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the particle concentration. This will publish to MQTT regardless if the value has changed. Also see
-   * update().
+   * @brief Publish the particulate matter concentration regardless of whether the value has changed. Also see
+   * `update()`.
    *
-   * @param concentration concentration of particles.
+   * @param concentration Particulate matter concentration in `µg/m³`.
    */
   void publish(double concentration) { _ha_entity_sensor.publish(concentration); }
 
   /**
-   * @brief Publish the particle concentration, but only if the value has changed. Also see publish().
+   * @brief Publish the particulate matter concentration only if the value has changed. Also see `publish()`.
    *
-   * @param concentration concentration of particles.
+   * @param concentration Particulate matter concentration in `µg/m³`.
    */
   void update(double concentration) { _ha_entity_sensor.update(concentration); }
 

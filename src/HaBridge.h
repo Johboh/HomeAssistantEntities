@@ -78,26 +78,20 @@ public:
   /**
    * @brief Construct a new HaBridge object for a device/node.
    *
-   * @param remote the MQTT Interface / Remote to send messages and subscribe to topics.
-   * @param node_id this is used as the root in the MQTT path for publishing values to a state topic, or for
-   * subscribing to a state. This is also the path key used under the MQTT
-   * "homeassistant/<component>/<node_id>" path for publishing the configuration. Example for a state topic for
-   * a temperature for bathroom: "bathroom" which will lead to state topic "bathroom/sensor/temperature/state", and the
-   * Home Assistant Configuration will be published under "homeassistant/sensor/bathroom/temperature/config" Valid
-   * characters are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param this_device_json_doc Information about this device. The device is this hardware that have all the Home
-   * Assistant entities. A device is not required for single-component entities (required for device triggers and
-   * device-based discovery). If there is a device, the name displayed in the UI will be the device name combined with
-   * the entity name. See https://developers.home-assistant.io/docs/core/entity/#entity-naming for more information. All
-   * these keys will be added to a "device" key in the Home Assistant configuration for each entity (including arrays or
-   * nested objects such as "identifiers", "connections", or "via_device"). Set to empty document if no device
-   * information should be set.
-   * @param verbose True to do extra debug logging and printouts.
-   * @param availability_topic the topic to use for availabilty. Defaults to using the MQTT client ID + /status, but can
-   * be anything.
-   * @param unique_id Each node need a unique ID for Home Assistant to uniquely identify the entry. This should be
-   * stable and never change for a given node and sensor/actuator/etc. Defaults
-   * to using MQTT client ID + "_" + node id.
+   * @param remote MQTT interface / remote used to publish messages and subscribe to topics.
+   * @param node_id Machine-readable root identifier (`[a-zA-Z0-9_-]`) used in MQTT state/command/attributes topics and
+   * under `<discovery_prefix>/<component>/<node_id>/` for discovery payloads. For example, `"bathroom"` yields state
+   * topic `"bathroom/sensor/temperature/state"` and discovery topic
+   * `"homeassistant/sensor/bathroom/temperature/config"`.
+   * @param this_device_json_doc JSON document describing this hardware device. Optional for single-component entities
+   * (required for device triggers and device-based discovery). When populated, Home Assistant combines the device name
+   * with each entity's name in the UI (see https://developers.home-assistant.io/docs/core/entity/#entity-naming) and
+   * includes all keys under `"device"` in discovery payloads (including `"identifiers"`, `"connections"`, and
+   * `"via_device"`). Pass an empty document to omit device metadata.
+   * @param verbose `true` to enable extra debug logging.
+   * @param availability_topic Custom availability topic builder. Defaults to `<mqtt_client_id>/status`.
+   * @param unique_id Custom unique ID prefix builder. Each entity needs a stable unique ID in Home Assistant; defaults
+   * to `<mqtt_client_id>_<node_id>`.
    */
   HaBridge(IMQTTRemote &remote, std::string node_id, IJsonDocument &this_device_json_doc, bool verbose = false,
            std::function<std::string(IMQTTRemote &remote)> availability_topic = {},
@@ -168,7 +162,7 @@ public:
    * components where Home Assistant forbids them), as well as add "device" (and "child_device" / "origin" if set).
    *
    * The component and the object_id will create a topic like this (node_id is from the constructor of the HaBridge):
-   * <discovery_prefix>/<component>/<node_id>/<object_id>/config
+   * `<discovery_prefix>/<component>/<node_id>/<object_id>/config`
    *
    * For more information, see https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery
    */
@@ -209,24 +203,23 @@ public:
   bool migrateToDeviceConfiguration(const std::vector<std::reference_wrapper<HaEntity>> &entities);
 
   /**
-   * @brief Publish a message.
+   * @brief Publish a message to MQTT.
    *
-   * @param topic the topic to publish to.
-   * @param message The message to send. This cannot be larger than the value set for max_message_size in the
-   * constructor.
-   * @param retain True to set this message as retained.
-   * @returns true on success, or false on failure.
+   * @param topic MQTT topic to publish to.
+   * @param message Payload string to publish.
+   * @param retain `true` to set the MQTT retain flag on the message.
+   * @return true on success, false on failure.
    */
   bool publishMessage(const std::string &topic, const std::string &message, bool retain = false);
 
   enum class TopicType {
-    State,      // Usually when the entity post a state for the entity.
-    Command,    // Usually where the entity listen for actions/states to set (i.e. when Home Assistant update the value)
-    Attributes, // For attributes.
+    State,      // Topic where the entity publishes its state.
+    Command,    // Topic where the entity listens for commands/actions from Home Assistant.
+    Attributes, // Topic where the entity publishes JSON attributes.
   };
 
   /**
-   * @brief Get the topic to use for publishing state, subscribing to events and to use in the home assistant setup
+   * @brief Get the topic to use for publishing state, subscribing to commands, and configuring Home Assistant
    * (including manual Home Assistant MQTT Subentry configuration).
    */
   std::string getTopic(TopicType topic_type, const std::string &component, const std::string &object_id,
@@ -254,8 +247,8 @@ public:
   const std::string &nodeId() const { return _node_id; }
 
   /**
-   * @brief Raw IMQTTRemote. Usually only needed for subscription. Otherwise use publishConfiguration() and
-   * publishMessage defined here).
+   * @brief Access the underlying `IMQTTRemote` (typically only needed for custom topic subscriptions; prefer
+   * `publishConfiguration()` and `publishMessage()` for publishing).
    */
   IMQTTRemote &remote() { return _remote; }
 

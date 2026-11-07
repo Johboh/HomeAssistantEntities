@@ -15,108 +15,127 @@
 #include <vector>
 
 /**
- * @brief A generic composable actuator/control entity (the actuator counterpart to HaEntitySensor).
+ * @brief Generic composable MQTT actuator/control entity (the actuator counterpart to `HaEntitySensor`).
  *
- * Handles discovery configuration, state publishing/caching/republishing, JSON attributes, and command topic
- * subscriptions across Home Assistant MQTT actuator platforms (such as switch, button, lock, valve, number, select,
- * text, update, etc.). Specific actuator classes can compose HaEntityActuator to avoid boilerplate, or users can
- * instantiate HaEntityActuator directly with a DeviceClass from HaDeviceClasses.h.
+ * Handles MQTT discovery configuration, state publishing/caching/republishing, JSON attributes, and command topic
+ * subscriptions across Home Assistant MQTT actuator platforms (such as `switch`, `button`, `lock`, `valve`, `number`,
+ * `select`, `text`, `update`, etc.). Prefer dedicated typed wrappers (such as `HaEntitySwitch`, `HaEntityLock`,
+ * `HaEntityValve`, `HaEntityNumber`) when available, or instantiate `HaEntityActuator` directly with a `DeviceClass`
+ * from `HaDeviceClasses.h`.
+ *
+ * @par Example
+ * @code
+ * HaEntityActuator outlet(ha_bridge, "Desk Outlet", "desk", {
+ *     .device_class = homeassistantentities::Switch::Outlet{},
+ * });
+ *
+ * outlet.onCommand([&](const std::string &cmd) {
+ *   bool turn_on = (cmd == "ON");
+ *   setOutletHardware(turn_on);
+ *   outlet.publish(turn_on ? "ON" : "OFF");
+ * });
+ *
+ * // Once MQTT is connected:
+ * outlet.publishConfiguration();
+ * outlet.publish("OFF");
+ * @endcode
  */
 class HaEntityActuator : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief The Device class to use (determines default component, object_id, and device_class).
-     * See namespaces Button, Switch, Cover, Valve, Lock, Update, Number, Select, Text, Fan, Light in HaDeviceClasses.h.
+     * @brief The device class to use (determines default `component`, `object_id`, and `device_class`).
+     * See namespaces `Button`, `Switch`, `Cover`, `Valve`, `Lock`, `Update`, `Number`, `Select`, `Text`, `Fan`, and
+     * `Light` in `HaDeviceClasses.h`.
      */
     const homeassistantentities::DeviceClass &device_class;
 
     /**
-     * @brief Optional unit of measurement from the DeviceClass (e.g. when reusing a Sensor::* class for a "number"
-     * actuator).
+     * @brief Optional unit of measurement from the `DeviceClass` (e.g. when reusing a `Sensor::*` class for a
+     * `"number"` actuator).
      */
     std::optional<homeassistantentities::UnitType> unit_of_measurement = std::nullopt;
 
     /**
-     * @brief Optional custom unit of measurement string (used when unit_of_measurement is not set).
+     * @brief Optional custom unit of measurement string (used when `unit_of_measurement` is not set).
      */
     std::optional<std::string> custom_unit_of_measurement = std::nullopt;
 
     /**
-     * @brief Optional override for the Home Assistant component platform (e.g. "number" when reusing a Sensor::*
-     * DeviceClass). Defaults to device_class.component().
+     * @brief Optional override for the Home Assistant component platform (e.g. `"number"` when reusing a `Sensor::*`
+     * `DeviceClass`). Defaults to `device_class.component()`.
      */
     std::optional<std::string> component_override = std::nullopt;
 
     /**
-     * @brief Optional override for the discovery object_id segment. Defaults to device_class.objectId().
+     * @brief Optional override for the discovery `object_id` segment. Defaults to `device_class.objectId()`.
      */
     std::optional<std::string> object_id_override = std::nullopt;
 
     /**
-     * @brief Optional override for the device_class string in discovery JSON (set to "" to omit device_class, or a
-     * non-empty string to override device_class.deviceClass()).
+     * @brief Optional override for the `device_class` string in discovery JSON (set to `""` to omit `device_class`, or
+     * a non-empty string to override `device_class.deviceClass()`).
      */
     std::optional<std::string> device_class_override = std::nullopt;
 
     /**
-     * @brief Optional sub-topic suffix placed between child_object_id and "/state" or "/command" (e.g. "onoff",
-     * "text", or "" for `<node_id>/<component>/[<child>/]state`). When std::nullopt, topics use
-     * `<node_id>/<component>/<object_id>/[<child>/]state` matching HaEntitySensor.
+     * @brief Optional sub-topic suffix placed between `child_object_id` and `"/state"` or `"/command"` (e.g. `"onoff"`,
+     * `"text"`, or `""` for `<node_id>/<component>/[<child>/]state`). When `std::nullopt`, topics use
+     * `<node_id>/<component>/<object_id>/[<child>/]state` matching `HaEntitySensor`.
      */
     std::optional<std::string> sub_topic = std::nullopt;
 
     /**
-     * @brief If true, configure and publish to `state_topic` (set to false for command-only actuators like buttons or
-     * write-only text).
+     * @brief If true, configure and publish to `state_topic` (set to `false` for command-only actuators such as buttons
+     * or write-only text).
      */
     bool with_state_topic = true;
 
     /**
-     * @brief If true, configure and subscribe to `command_topic` (set to false for read-only entities).
+     * @brief If true, configure and subscribe to `command_topic` (set to `false` for read-only entities).
      */
     bool with_command_topic = true;
 
     /**
-     * @brief If true, configure an attributes topic (`json_attributes_topic`) so attributes can be published with
+     * @brief If true, configure a JSON attributes topic (`json_attributes_topic`) so attributes can be published with
      * state or separately.
      */
     bool with_attributes = false;
 
     /**
-     * @brief If true, tells Home Assistant to publish command messages with MQTT retain set to true.
+     * @brief If true, tells Home Assistant to publish command messages with the MQTT retain flag set.
      */
     bool retain = false;
 
     /**
-     * @brief If true, emit `"retain": false` when `retain` is false; if false, only emit `"retain": true` when `retain`
-     * is true.
+     * @brief If true, emit `"retain": false` when `retain` is `false`; if `false`, only emit `"retain": true` when
+     * `retain` is `true`.
      */
     bool emit_retain_when_false = true;
 
     /**
-     * @brief Flag that defines if the actuator works in optimistic mode.
+     * @brief Defines whether the actuator works in optimistic mode in Home Assistant.
      */
     bool optimistic = false;
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:toggle-switch").
+     * @brief Optional custom icon (e.g. `"mdi:toggle-switch"`).
      */
     std::optional<std::string> icon = std::nullopt;
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::optional<std::string> entity_category = std::nullopt;
 
     /**
-     * @brief Number of decimals which should be used in the Home Assistant frontend when displaying numeric values.
+     * @brief Number of decimals to use in the Home Assistant frontend when displaying numeric values.
      */
     std::optional<uint8_t> suggested_display_precision = std::nullopt;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
 
@@ -136,15 +155,19 @@ public:
    *
    * @param ha_bridge Bridge for MQTT and Home Assistant.
    * @param name Human-readable entity name in Home Assistant (can be empty if main entity of a device).
-   * @param child_object_id Optional machine-readable child identifier to distinguish multiple actuators of the same
-   * type on the same node.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) to distinguish multiple
+   * actuators of the same type on the same node.
    * @param configuration Configuration for this actuator.
    */
   HaEntityActuator(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id,
                    const Configuration &configuration);
 
   /**
-   * @brief Convenience constructor without child_object_id.
+   * @brief Convenience constructor without `child_object_id`.
+   *
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable entity name in Home Assistant (can be empty if main entity of a device).
+   * @param configuration Configuration for this actuator.
    */
   HaEntityActuator(HaBridge &ha_bridge, std::string name, const Configuration &configuration);
 
@@ -154,52 +177,77 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish numeric state to `state_topic` regardless of whether it changed. Non-finite values are ignored.
+   * @brief Publish numeric state to `state_topic` regardless of whether the value has changed. Non-finite values
+   * (`NaN`/`Inf`) are ignored.
+   *
+   * @param value Numeric state value to publish.
+   * @param attributes Optional JSON attributes (`Configuration::with_attributes` must be `true`).
    */
   void publish(double value, const Attributes::Map &attributes = {});
 
   /**
-   * @brief Publish numeric state to `state_topic` only if it changed. Non-finite values are ignored.
+   * @brief Publish numeric state to `state_topic` only if the value (or attributes) has changed. Non-finite values
+   * (`NaN`/`Inf`) are ignored.
+   *
+   * @param value Numeric state value to publish.
+   * @param attributes Optional JSON attributes (`Configuration::with_attributes` must be `true`).
    */
   void update(double value, const Attributes::Map &attributes = {});
 
   /**
-   * @brief Publish string/JSON state to `state_topic` regardless of whether it changed.
+   * @brief Publish string or JSON state to `state_topic` regardless of whether the value has changed.
+   *
+   * @param value String or serialized JSON state payload.
+   * @param attributes Optional JSON attributes (`Configuration::with_attributes` must be `true`).
    */
   void publish(const std::string &value, const Attributes::Map &attributes = {});
 
   /**
-   * @brief Publish string/JSON state to `state_topic` only if it changed.
+   * @brief Publish string or JSON state to `state_topic` only if the value (or attributes) has changed.
+   *
+   * @param value String or serialized JSON state payload.
+   * @param attributes Optional JSON attributes (`Configuration::with_attributes` must be `true`).
    */
   void update(const std::string &value, const Attributes::Map &attributes = {});
 
   /**
-   * @brief Publish attributes only (`with_attributes` must be true).
+   * @brief Publish JSON attributes only (`Configuration::with_attributes` must be `true`), regardless of whether they
+   * have changed.
+   *
+   * @param attributes Attributes map to publish.
    */
   void publishAttributes(const Attributes::Map &attributes);
 
   /**
-   * @brief Publish attributes only if changed (`with_attributes` must be true).
+   * @brief Publish JSON attributes only if they have changed (`Configuration::with_attributes` must be `true`).
+   *
+   * @param attributes Attributes map to publish.
    */
   void updateAttributes(const Attributes::Map &attributes);
 
   /**
    * @brief Subscribe to raw command payloads sent by Home Assistant on `command_topic`.
+   *
+   * @param callback Callback invoked with the raw payload string when a command arrives.
+   * @return true if the subscription succeeded, false otherwise.
    */
   bool onCommand(std::function<void(const std::string &)> callback);
 
   /**
-   * @brief Get the resolved state topic for this actuator.
+   * @brief Get the resolved MQTT state topic for this actuator.
+   * @return Resolved state topic string, or empty string if `with_state_topic` is `false`.
    */
   std::string stateTopic() const;
 
   /**
-   * @brief Get the resolved command topic for this actuator.
+   * @brief Get the resolved MQTT command topic for this actuator.
+   * @return Resolved command topic string, or empty string if `with_command_topic` is `false`.
    */
   std::string commandTopic() const;
 
   /**
-   * @brief Get the resolved JSON attributes topic for this actuator.
+   * @brief Get the resolved MQTT JSON attributes topic for this actuator.
+   * @return Resolved JSON attributes topic string, or empty string if `with_attributes` is `false`.
    */
   std::string attributesTopic() const;
 

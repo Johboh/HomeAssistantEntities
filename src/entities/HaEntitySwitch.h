@@ -14,41 +14,59 @@
 #include <string>
 
 /**
- * @brief Represent a Switch that can be set by Home Assistant or reported back to Home Assistant.
- * See more at https://www.home-assistant.io/integrations/switch.mqtt/
+ * @brief Represents an MQTT Switch (`switch.mqtt`) supporting bidirectional on/off control and state reporting.
+ *
+ * See https://www.home-assistant.io/integrations/switch.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntitySwitch pump(ha_bridge, "Water Pump", "pump", {
+ *     .device_class = homeassistantentities::Switch::Switch{},
+ * });
+ *
+ * pump.onCommand([&](bool on) {
+ *   setPumpRelay(on);
+ *   pump.publish(on);
+ * });
+ *
+ * // Once MQTT is connected:
+ * pump.publishConfiguration();
+ * pump.publish(false);
+ * @endcode
  */
 class HaEntitySwitch : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief If true, this tells Home Assistant to publish the message on the command topic with retain set to true.
+     * @brief If `true`, tells Home Assistant to publish command messages with the MQTT retain flag set.
      */
     bool retain = false;
 
     /**
-     * @brief Optional device class for this switch (e.g. "outlet", "switch", or
-     * homeassistantentities::Switch::Outlet{}). See https://www.home-assistant.io/integrations/switch/#device-class
+     * @brief Optional device class for this switch (e.g. `"outlet"`, `"switch"`, or
+     * `homeassistantentities::Switch::Outlet{}`). Leave empty for a generic switch.
+     * See https://www.home-assistant.io/integrations/switch/#device-class
      */
     std::string device_class = "";
 
     /**
-     * @brief Optional custom icon (e.g. "mdi:power-socket-eu").
+     * @brief Optional custom icon (e.g. `"mdi:power-socket-eu"`).
      */
     std::string icon = "";
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::string entity_category = "";
 
     /**
-     * @brief Flag that defines if switch works in optimistic mode.
+     * @brief Defines whether the switch works in optimistic mode in Home Assistant.
      */
     bool optimistic = false;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -61,19 +79,16 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Switch object
+   * @brief Construct a new HaEntitySwitch object.
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
-   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "switch", friendly name will be "Bathroom switch". If no
-   * device, friendly name will be just "switch". If a device is set, this name can be left empty if this entity is the
-   * one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information.
-   * @param child_object_id optional child identifier for this entity in case there are several switches for the same
-   * node ID. Leave as empty string for no child object ID. Valid characters are [a-zA-Z0-9_-] (machine readable, not
-   * human readable)
-   * @param configuration the configuration for this entity.
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Bathroom"` + name `"Switch"` ->
+   * `"Bathroom Switch"`). Can be empty if a device is set and this is the main (or only) entity of the device. See
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several
+   * switches on the same node ID. Leave empty (`""`) when not needed.
+   * @param configuration Configuration for this switch.
    */
   HaEntitySwitch(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                  Configuration configuration = _default);
@@ -84,22 +99,24 @@ public:
   void republishState() override;
 
   /**
-   * @brief Publish the switch state. This will publish to MQTT regardless if the state has changed. Also see
-   * update().
+   * @brief Publish the switch on/off state regardless of whether the state has changed. Also see `update()`.
    *
-   * @param on if switch is on or off.
+   * @param on `true` if the switch is on (`"ON"`), `false` if off (`"OFF"`).
    */
   void publish(bool on);
 
   /**
-   * @brief Publish the switch state, but only if the state has changed. Also see publish().
+   * @brief Publish the switch on/off state only if the state has changed. Also see `publish()`.
    *
-   * @param on if switch is on or off.
+   * @param on `true` if the switch is on (`"ON"`), `false` if off (`"OFF"`).
    */
   void update(bool on);
 
   /**
-   * @brief Set callback for receiving commands from Home Assistant.
+   * @brief Set callback for receiving on/off commands from Home Assistant.
+   *
+   * @param callback Callback invoked with `true` for `"ON"` or `false` for `"OFF"`.
+   * @return true if the subscription succeeded, false otherwise.
    */
   bool onCommand(std::function<void(bool)> callback);
 

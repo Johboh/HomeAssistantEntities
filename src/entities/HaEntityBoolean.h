@@ -13,31 +13,45 @@
 #include <string>
 
 /**
- * @brief Represent a boolean binary sensor.
+ * @brief Represents a generic boolean MQTT Binary Sensor (`binary_sensor.mqtt` with no specific `device_class`).
+ *
+ * Publishes `"ON"` when `true` and `"OFF"` when `false`, with optional JSON attributes. For typed binary sensors, see
+ * `HaEntityDoor`, `HaEntityMotion`, `HaEntitySound`, or `HaEntitySensor` with `BinarySensor::*`.
+ * See https://www.home-assistant.io/integrations/binary_sensor.mqtt/
+ *
+ * @par Example
+ * @code
+ * HaEntityBoolean leak_alarm(ha_bridge, "Filter Active", "filter", {
+ *     .with_attributes = true,
+ * });
+ *
+ * // Once MQTT is connected:
+ * leak_alarm.publishConfiguration();
+ * leak_alarm.update(true, {{"runtime_s", 3600U}});
+ * @endcode
  */
 class HaEntityBoolean : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief if true, setup an attribute topic attributes will be published to. With this set, attributes
-     * can be published when the message is published, or using a separate call.
+     * @brief If `true`, set up a JSON attributes topic (`json_attributes_topic`) so attributes can be published along
+     * with the boolean state or separately.
      */
     bool with_attributes = false;
 
     /**
-     * In Home Assistant, trigger events even if the sensor's state hasn't changed. Useful if you want
-     * to have meaningful value graphs in history or want to create an automation that triggers on every incoming state
-     * message (not only when the sensor’s new state is different to the current one).
+     * @brief In Home Assistant, trigger state events even if the sensor's state has not changed. Useful for graphing
+     * repeated states or triggering automations on every incoming state message.
      */
     bool force_update = false;
 
     /**
-     * @brief Optional custom icon.
+     * @brief Optional custom icon (e.g. `"mdi:check-circle"`).
      */
     std::optional<std::string> icon = std::nullopt;
 
     /**
-     * @brief Optional entity category ("config" or "diagnostic").
+     * @brief Optional entity category (`"config"` or `"diagnostic"`).
      */
     std::optional<std::string> entity_category = std::nullopt;
 
@@ -47,14 +61,14 @@ public:
     std::optional<uint32_t> expire_after = std::nullopt;
 
     /**
-     * @brief For binary sensors only: number of seconds after turning on before Home Assistant automatically resets the
-     * binary sensor state back to off.
+     * @brief Number of seconds after turning on before Home Assistant automatically resets the binary sensor state back
+     * to off.
      */
     std::optional<uint32_t> off_delay = std::nullopt;
 
     /**
-     * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
-     * in Home Assistant when omitted.
+     * @brief Defines whether the entity should be enabled when first added to Home Assistant. Defaults to `true` in
+     * Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
   };
@@ -68,23 +82,18 @@ public:
                                           .enabled_by_default = std::nullopt};
 
   /**
-   * @brief Construct a new Ha Entity Boolean object
+   * @brief Construct a new HaEntityBoolean object.
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
-   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "boolean", friendly name will be "Bathroom boolean". If no
-   * device, friendly name will be just "boolean". If a device is set, this name can be left empty if this entity is the
-   * one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information.
-   * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Example: If you have a lock for the node ID "door", the home assistant
-   * configuration path will be "homeassistant/binary_sensor/door/lock/config". This works if you only have one lock on
-   * your door, but if you have two locks, you want to add a child object ID to them. By setting the child_object_id to
-   * say "upper", the configuration will be "homeassistant/binary_sensor/door/lock/upper/config". This also apply for
-   * all state/command topics and so on. Leave as empty string for no child object ID. Valid characters
-   * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param configuration the configuration for this entity.
+   * @param ha_bridge Bridge for MQTT and Home Assistant.
+   * @param name Human-readable name used for the entity in Home Assistant. If a device is set on `ha_bridge`, the
+   * friendly name displayed in the UI is the device name plus this name (e.g. device `"Bathroom"` + name `"Active"` ->
+   * `"Bathroom Active"`). Can be empty if a device is set and this is the main (or only) entity of the device. See
+   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for details.
+   * @param child_object_id Optional machine-readable child identifier (`[a-zA-Z0-9_-]`) in case there are several
+   * boolean binary sensors on the same node ID. For example, for node `"pump"`, the default discovery topic is
+   * `"homeassistant/binary_sensor/pump/boolean/config"`; setting `child_object_id` to `"aux"` yields
+   * `"homeassistant/binary_sensor/pump/boolean_aux/config"`. Pass `std::nullopt` or `""` when not needed.
+   * @param configuration Configuration for this binary sensor.
    */
   HaEntityBoolean(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
                   Configuration configuration = _default)
@@ -107,40 +116,40 @@ public:
   void republishState() override { _ha_entity_sensor.republishState(); }
 
   /**
-   * @brief Publish the boolean value for the binary sensor. This will publish to MQTT regardless if the value has
-   * changed. Also see update().
+   * @brief Publish the boolean state regardless of whether the value has changed. Also see `update()`.
    *
-   * @param value the value to publish.
-   * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
+   * @param value Boolean state to publish (`true` -> `"ON"`, `false` -> `"OFF"`).
+   * @param attributes Optional JSON attributes to send with the state (`Configuration::with_attributes` must be
+   * `true`).
    */
   void publish(bool value, const Attributes::Map &attributes = {}) {
     _ha_entity_sensor.publish(value ? "ON" : "OFF", attributes);
   }
 
   /**
-   * @brief Publish the boolean value for the binary sensor, but only if the value has changed. Also see
-   * publish().
+   * @brief Publish the boolean state only if the value (or attributes) has changed. Also see `publish()`.
    *
-   * @param value the value to publish.
-   * @param attributes optional attributes to send with the value. with_attributes in constructor must be set.
+   * @param value Boolean state to publish (`true` -> `"ON"`, `false` -> `"OFF"`).
+   * @param attributes Optional JSON attributes to send with the state (`Configuration::with_attributes` must be
+   * `true`).
    */
   void update(bool value, const Attributes::Map &attributes = {}) {
     _ha_entity_sensor.update(value ? "ON" : "OFF", attributes);
   }
 
   /**
-   * @brief Publish attributes only. with_attributes in constructor must be set. This will publish to MQTT regardless if
-   * the value has changed. Also see updateAttributes().
+   * @brief Publish JSON attributes only (`Configuration::with_attributes` must be `true`), regardless of whether they
+   * have changed. Also see `updateAttributes()`.
    *
-   * @param attributes attributes to publish.
+   * @param attributes Attributes map to publish.
    */
   void publishAttributes(const Attributes::Map &attributes) { _ha_entity_sensor.publishAttributes(attributes); }
 
   /**
-   * @brief Publish attributes only, but only if the value has changed. Also see
-   * publishAttributes(). with_attributes in constructor must be set.
+   * @brief Publish JSON attributes only if they have changed (`Configuration::with_attributes` must be `true`). Also
+   * see `publishAttributes()`.
    *
-   * @param attributes attributes to publish.
+   * @param attributes Attributes map to publish.
    */
   void updateAttributes(const Attributes::Map &attributes) { _ha_entity_sensor.updateAttributes(attributes); }
 
