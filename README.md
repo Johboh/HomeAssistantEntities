@@ -93,7 +93,7 @@ In addition to standard single-component discovery (`entity.publishConfiguration
 This library supports two complementary discovery mechanisms for Home Assistant:
 
 #### 1. Per-Entity Discovery (Classic Path)
-In the classic approach, each entity publishes its own discovery configuration to its own topic:  
+In the classic approach, each entity publishes its own discovery configuration to its own topic:
 `<discovery_prefix>/<component>/<node_id>/<object_id>/config`
 
 ```cpp
@@ -114,7 +114,7 @@ relay.publishConfiguration();
   - **Individual cleanup**: Deleting a device requires removing each entity topic individually with `entity.unpublishConfiguration()`.
 
 #### 2. Unified Device-Based Discovery (Device Path)
-Introduced in Home Assistant 2024.2, device discovery publishes a single unified discovery payload representing the entire device and all its entities to:  
+Introduced in Home Assistant 2024.2, device discovery publishes a single unified discovery payload representing the entire device and all its entities to:
 `<discovery_prefix>/device/<node_id>/config`
 
 ```cpp
@@ -161,7 +161,7 @@ ha_bridge.migrateToDeviceConfiguration(all_entities);
 #### PlatformIO (Arduino or ESP-IDF):
 Add the following to `lib_deps`:
 ```
-   Johboh/HomeAssistantEntities@^10.0.0
+   Johboh/HomeAssistantEntities@^10.0.1
 ```
 You also need an MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
@@ -177,7 +177,7 @@ In your existing `idf_component.yml` or in a new `idf_component.yml` next to you
 ```
 dependencies:
   johboh/homeassistantentities:
-    version: ">=10.0.0"
+    version: ">=10.0.1"
 ```
 
 You also need an MQTT library. See Dependencies section. Suggestion:
