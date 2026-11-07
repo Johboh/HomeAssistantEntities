@@ -76,8 +76,8 @@ Add the following to `lib_deps`:
 ```
 You also need a MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
-   johboh/MQTTRemote@^6.0.2
-   bblanchon/ArduinoJson@^7.1.0
+   johboh/MQTTRemote@^6.0.5
+   bblanchon/ArduinoJson@^7.4.3
 ```
 
 ### Arduino IDE
@@ -94,7 +94,7 @@ dependencies:
 You also need a MQTT library. See Dependencies section. Suggestion:
 ```
   johboh/mqttremote:
-    version: ">=6.0.2"
+    version: ">=6.0.5"
 ```
 
 ### Examples
@@ -115,7 +115,7 @@ You also need a MQTT library. See Dependencies section. Suggestion:
 Newer versions most probably work too, but they have not been verified.
 
 ### Dependencies
-- For ESP-IDF: https://github.com/Johboh/nlohmann-json @^3.12.0, for Arduino: https://github.com/Johboh/nlohmann-json @^3.12.0 OR https://github.com/bblanchon/ArduinoJson@^7.1.0
+- For ESP-IDF: https://github.com/Johboh/nlohmann-json @^3.12.0, for Arduino: https://github.com/Johboh/nlohmann-json @^3.12.0 OR https://github.com/bblanchon/ArduinoJson@^7.4.3
 - *An MQTT implementation is required.* There is a copy of [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) in this library from [Johboh/MQTTRemote](https://github.com/Johboh/MQTTRemote). You can either add a dependency on [MQTTRemote](https://github.com/Johboh/MQTTRemote) to get a fully working MQTT client (the examples are using this dependency), or you can implement/adapt/forward to your own MQTT implementation. This library only depends on the [IMQTTRemote](https://github.com/Johboh/MQTTRemote/blob/main/includes/IMQTTRemote.h) interface.
 - Needs C++17 for `std::optional`.
   - For PlatformIO in `platformio.ini`:

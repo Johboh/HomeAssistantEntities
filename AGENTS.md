@@ -7,7 +7,7 @@ This document outlines verification procedures and standards for AI agents and c
 Before completing or proposing changes, verify builds locally across the supported embedded ecosystems using the Dockerfiles in `dockerfiles/`:
 
 ### 1. Arduino CLI
-Builds all Arduino examples (`actuators`, `sensors`, `child_devices`, `gateway_and_lifecycle`) targeting ESP32 (`esp32:esp32@3.3.1`):
+Builds all Arduino examples (`actuators`, `sensors`, `child_devices`, `gateway_and_lifecycle`) targeting ESP32 (`esp32:esp32@3.3.12`):
 ```bash
 docker build -f dockerfiles/arduino/Dockerfile .
 ```

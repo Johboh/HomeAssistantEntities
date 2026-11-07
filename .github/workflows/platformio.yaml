@@ -9,17 +9,17 @@ jobs:
           - variant: actuators_arduino_json_8266
             example: examples/arduino/actuators
             board: d1_mini
-            extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.4.3"
             extra_project_options: ""
           - variant: sensors_arduino_json_8266
             example: examples/arduino/sensors
             board: d1_mini
-            extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.4.3"
             extra_project_options: ""
           - variant: actuators_arduino_json
             example: examples/arduino/actuators
             board: lolin_s2_mini
-            extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.4.3"
             extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
           - variant: actuators_nlohmann_json
             example: examples/arduino/actuators
@@ -29,7 +29,7 @@ jobs:
           - variant: sensors_arduino_json
             example: examples/arduino/sensors
             board: lolin_s2_mini
-            extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.4.3"
             extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
           - variant: sensors_nlohmann_json
             example: examples/arduino/sensors
@@ -39,17 +39,17 @@ jobs:
           - variant: child_devices_arduino_json_8266
             example: examples/arduino/child_devices
             board: d1_mini
-            extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.4.3"
             extra_project_options: ""
           - variant: gateway_and_lifecycle_arduino_json_8266
             example: examples/arduino/gateway_and_lifecycle
             board: d1_mini
-            extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote8266@^6.0.5, bblanchon/ArduinoJson@^7.4.3"
             extra_project_options: ""
           - variant: child_devices_arduino_json
             example: examples/arduino/child_devices
             board: lolin_s2_mini
-            extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.4.3"
             extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
           - variant: child_devices_nlohmann_json
             example: examples/arduino/child_devices
@@ -59,7 +59,7 @@ jobs:
           - variant: gateway_and_lifecycle_arduino_json
             example: examples/arduino/gateway_and_lifecycle
             board: lolin_s2_mini
-            extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.1.0"
+            extra_dependencies: "johboh/MQTTRemote@^6.0.5, bblanchon/ArduinoJson@^7.4.3"
             extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
           - variant: gateway_and_lifecycle_nlohmann_json
             example: examples/arduino/gateway_and_lifecycle
