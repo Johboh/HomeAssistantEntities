@@ -22,6 +22,9 @@ RUN pio pkg install --global --platform "espressif8266" && \
 WORKDIR /workspace
 COPY . /workspace
 
+# Cap build concurrency to prevent OOM in constrained Docker environments
+ENV PLATFORMIO_RUN_JOBS=4
+
 # Build all PlatformIO matrix targets (ESP8266 + ArduinoJson, ESP32 + ArduinoJson, ESP32 + nlohmann-json)
 RUN for ex in actuators sensors child_devices gateway_and_lifecycle; do \
       echo "=== Building PlatformIO ESP8266 d1_mini: ${ex} ===" && \

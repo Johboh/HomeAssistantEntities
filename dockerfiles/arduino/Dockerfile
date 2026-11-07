@@ -32,9 +32,9 @@ RUN mkdir -p /root/Arduino/libraries && \
     ln -s /workspace /root/Arduino/libraries/HomeAssistantEntities
 
 # Build all Arduino examples
-RUN arduino-cli compile --fqbn "esp32:esp32:esp32:PartitionScheme=default_8MB,FlashSize=8M" examples/arduino/actuators && \
-    arduino-cli compile --fqbn "esp32:esp32:esp32:PartitionScheme=default_8MB,FlashSize=8M" examples/arduino/sensors && \
-    arduino-cli compile --fqbn "esp32:esp32:esp32:PartitionScheme=default_8MB,FlashSize=8M" examples/arduino/child_devices && \
-    arduino-cli compile --fqbn "esp32:esp32:esp32:PartitionScheme=default_8MB,FlashSize=8M" examples/arduino/gateway_and_lifecycle
+RUN arduino-cli compile --jobs 4 --fqbn "esp32:esp32:esp32:PartitionScheme=default_8MB,FlashSize=8M" examples/arduino/actuators && \
+    arduino-cli compile --jobs 4 --fqbn "esp32:esp32:esp32:PartitionScheme=default_8MB,FlashSize=8M" examples/arduino/sensors && \
+    arduino-cli compile --jobs 4 --fqbn "esp32:esp32:esp32:PartitionScheme=default_8MB,FlashSize=8M" examples/arduino/child_devices && \
+    arduino-cli compile --jobs 4 --fqbn "esp32:esp32:esp32:PartitionScheme=default_8MB,FlashSize=8M" examples/arduino/gateway_and_lifecycle
 
 CMD ["echo", "All Arduino examples built successfully!"]
