@@ -10,9 +10,10 @@
 
 // NOTE! We have swapped object ID and child object ID to get a nicer state/command topic path.
 #define COMPONENT "cover"
-#define OBJECT_ID "curtain"
+#define OBJECT_ID "cover"
 #define OBJECT_ID_STATE "state"
 #define OBJECT_ID_POSITION "position"
+#define OBJECT_ID_TILT "tilt"
 
 using namespace homeassistantentities;
 
@@ -20,8 +21,11 @@ HaEntityCover::HaEntityCover(HaBridge &ha_bridge, std::string name, std::string 
                              Configuration configuration)
     : _name(homeassistantentities::trim(name)), _ha_bridge(ha_bridge), _child_object_id(std::move(child_object_id)),
       _configuration(std::move(configuration)) {
-  if (!_configuration.with_state_topic && !_configuration.with_position) {
+  if (!_configuration.with_state_topic && !_configuration.with_position && !_configuration.with_tilt) {
     _configuration.with_state_topic = true;
+  }
+  if (_configuration.tilt_min > _configuration.tilt_max) {
+    std::swap(_configuration.tilt_min, _configuration.tilt_max);
   }
 }
 
@@ -81,6 +85,17 @@ bool HaEntityCover::buildComponentConfiguration(ComponentConfig &out) {
     doc["position_closed"] = _configuration.position_closed;
   }
 
+  if (_configuration.with_tilt) {
+    doc["tilt_status_topic"] =
+        _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_TILT);
+    if (!_configuration.read_only) {
+      doc["tilt_command_topic"] =
+          _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_TILT);
+    }
+    doc["tilt_min"] = _configuration.tilt_min;
+    doc["tilt_max"] = _configuration.tilt_max;
+  }
+
   return true;
 }
 
@@ -95,7 +110,12 @@ void HaEntityCover::unpublishConfiguration() {
   _ha_bridge.unpublishConfiguration(COMPONENT, OBJECT_ID, _child_object_id);
 }
 
-void HaEntityCover::republishState() { publish(_state, _position); }
+void HaEntityCover::republishState() {
+  publish(_state, _position);
+  if (_tilt) {
+    publishTilt(*_tilt);
+  }
+}
 
 void HaEntityCover::publish(std::optional<State> state, std::optional<uint8_t> position) {
   publishState(state);
@@ -109,6 +129,10 @@ uint8_t HaEntityCover::clampPosition(uint8_t position) const {
     std::swap(lo, hi);
   }
   return std::clamp(position, lo, hi);
+}
+
+uint8_t HaEntityCover::clampTilt(uint8_t tilt) const {
+  return std::clamp(tilt, _configuration.tilt_min, _configuration.tilt_max);
 }
 
 void HaEntityCover::publishState(std::optional<State> state) {
@@ -157,6 +181,17 @@ void HaEntityCover::publishPosition(std::optional<uint8_t> position) {
   }
 }
 
+void HaEntityCover::publishTilt(uint8_t tilt) {
+  if (!_configuration.with_tilt) {
+    return;
+  }
+  uint8_t clamped = clampTilt(tilt);
+  _ha_bridge.publishMessage(
+      _ha_bridge.getTopic(HaBridge::TopicType::State, COMPONENT, _child_object_id, OBJECT_ID_TILT),
+      std::to_string(clamped));
+  _tilt = clamped;
+}
+
 void HaEntityCover::update(std::optional<State> state, std::optional<uint8_t> position) {
   if (_configuration.with_state_topic && state && state != State::Unknown && state != _state) {
     publishState(state);
@@ -166,6 +201,16 @@ void HaEntityCover::update(std::optional<State> state, std::optional<uint8_t> po
     if (!_position || *_position != clamped) {
       publishPosition(clamped);
     }
+  }
+}
+
+void HaEntityCover::updateTilt(uint8_t tilt) {
+  if (!_configuration.with_tilt) {
+    return;
+  }
+  uint8_t clamped = clampTilt(tilt);
+  if (!_tilt || *_tilt != clamped) {
+    publishTilt(clamped);
   }
 }
 
@@ -202,6 +247,23 @@ bool HaEntityCover::onPosition(std::function<void(uint8_t)> callback) {
   }
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_POSITION),
+      [callback, lo, hi](std::string, std::string message) {
+        char *end = nullptr;
+        long pos = std::strtol(message.c_str(), &end, 10);
+        if (end != message.c_str() && *end == '\0' && pos >= lo && pos <= hi) {
+          callback(static_cast<uint8_t>(pos));
+        }
+      });
+}
+
+bool HaEntityCover::onTilt(std::function<void(uint8_t)> callback) {
+  if (_configuration.read_only || !_configuration.with_tilt || !callback) {
+    return false;
+  }
+  uint8_t lo = _configuration.tilt_min;
+  uint8_t hi = _configuration.tilt_max;
+  return _ha_bridge.remote().subscribe(
+      _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_TILT),
       [callback, lo, hi](std::string, std::string message) {
         char *end = nullptr;
         long pos = std::strtol(message.c_str(), &end, 10);

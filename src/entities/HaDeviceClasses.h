@@ -38,6 +38,21 @@ public:
   virtual std::optional<std::string> defaultStateClass() const {
     return sensorType() == SensorType::Sensor ? std::optional<std::string>("measurement") : std::nullopt;
   }
+
+  virtual std::string component() const { return sensorType() == SensorType::Sensor ? "sensor" : "binary_sensor"; }
+
+  operator std::string() const { return deviceClass().value_or(""); }
+};
+
+/**
+ * @brief Base class for actuator/control device classes (e.g. Button, Switch, Cover, Valve, Lock, Update, Number,
+ * Select, Text, Fan, Light).
+ */
+class ActuatorDeviceClass : public DeviceClass {
+public:
+  SensorType sensorType() const override { return SensorType::Sensor; }
+  std::optional<std::string> unitOfMeasurement(UnitType) const override { return std::nullopt; }
+  std::optional<std::string> defaultStateClass() const override { return std::nullopt; }
 };
 
 /**
@@ -2394,4 +2409,267 @@ public:
 }; // namespace Undefined
 
 }; // namespace BinarySensor
+
+/**
+ * @brief Device classes from https://www.home-assistant.io/integrations/button/#device-class
+ */
+namespace Button {
+
+class Identify : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "button"; }
+  std::optional<std::string> deviceClass() const override { return "identify"; }
+};
+
+class Restart : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "button"; }
+  std::optional<std::string> deviceClass() const override { return "restart"; }
+};
+
+class Update : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "button"; }
+  std::optional<std::string> deviceClass() const override { return "update"; }
+};
+
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "button"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "button"; }
+};
+} // namespace Undefined
+
+} // namespace Button
+
+/**
+ * @brief Device classes from https://www.home-assistant.io/integrations/switch/#device-class
+ */
+namespace Switch {
+
+class Outlet : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "switch"; }
+  std::optional<std::string> deviceClass() const override { return "outlet"; }
+};
+
+class Switch : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "switch"; }
+  std::optional<std::string> deviceClass() const override { return "switch"; }
+};
+
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "switch"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "switch"; }
+};
+} // namespace Undefined
+
+} // namespace Switch
+
+/**
+ * @brief Device classes from https://www.home-assistant.io/integrations/cover/#device-class
+ */
+namespace Cover {
+
+class Awning : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "awning"; }
+};
+
+class Blind : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "blind"; }
+};
+
+class Curtain : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "curtain"; }
+};
+
+class Damper : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "damper"; }
+};
+
+class Door : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "door"; }
+};
+
+class Garage : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "garage"; }
+};
+
+class Gate : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "gate"; }
+};
+
+class Shade : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "shade"; }
+};
+
+class Shutter : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "shutter"; }
+};
+
+class Window : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return "window"; }
+};
+
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "cover"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "cover"; }
+};
+} // namespace Undefined
+
+} // namespace Cover
+
+/**
+ * @brief Device classes from https://www.home-assistant.io/integrations/valve/#device-class
+ */
+namespace Valve {
+
+class Water : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "valve"; }
+  std::optional<std::string> deviceClass() const override { return "water"; }
+};
+
+class Gas : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "valve"; }
+  std::optional<std::string> deviceClass() const override { return "gas"; }
+};
+
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "valve"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "valve"; }
+};
+} // namespace Undefined
+
+} // namespace Valve
+
+/**
+ * @brief Device classes for Lock actuators (https://www.home-assistant.io/integrations/lock.mqtt/)
+ */
+namespace Lock {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "lock"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "lock"; }
+};
+} // namespace Undefined
+} // namespace Lock
+
+/**
+ * @brief Device classes from https://www.home-assistant.io/integrations/update/#device-class
+ */
+namespace Update {
+
+class Firmware : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "update"; }
+  std::optional<std::string> deviceClass() const override { return "firmware"; }
+};
+
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "update"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "update"; }
+};
+} // namespace Undefined
+
+} // namespace Update
+
+/**
+ * @brief Default device classes for Number, Select, Text, Fan, and Light actuators.
+ * Note: Number actuators can also reuse numeric classes in homeassistantentities::Sensor::* with component_override =
+ * "number" on HaEntityActuator.
+ */
+namespace Number {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "number"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "number"; }
+};
+} // namespace Undefined
+} // namespace Number
+
+namespace Select {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "select"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "select"; }
+};
+} // namespace Undefined
+} // namespace Select
+
+namespace Text {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "text"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "text"; }
+};
+} // namespace Undefined
+} // namespace Text
+
+namespace Fan {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "fan"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "fan"; }
+};
+} // namespace Undefined
+} // namespace Fan
+
+namespace Light {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "light"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "light"; }
+};
+} // namespace Undefined
+} // namespace Light
+
 }; // namespace homeassistantentities

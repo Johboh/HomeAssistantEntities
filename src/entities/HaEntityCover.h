@@ -4,6 +4,7 @@
 #ifndef __HA_ENTITY_COVER_H__
 #define __HA_ENTITY_COVER_H__
 
+#include "HaDeviceClasses.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -20,11 +21,11 @@ class HaEntityCover : public HaEntity {
 public:
   struct Configuration {
     /**
-     * @brief the device class for this cover. Should be any of
-     * https://www.home-assistant.io/integrations/cover/#device_class
-     * Will eventually be replaced by a typed device class.
+     * @brief Optional device class for this cover (e.g. "curtain", "shade", "garage", or
+     * homeassistantentities::Cover::Shade{}). Leave empty for generic cover.
+     * See https://www.home-assistant.io/integrations/cover/#device-class
      */
-    std::string device_class = "curtain";
+    std::string device_class = "";
 
     /**
      * If set to true, this device is only reporting its state and position, but cannot be controlled by Home Assistant.
@@ -90,9 +91,24 @@ public:
      * in Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
+
+    /**
+     * @brief If true, configure tilt_status_topic (and tilt_command_topic when !read_only) for slat/tilt control.
+     */
+    bool with_tilt = false;
+
+    /**
+     * @brief Minimum tilt value (default 0). Must be <= tilt_max.
+     */
+    uint8_t tilt_min = 0;
+
+    /**
+     * @brief Maximum tilt value (default 100).
+     */
+    uint8_t tilt_max = 100;
   };
 
-  inline static Configuration _default = {.device_class = "curtain",
+  inline static Configuration _default = {.device_class = "",
                                           .read_only = false,
                                           .position_closed = 0,
                                           .position_open = 100,
@@ -102,7 +118,10 @@ public:
                                           .icon = "",
                                           .entity_category = "",
                                           .optimistic = false,
-                                          .enabled_by_default = std::nullopt};
+                                          .enabled_by_default = std::nullopt,
+                                          .with_tilt = false,
+                                          .tilt_min = 0,
+                                          .tilt_max = 100};
 
   /**
    * @brief Construct a new Ha Entity Cover object
@@ -119,7 +138,7 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityCover(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+  HaEntityCover(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                 Configuration configuration = _default);
 
 public:
@@ -155,6 +174,16 @@ public:
    */
   void update(std::optional<State> state, std::optional<uint8_t> position = std::nullopt);
 
+  /**
+   * @brief Publish the cover tilt value regardless of whether it changed (`with_tilt` must be true).
+   */
+  void publishTilt(uint8_t tilt);
+
+  /**
+   * @brief Publish the cover tilt value only if it changed (`with_tilt` must be true).
+   */
+  void updateTilt(uint8_t tilt);
+
   enum class Action {
     Open,
     Close,
@@ -175,11 +204,17 @@ public:
    */
   bool onPosition(std::function<void(uint8_t)> callback);
 
+  /**
+   * @brief Set callback for receiving tilt commands from Home Assistant (`with_tilt` must be true and !read_only).
+   */
+  bool onTilt(std::function<void(uint8_t)> callback);
+
 protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
   uint8_t clampPosition(uint8_t position) const;
+  uint8_t clampTilt(uint8_t tilt) const;
   void publishState(std::optional<State> state);
   void publishPosition(std::optional<uint8_t> position);
 
@@ -192,6 +227,7 @@ private:
 private:
   std::optional<State> _state;
   std::optional<uint8_t> _position;
+  std::optional<uint8_t> _tilt;
 };
 
 #endif // __HA_ENTITY_COVER_H__

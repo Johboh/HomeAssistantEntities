@@ -4,24 +4,37 @@
 #ifndef __HA_ENTITY_LOCK_H__
 #define __HA_ENTITY_LOCK_H__
 
+#include "AttributeVariants.h"
 #include "HaDeviceClasses.h"
-#include "HaEntitySensor.h"
+#include "HaEntityActuator.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 
 /**
- * @brief Represent a Lock binary sensor (if a lock is locked or unlocked).
+ * @brief Represent a Lock actuator that reports lock states to Home Assistant and receives lock/unlock/open commands.
+ * See more at https://www.home-assistant.io/integrations/lock.mqtt/
  */
 class HaEntityLock : public HaEntity {
 public:
   struct Configuration {
     /**
-     * In Home Assistant, trigger events even if the sensor's state hasn't changed.
+     * @brief If true, enables the unlatch/"open" command in Home Assistant (`payload_open: "OPEN"`).
      */
-    bool force_update = false;
+    bool with_open = false;
+
+    /**
+     * @brief If true, tells Home Assistant to publish command messages with retain set to true.
+     */
+    bool retain = false;
+
+    /**
+     * @brief Optional regular expression to validate PIN codes entered in Home Assistant UI/actions (e.g. "^\\d{4}$").
+     */
+    std::string code_format = "";
 
     /**
      * @brief Optional custom icon (e.g. "mdi:lock").
@@ -34,85 +47,107 @@ public:
     std::optional<std::string> entity_category = std::nullopt;
 
     /**
-     * @brief Optional number of seconds after which the sensor's state expires if not updated.
+     * @brief Flag that defines if lock works in optimistic mode.
      */
-    std::optional<uint32_t> expire_after = std::nullopt;
-
-    /**
-     * @brief Number of seconds after turning on before Home Assistant automatically resets back to off.
-     */
-    std::optional<uint32_t> off_delay = std::nullopt;
+    bool optimistic = false;
 
     /**
      * @brief Flag which defines if the entity should be enabled when first added to Home Assistant. Defaults to true
      * in Home Assistant when omitted.
      */
     std::optional<bool> enabled_by_default = std::nullopt;
+
+    /**
+     * @brief If true, configure an attributes topic (`json_attributes_topic`) for publishing attributes.
+     */
+    bool with_attributes = false;
   };
 
-  inline static Configuration _default = {.force_update = false,
+  inline static Configuration _default = {.with_open = false,
+                                          .retain = false,
+                                          .code_format = "",
                                           .icon = std::nullopt,
                                           .entity_category = std::nullopt,
-                                          .expire_after = std::nullopt,
-                                          .off_delay = std::nullopt,
-                                          .enabled_by_default = std::nullopt};
+                                          .optimistic = false,
+                                          .enabled_by_default = std::nullopt,
+                                          .with_attributes = false};
+
+  enum class State {
+    Locked,
+    Unlocked,
+    Locking,
+    Unlocking,
+    Jammed,
+    Opening,
+    Open,
+  };
+
+  enum class Action {
+    Lock,
+    Unlock,
+    Open,
+    Unknown,
+  };
 
   /**
    * @brief Construct a new Ha Entity Lock object
    *
-   * @param name this is the human readable name that will be used for the entity in Home Assistant. If a device is set
-   * when creating the [HaBridge], the friendly named displayed in the UI will be the device name plus this name.
-   * Example: if device name is "Bathroom" and entity name "lock", friendly name will be "Bathroom lock". If no
-   * device, friendly name will be just "lock". If a device is set, this name can be left empty if this entity is the
-   * one main entity (or only) entity of this device. See
-   * https://developers.home-assistant.io/docs/core/entity/#entity-naming for more
-   * information.
-   * @param child_object_id optional child identifier for this entity in case there are several sensors of the same
-   * entity type for the same node ID. Leave as empty string for no child object ID. Valid characters
-   * are [a-zA-Z0-9_-] (machine readable, not human readable)
-   * @param configuration the configuration for this entity.
+   * @param name Human-readable name used for the entity in Home Assistant.
+   * @param child_object_id Optional child identifier in case there are several locks for the same node ID.
+   * @param configuration Configuration for this lock entity.
    */
   HaEntityLock(HaBridge &ha_bridge, std::string name, std::optional<std::string> child_object_id = std::nullopt,
-               Configuration configuration = _default)
-      : _ha_entity_sensor(ha_bridge, name, child_object_id,
-                          HaEntitySensor::Configuration{
-                              .device_class = homeassistantentities::BinarySensor::Lock{},
-                              .state_class = std::nullopt,
-                              .icon = configuration.icon,
-                              .force_update = configuration.force_update,
-                              .entity_category = configuration.entity_category,
-                              .expire_after = configuration.expire_after,
-                              .off_delay = configuration.off_delay,
-                              .enabled_by_default = configuration.enabled_by_default,
-                          }) {}
+               Configuration configuration = _default);
 
 public:
-  void publishConfiguration() override { _ha_entity_sensor.publishConfiguration(); }
-  void unpublishConfiguration() override { _ha_entity_sensor.unpublishConfiguration(); }
-  void republishState() override { _ha_entity_sensor.republishState(); }
+  void publishConfiguration() override;
+  void unpublishConfiguration() override;
+  void republishState() override;
 
   /**
-   * @brief Publish the lock. This will publish to MQTT regardless if the value has changed. Also see
-   * update().
-   *
-   * @param locked true if lock is locked, or false if unlocked.
+   * @brief Publish whether the lock is locked (`true` -> `LOCKED`, `false` -> `UNLOCKED`).
    */
-  void publish(bool locked) { _ha_entity_sensor.publish(locked ? "OFF" : "ON"); } // locked == OFF
+  void publish(bool locked, const Attributes::Map &attributes = {});
 
   /**
-   * @brief Publish the lock, but only if the value has changed. Also see publish().
-   *
-   * @param locked true if lock is locked, or false if unlocked.
+   * @brief Publish whether the lock is locked only if the state has changed.
    */
-  void update(bool locked) { _ha_entity_sensor.update(locked ? "OFF" : "ON"); } // locked == OFF
+  void update(bool locked, const Attributes::Map &attributes = {});
+
+  /**
+   * @brief Publish a detailed lock state (`Locked`, `Unlocked`, `Locking`, `Unlocking`, `Jammed`, `Opening`, `Open`).
+   */
+  void publish(State state, const Attributes::Map &attributes = {});
+
+  /**
+   * @brief Publish a detailed lock state only if it changed.
+   */
+  void update(State state, const Attributes::Map &attributes = {});
+
+  /**
+   * @brief Publish JSON attributes (`with_attributes` must be true).
+   */
+  void publishAttributes(const Attributes::Map &attributes);
+
+  /**
+   * @brief Publish JSON attributes only if changed (`with_attributes` must be true).
+   */
+  void updateAttributes(const Attributes::Map &attributes);
+
+  /**
+   * @brief Set callback for receiving Lock / Unlock / Open commands from Home Assistant.
+   */
+  bool onCommand(std::function<void(Action)> callback);
 
 protected:
-  bool buildComponentConfiguration(ComponentConfig &out) override {
-    return buildChildComponentConfiguration(_ha_entity_sensor, out);
-  }
+  bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
-  HaEntitySensor _ha_entity_sensor;
+  static const char *stateToPayload(State state);
+
+private:
+  bool _with_open;
+  HaEntityActuator _ha_entity_actuator;
 };
 
 #endif // __HA_ENTITY_LOCK_H__

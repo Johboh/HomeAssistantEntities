@@ -5,6 +5,7 @@
 #include <HaUtilities.h>
 #include <IJson.h>
 #include <algorithm>
+#include <cmath>
 
 using namespace homeassistantentities;
 
@@ -162,6 +163,9 @@ void HaEntitySensor::republishState() {
 }
 
 void HaEntitySensor::publish(double value, const Attributes::Map &attributes) {
+  if (!std::isfinite(value)) {
+    return;
+  }
   publish(formatNumber(value), attributes);
 }
 
@@ -194,6 +198,9 @@ void HaEntitySensor::publishAttributes(const Attributes::Map &attributes) {
 }
 
 void HaEntitySensor::update(double value, const Attributes::Map &attributes) {
+  if (!std::isfinite(value)) {
+    return;
+  }
   update(formatNumber(value), attributes);
 }
 

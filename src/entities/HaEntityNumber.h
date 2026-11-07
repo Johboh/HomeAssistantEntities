@@ -4,6 +4,8 @@
 #ifndef __HA_ENTITY_NUMBER_H__
 #define __HA_ENTITY_NUMBER_H__
 
+#include "HaDeviceClasses.h"
+#include "HaEntityActuator.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -39,9 +41,8 @@ public:
     std::string unit = "";
 
     /**
-     * @brief the device class for this number. Should be any of
-     * https://www.home-assistant.io/integrations/number/#device-class
-     * Will eventually be replaced by a typed device class.
+     * @brief the device class for this number (e.g. "duration", "temperature", or a class from
+     * homeassistantentities::Sensor::*). See https://www.home-assistant.io/integrations/number/#device-class
      */
     std::string device_class = "";
 
@@ -142,13 +143,11 @@ protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _object_id;
-  Configuration _configuration;
+  static Configuration sanitizeConfiguration(Configuration configuration);
 
 private:
-  std::optional<float> _number;
+  Configuration _configuration;
+  HaEntityActuator _ha_entity_actuator;
 };
 
 #endif // __HA_ENTITY_NUMBER_H__

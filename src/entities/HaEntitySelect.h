@@ -4,6 +4,8 @@
 #ifndef __HA_ENTITY_SELECT_H__
 #define __HA_ENTITY_SELECT_H__
 
+#include "HaDeviceClasses.h"
+#include "HaEntityActuator.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -98,13 +100,7 @@ protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _object_id;
-  Configuration _configuration;
-
-private:
-  std::optional<std::string> _selection;
+  HaEntityActuator _ha_entity_actuator;
 };
 
 #endif // __HA_ENTITY_SELECT_H__

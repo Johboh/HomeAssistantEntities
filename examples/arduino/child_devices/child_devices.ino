@@ -10,10 +10,12 @@
 #include <IJson.h>
 #include <MQTTRemote.h>
 #include <entities/HaEntityButton.h>
+#include <entities/HaEntityEnergy.h>
 #include <entities/HaEntityPower.h>
 #include <entities/HaEntitySensor.h>
 #include <entities/HaEntitySwitch.h>
 #include <entities/HaEntityTemperature.h>
+#include <entities/HaEntityUpdate.h>
 #include <functional>
 #include <vector>
 #ifdef ESP32
@@ -63,20 +65,24 @@ HaEntitySensor _wifi_rssi(ha_bridge, "WiFi Signal", std::nullopt,
                           });
 HaEntityButton _restart_button(ha_bridge, "Restart", "restart",
                                {.device_class = "restart", .icon = "mdi:restart", .entity_category = "config"});
+HaEntityUpdate _firmware_update(ha_bridge, "Firmware");
 
-// Child device 1 entities (Outlet 1 switch + power meter).
+// Child device 1 entities (Outlet 1 switch + power + energy meter).
 HaEntitySwitch _outlet_1_switch(outlet_1_bridge, "Switch", "",
                                 {.retain = false, .device_class = "outlet", .icon = "mdi:power-socket-eu"});
 HaEntityPower _outlet_1_power(outlet_1_bridge, "Power");
+HaEntityEnergy _outlet_1_energy(outlet_1_bridge, "Energy");
 
 // Child device 2 entities (Outlet 2 switch + power meter).
 HaEntitySwitch _outlet_2_switch(outlet_2_bridge, "Switch", "",
-                                {.retain = false, .device_class = "outlet", .icon = "mdi:power-socket-eu"});
+                                {.retain = false,
+                                 .device_class = homeassistantentities::Switch::Outlet{},
+                                 .icon = "mdi:power-socket-eu"});
 HaEntityPower _outlet_2_power(outlet_2_bridge, "Power");
 
 std::vector<std::reference_wrapper<HaEntity>> _all_entities = {
-    _board_temperature, _wifi_rssi,       _restart_button, _outlet_1_switch,
-    _outlet_1_power,    _outlet_2_switch, _outlet_2_power,
+    _board_temperature, _wifi_rssi,       _restart_button,  _firmware_update, _outlet_1_switch,
+    _outlet_1_power,    _outlet_1_energy, _outlet_2_switch, _outlet_2_power,
 };
 
 unsigned long _last_publish_ms = 0;
@@ -108,6 +114,7 @@ void setup() {
 
   // Register command and Home Assistant birth subscriptions once before starting MQTT.
   _restart_button.onCommand([]() { ESP.restart(); });
+  _firmware_update.onCommand([]() { Serial.println("Starting OTA firmware update..."); });
   _outlet_1_switch.onCommand([](bool on) { _outlet_1_switch.publish(on); });
   _outlet_2_switch.onCommand([](bool on) { _outlet_2_switch.publish(on); });
 
@@ -139,7 +146,9 @@ void loop() {
   if (now - _last_publish_ms > 10000) {
     _board_temperature.update(38.5);
     _wifi_rssi.update(WiFi.RSSI());
+    _firmware_update.update("1.0.0", "1.0.0");
     _outlet_1_power.update(42.0);
+    _outlet_1_energy.update(1.25);
     _outlet_2_power.update(0.0);
     _last_publish_ms = now;
   }

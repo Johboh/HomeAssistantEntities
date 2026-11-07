@@ -12,18 +12,23 @@
 #include <functional>
 #include <nlohmann/json.hpp>
 
+#include <entities/HaEntityActuator.h>
 #include <entities/HaEntityAtmosphericPressure.h>
 #include <entities/HaEntityBoolean.h>
 #include <entities/HaEntityBrightness.h>
 #include <entities/HaEntityButton.h>
 #include <entities/HaEntityCarbonDioxide.h>
+#include <entities/HaEntityCarbonMonoxide.h>
 #include <entities/HaEntityCover.h>
 #include <entities/HaEntityCurrent.h>
 #include <entities/HaEntityDeviceTrigger.h>
+#include <entities/HaEntityDistance.h>
 #include <entities/HaEntityDoor.h>
+#include <entities/HaEntityEnergy.h>
 #include <entities/HaEntityEvent.h>
 #include <entities/HaEntityFan.h>
 #include <entities/HaEntityHumidity.h>
+#include <entities/HaEntityIlluminance.h>
 #include <entities/HaEntityJson.h>
 #include <entities/HaEntityLight.h>
 #include <entities/HaEntityLock.h>
@@ -41,6 +46,8 @@
 #include <entities/HaEntityText.h>
 #include <entities/HaEntityTimestamp.h>
 #include <entities/HaEntityUnitConcentration.h>
+#include <entities/HaEntityUpdate.h>
+#include <entities/HaEntityValve.h>
 #include <entities/HaEntityVolatileOrganicCompounds.h>
 #include <entities/HaEntityVoltage.h>
 #include <entities/HaEntityWeight.h>
@@ -49,7 +56,6 @@
 
 // Information about this device.
 // All these keys will be added to a "device" key in the Home Assistant configuration for each entity.
-// Only a flat layout structure is supported, no nesting.
 // We call setupJsonForThisDevice() from app_main() to populate the Json document.
 nlohmann::json _json_this_device_doc;
 void setupJsonForThisDevice() {
@@ -75,18 +81,28 @@ auto unique_id = [](IMQTTRemote &remote, std::string &node_id) {
 HaBridge ha_bridge(_mqtt_remote, "livingroom", _json_this_device_doc, verbose, availability_topic, unique_id);
 
 // All entities.
+homeassistantentities::Switch::Outlet _outlet_class;
+HaEntityActuator _ha_entity_actuator(ha_bridge, "actuator outlet", "desk",
+                                     HaEntityActuator::Configuration{
+                                         .device_class = _outlet_class,
+                                         .with_attributes = true,
+                                     });
 HaEntityAtmosphericPressure _ha_entity_atm(ha_bridge, "pressure", std::nullopt,
                                            HaEntityAtmosphericPressure::Configuration{.force_update = false});
 HaEntityBoolean _ha_entity_bool(ha_bridge, "bool", std::nullopt, {.with_attributes = true, .force_update = false});
 HaEntityBrightness _ha_entity_bright(ha_bridge, "brightness", std::nullopt, {.force_update = false});
-HaEntityButton _ha_entity_button(ha_bridge, "button", "");
+HaEntityButton _ha_entity_button(ha_bridge, "button", "", {.device_class = homeassistantentities::Button::Identify{}});
 HaEntityCarbonDioxide _ha_entity_carbon_dioxide(ha_bridge, "Carbon dioxide");
-HaEntityCover _ha_entity_cover(ha_bridge, "cover", "left_window", {.device_class = "shade"});
+HaEntityCarbonMonoxide _ha_entity_carbon_monoxide(ha_bridge, "Carbon monoxide");
+HaEntityCover _ha_entity_cover(ha_bridge, "cover", "left_window",
+                               {.device_class = homeassistantentities::Cover::Shade{}, .with_tilt = true});
 HaEntityCurrent _ha_entity_current(ha_bridge, "current", std::nullopt,
                                    {.unit = HaEntityCurrent::Unit::mA, .force_update = false});
 HaEntityDeviceTrigger _ha_entity_device_trigger(ha_bridge, "device_trigger",
                                                 {.type = "button_short_press", .subtype = "button_1"});
+HaEntityDistance _ha_entity_distance(ha_bridge, "distance", std::nullopt, {.unit = HaEntityDistance::Unit::cm});
 HaEntityDoor _ha_entity_door(ha_bridge, "door", "");
+HaEntityEnergy _ha_entity_energy(ha_bridge, "energy");
 HaEntityEvent _ha_entity_event(ha_bridge, "event", "party",
                                {.event_types = {"button_press"}, .device_class = HaEntityEvent::DeviceClass::Button});
 HaEntityFan _ha_entity_fan(ha_bridge, "fan", "ceiling",
@@ -98,6 +114,7 @@ HaEntityFan _ha_entity_fan(ha_bridge, "fan", "ceiling",
                             .presets = {"eco", "boost"},
                             .retain = false});
 HaEntityHumidity _ha_entity_humidity(ha_bridge, "humidity", std::nullopt, {.force_update = false});
+HaEntityIlluminance _ha_entity_illuminance(ha_bridge, "illuminance");
 HaEntityJson _ha_entity_json(ha_bridge, "json", std::nullopt, {.force_update = false});
 HaEntityLight _ha_entity_light(ha_bridge, "light", "roof",
                                {.with_brightness = true,
@@ -105,7 +122,7 @@ HaEntityLight _ha_entity_light(ha_bridge, "light", "roof",
                                 .with_rgb_color = true,
                                 .effects = {"colorloop"},
                                 .retain = false});
-HaEntityLock _ha_entity_lock(ha_bridge, "lock");
+HaEntityLock _ha_entity_lock(ha_bridge, "lock", std::nullopt, {.with_open = true});
 HaEntityMotion _ha_entity_motion(ha_bridge, "motion");
 HaEntityNumber _ha_entity_number(
     ha_bridge, "number", "danceability",
@@ -134,6 +151,9 @@ HaEntityTimestamp _ha_entity_timestamp(ha_bridge, "timestamp", std::nullopt,
                                        {.with_attributes = false, .force_update = false});
 HaEntityUnitConcentration _ha_entity_unit_concentration(ha_bridge, "concentration", std::nullopt,
                                                         {.unit = HaEntityUnitConcentration::Unit::mL});
+HaEntityUpdate _ha_entity_update(ha_bridge, "firmware");
+HaEntityValve _ha_entity_valve(ha_bridge, "water valve", "main",
+                               {.device_class = homeassistantentities::Valve::Water{}, .reports_position = true});
 HaEntityVolatileOrganicCompounds _ha_entity_volatile_organic_compounds(
     ha_bridge, "volatile organic compounds", std::nullopt,
     {.unit = HaEntityVolatileOrganicCompounds::Unit::Concentration, .force_update = false});
@@ -149,15 +169,20 @@ void haStateTask(void *pvParameters) {
   jsn["hello"] = "world";
 
   while (1) {
+    _ha_entity_actuator.publish("ON", {{"load_w", 42}});
     _ha_entity_atm.publish(1001.5);
     _ha_entity_bool.publish(true);
     _ha_entity_bool.publishAttributes({{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_bright.publish(55.0);
     _ha_entity_carbon_dioxide.publish(55.0);
+    _ha_entity_carbon_monoxide.publish(1.2);
     _ha_entity_cover.publish(HaEntityCover::State::Opening, 50);
+    _ha_entity_cover.publishTilt(30);
     _ha_entity_current.publish(10);
     _ha_entity_device_trigger.publish();
+    _ha_entity_distance.publish(120.5);
     _ha_entity_door.publish(true);
+    _ha_entity_energy.publish(12.34);
     _ha_entity_event.publish("button_press", {{"attr1", "value1"}, {"attr2", "value2"}});
     _ha_entity_fan.publish(true);
     _ha_entity_fan.publishSpeed(50);
@@ -165,6 +190,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_fan.publishDirection("forward");
     _ha_entity_fan.publishOscillation(true);
     _ha_entity_humidity.publish(55.0);
+    _ha_entity_illuminance.publish(350.0);
     _ha_entity_json.publish(jsn);
     _ha_entity_light.publish(true);
     _ha_entity_light.publishBrightness(255);
@@ -185,6 +211,8 @@ void haStateTask(void *pvParameters) {
     _ha_entity_text.publish("text");
     _ha_entity_timestamp.publish("2025-05-06T15:43:00Z");
     _ha_entity_unit_concentration.publish(55.0);
+    _ha_entity_update.publish({.installed_version = "1.0.0", .latest_version = "1.1.0", .title = "Livingroom FW"});
+    _ha_entity_valve.publish(HaEntityValve::State::Opening, 60);
     _ha_entity_volatile_organic_compounds.publish(55.0);
     _ha_entity_voltage.publish(55.0);
     _ha_entity_weight.publish(55.0);
@@ -198,18 +226,23 @@ void app_main();
 }
 
 void publishAllConfigurations() {
+  _ha_entity_actuator.publishConfiguration();
   _ha_entity_atm.publishConfiguration();
   _ha_entity_bool.publishConfiguration();
   _ha_entity_bright.publishConfiguration();
   _ha_entity_button.publishConfiguration();
   _ha_entity_carbon_dioxide.publishConfiguration();
+  _ha_entity_carbon_monoxide.publishConfiguration();
   _ha_entity_cover.publishConfiguration();
   _ha_entity_current.publishConfiguration();
   _ha_entity_device_trigger.publishConfiguration();
+  _ha_entity_distance.publishConfiguration();
   _ha_entity_door.publishConfiguration();
+  _ha_entity_energy.publishConfiguration();
   _ha_entity_event.publishConfiguration();
   _ha_entity_fan.publishConfiguration();
   _ha_entity_humidity.publishConfiguration();
+  _ha_entity_illuminance.publishConfiguration();
   _ha_entity_json.publishConfiguration();
   _ha_entity_light.publishConfiguration();
   _ha_entity_lock.publishConfiguration();
@@ -226,6 +259,8 @@ void publishAllConfigurations() {
   _ha_entity_text.publishConfiguration();
   _ha_entity_timestamp.publishConfiguration();
   _ha_entity_unit_concentration.publishConfiguration();
+  _ha_entity_update.publishConfiguration();
+  _ha_entity_valve.publishConfiguration();
   _ha_entity_volatile_organic_compounds.publishConfiguration();
   _ha_entity_voltage.publishConfiguration();
   _ha_entity_weight.publishConfiguration();
@@ -247,9 +282,11 @@ void app_main(void) {
     // Connected to WIFI.
 
     // Register for callbacks.
+    _ha_entity_actuator.onCommand([](const std::string &cmd) {});
     _ha_entity_button.onCommand([]() {});
     _ha_entity_cover.onCommand([](HaEntityCover::Action action) {});
     _ha_entity_cover.onPosition([](uint8_t position) {});
+    _ha_entity_cover.onTilt([](uint8_t tilt) {});
     _ha_entity_fan.onCommand([](bool on) {});
     _ha_entity_fan.onSpeed([](uint32_t speed) {});
     _ha_entity_fan.onPreset([](std::string preset) {});
@@ -260,10 +297,14 @@ void app_main(void) {
     _ha_entity_light.onColorTemperature([](uint16_t color_temp) {});
     _ha_entity_light.onRgb([](HaEntityLight::RGB rgb) {});
     _ha_entity_light.onEffect([](std::string effect) {});
+    _ha_entity_lock.onCommand([](HaEntityLock::Action action) {});
     _ha_entity_number.onCommand([](float number) {});
     _ha_entity_select.onCommand([](std::string selected) {});
     _ha_entity_text.onCommand([](std::string text) {});
     _ha_entity_switch.onCommand([](bool on) {});
+    _ha_entity_update.onCommand([]() {});
+    _ha_entity_valve.onCommand([](HaEntityValve::Action action) {});
+    _ha_entity_valve.onPosition([](uint8_t position) {});
 
     // Re-publish configurations if Home Assistant restarts while we stay connected to MQTT.
     ha_bridge.onHomeAssistantBirth([]() { publishAllConfigurations(); });

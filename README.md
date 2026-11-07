@@ -15,11 +15,14 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Binary sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/binary_sensor/#device-class) using a device class from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
 - Brightness (%)
 - Carbon Dioxide (ppm)
-- Current (A, mA)
+- Carbon Monoxide (ppm, ppb, mg/m³, μg/m³)
+- Current (A, mA, μA)
+- Distance (km, m, cm, mm, mi, nmi, yd, in, ft)
 - Door (open/closed)
+- Energy (J, kJ, MJ, GJ, mWh, Wh, kWh, MWh, GWh, TWh, cal, kcal, Mcal, Gcal, thm)
 - Humidity (%)
+- Illuminance (lx)
 - Json (raw "json"-sensor)
-- Lock (binary sensor: locked/unlocked)
 - Motion (detected/not detected)
 - Particulate matter (μg/m³)
 - Power (mW, W, kW, MW, GW, TW)
@@ -32,21 +35,25 @@ Home Assistant has a well defined way of defining sensors and actuators using MQ
 - Volatile organic compounds (µg/m³, ppb)
 - Voltage (V, mV, µV)
 - Weight (kg, g, mg, ug, oz, lb, st)
-- Sensor (Generic sensor, with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement using a device class from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
+- Sensor (Generic composable sensor via [HaEntitySensor.h](./src/entities/HaEntitySensor.h), with any supported [device class](https://www.home-assistant.io/integrations/sensor/#device-class) and unit of measurement from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
 
 ### Currently supported actuators (and controls)*
-- Button
-- Cover (open/opening, close/closing, position)
+- Actuator (Generic composable actuator via [HaEntityActuator.h](./src/entities/HaEntityActuator.h), with typed device classes from [HaDeviceClasses.h](./src/entities/HaDeviceClasses.h))
+- Button (press, device classes `identify`, `restart`, `update`)
+- Cover (open/opening, close/closing, stop/stopped, position, tilt, typed cover device classes)
 - Device trigger
 - Event
-- Fan
-- Light (brightness, color temperature, rgb, effect)
-- Number (value, slider/box, step, min/max, unit)
+- Fan (on/off, speed percentage, presets, direction, oscillation)
+- Light (brightness, color temperature in Kelvin/mireds, rgb, effect)
+- Lock (lock/unlock/open commands, locked/unlocked/locking/unlocking/jammed/opening/open states, PIN `code_format`)
+- Number (value, slider/box, step, min/max, unit, device class)
 - Select (options list)
-- Switch (on/off)
+- Switch (on/off, device classes `outlet`, `switch`)
 - Text (text input, regex pattern, password mode)
+- Update (installed/latest firmware or software version, release notes, progress, OTA `INSTALL` command)
+- Valve (open/opening, close/closing, stop/stopped, position, device classes `water`, `gas`)
 
-*_If you can't find a sensor/actuator you need, either use the generic sensor, create a pull request to add one or raise an issue on GitHub and we'll add it to this library._
+*_If you can't find a sensor/actuator you need, either use the generic composable `HaEntitySensor` / `HaEntityActuator`, create a pull request to add one, or raise an issue on GitHub and we'll add it to this library._
 
 ### Device Topologies & Home Assistant MQTT Discovery
 In addition to standard single-component discovery (`entity.publishConfiguration()`), [HaBridge.h](./src/HaBridge.h) and [HaDeviceInformation.h](./src/HaDeviceInformation.h) support the full [Home Assistant MQTT Discovery specification](https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery):

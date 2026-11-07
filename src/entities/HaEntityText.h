@@ -4,6 +4,8 @@
 #ifndef __HA_ENTITY_TEXT_H__
 #define __HA_ENTITY_TEXT_H__
 
+#include "HaDeviceClasses.h"
+#include "HaEntityActuator.h"
 #include <HaBridge.h>
 #include <HaEntity.h>
 #include <cstdint>
@@ -96,7 +98,7 @@ public:
    * are [a-zA-Z0-9_-] (machine readable, not human readable)
    * @param configuration the configuration for this entity.
    */
-  HaEntityText(HaBridge &ha_bridge, std::string name, std::string child_object_id,
+  HaEntityText(HaBridge &ha_bridge, std::string name, std::string child_object_id = "",
                Configuration configuration = _default);
 
 public:
@@ -132,13 +134,11 @@ protected:
   bool buildComponentConfiguration(ComponentConfig &out) override;
 
 private:
-  std::string _name;
-  HaBridge &_ha_bridge;
-  std::string _child_object_id;
-  Configuration _configuration;
+  static Configuration sanitizeConfiguration(Configuration configuration);
 
 private:
-  std::optional<std::string> _str;
+  Configuration _configuration;
+  HaEntityActuator _ha_entity_actuator;
 };
 
 #endif // __HA_ENTITY_TEXT_H__
