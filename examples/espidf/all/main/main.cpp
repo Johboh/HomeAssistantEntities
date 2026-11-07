@@ -37,6 +37,7 @@
 #include <entities/HaEntityHumidity.h>
 #include <entities/HaEntityIlluminance.h>
 #include <entities/HaEntityImage.h>
+#include <entities/HaEntityInfrared.h>
 #include <entities/HaEntityJson.h>
 #include <entities/HaEntityLawnMower.h>
 #include <entities/HaEntityLight.h>
@@ -187,6 +188,7 @@ HaEntityDateTime _ha_entity_datetime(ha_bridge, "datetime");
 HaEntityDeviceTracker _ha_entity_tracker(ha_bridge, "tracker");
 HaEntityHumidifier _ha_entity_humidifier(ha_bridge, "humidifier");
 HaEntityImage _ha_entity_image(ha_bridge, "image");
+HaEntityInfrared _ha_entity_infrared(ha_bridge, "infrared");
 HaEntityLawnMower _ha_entity_mower(ha_bridge, "lawn_mower");
 HaEntityNotify _ha_entity_notify(ha_bridge, "notify");
 HaEntityScene _ha_entity_scene(ha_bridge, "scene");
@@ -264,6 +266,7 @@ void haStateTask(void *pvParameters) {
     _ha_entity_humidifier.publishTargetHumidity(50);
     _ha_entity_humidifier.publishAction(HaEntityHumidifier::Action::Humidifying);
     _ha_entity_image.publishUrl("https://placehold.co/600x400.png");
+    _ha_entity_infrared.publish("{\"protocol\":\"NEC\",\"address\":0x00,\"command\":0x10}");
     _ha_entity_mower.publish(HaEntityLawnMower::Activity::Mowing);
     _ha_entity_siren.publish(false);
     _ha_entity_tag.publishTag("TAG_A1B2C3D4");
@@ -329,6 +332,7 @@ void publishAllConfigurations() {
   _ha_entity_tracker.publishConfiguration();
   _ha_entity_humidifier.publishConfiguration();
   _ha_entity_image.publishConfiguration();
+  _ha_entity_infrared.publishConfiguration();
   _ha_entity_mower.publishConfiguration();
   _ha_entity_notify.publishConfiguration();
   _ha_entity_scene.publishConfiguration();
@@ -371,6 +375,7 @@ void app_main(void) {
     _ha_entity_fan.onOscillation([](bool oscillation) {});
     _ha_entity_humidifier.onCommand([](bool on) {});
     _ha_entity_humidifier.onTargetHumidity([](uint8_t target) {});
+    _ha_entity_infrared.onCommand([](const std::string &code) {});
     _ha_entity_light.onCommand([](bool on) {});
     _ha_entity_light.onBrightness([](uint8_t brightness) {});
     _ha_entity_light.onColorTemperature([](uint16_t color_temp) {});

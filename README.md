@@ -57,6 +57,7 @@ Home Assistant has a well-defined way of defining sensors and actuators using MQ
 - [Fan](https://github.com/Johboh/HomeAssistantEntities/blob/main/src/entities/HaEntityFan.h) (on/off, numeric speed range mapped to percentage, preset modes, forward/reverse direction, oscillation)
 - [Humidifier](https://github.com/Johboh/HomeAssistantEntities/blob/main/src/entities/HaEntityHumidifier.h) (humidifier and dehumidifier with target humidity, ambient humidity, action, modes)
 - [Image](https://github.com/Johboh/HomeAssistantEntities/blob/main/src/entities/HaEntityImage.h) (image URL or binary image stream over MQTT)
+- [Infrared](https://github.com/Johboh/HomeAssistantEntities/blob/main/src/entities/HaEntityInfrared.h) (infrared transmitter/emitter for blasting IR commands and receiver for capturing IR codes, or combined transceiver)
 - [Lawn Mower](https://github.com/Johboh/HomeAssistantEntities/blob/main/src/entities/HaEntityLawnMower.h) (activity states: mowing, docked, paused, returning, error; start, pause, dock commands)
 - [Light](https://github.com/Johboh/HomeAssistantEntities/blob/main/src/entities/HaEntityLight.h) (on/off, brightness, color temperature in Kelvin or mireds, RGB color, effects)
 - [Lock](https://github.com/Johboh/HomeAssistantEntities/blob/main/src/entities/HaEntityLock.h) (`LOCK`/`UNLOCK`/optional `OPEN` commands; `LOCKED`, `UNLOCKED`, `LOCKING`, `UNLOCKING`, `JAMMED`, `OPENING`, `OPEN` states; optional PIN `code_format`)
