@@ -215,13 +215,12 @@ bool HaEntityAlarmControlPanel::onCommand(std::function<void(Command command, co
         if (!message.empty() && message.front() == '{') {
 // Parse JSON if needed
 #if __has_include("nlohmann/json.hpp")
-          try {
-            auto j = nlohmann::json::parse(message);
+          auto j = nlohmann::json::parse(message, nullptr, false);
+          if (!j.is_discarded()) {
             if (j.contains("action") && j["action"].is_string())
               cmd_str = j["action"].get<std::string>();
             if (j.contains("code") && j["code"].is_string())
               code_str = j["code"].get<std::string>();
-          } catch (...) {
           }
 #elif __has_include(<ArduinoJson.h>)
       JsonDocument jdoc;

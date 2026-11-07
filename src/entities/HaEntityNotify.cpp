@@ -70,15 +70,14 @@ bool HaEntityNotify::onNotify(std::function<void(const std::string &message, con
         std::string title = "";
         if (!message.empty() && message.front() == '{') {
 #if __has_include("nlohmann/json.hpp")
-          try {
-            auto j = nlohmann::json::parse(message);
+          auto j = nlohmann::json::parse(message, nullptr, false);
+          if (!j.is_discarded()) {
             if (j.contains("message") && j["message"].is_string()) {
               text = j["message"].get<std::string>();
             }
             if (j.contains("title") && j["title"].is_string()) {
               title = j["title"].get<std::string>();
             }
-          } catch (...) {
           }
 #elif __has_include(<ArduinoJson.h>)
           JsonDocument jdoc;

@@ -141,9 +141,10 @@ bool HaEntityWaterHeater::onTargetTemperature(std::function<void(double temperat
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_TARGET_TEMP),
       [callback](std::string, std::string message) {
-        try {
-          callback(std::stod(message));
-        } catch (...) {
+        char *end = nullptr;
+        double temp = std::strtod(message.c_str(), &end);
+        if (end != message.c_str() && *end == '\0') {
+          callback(temp);
         }
       });
 }

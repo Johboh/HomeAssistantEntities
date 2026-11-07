@@ -114,8 +114,8 @@ bool HaEntitySiren::onCommand(std::function<void(bool on)> callback) {
           bool is_on = true;
           TurnOnParams params;
 #if __has_include("nlohmann/json.hpp")
-          try {
-            auto j = nlohmann::json::parse(message);
+          auto j = nlohmann::json::parse(message, nullptr, false);
+          if (!j.is_discarded()) {
             if (j.contains("state") && j["state"].is_string()) {
               is_on = (j["state"].get<std::string>() == "ON");
             }
@@ -128,7 +128,6 @@ bool HaEntitySiren::onCommand(std::function<void(bool on)> callback) {
             if (j.contains("volume_level") && j["volume_level"].is_number()) {
               params.volume_level = j["volume_level"].get<double>();
             }
-          } catch (...) {
           }
 #elif __has_include(<ArduinoJson.h>)
           JsonDocument jdoc;

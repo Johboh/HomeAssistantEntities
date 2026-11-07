@@ -371,9 +371,10 @@ bool HaEntityClimate::onTargetTemperature(std::function<void(double)> callback) 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, SUB_TARGET_TEMP),
       [callback](std::string, std::string message) {
-        try {
-          callback(std::stod(message));
-        } catch (...) {
+        char *end = nullptr;
+        double temp = std::strtod(message.c_str(), &end);
+        if (end != message.c_str() && *end == '\0') {
+          callback(temp);
         }
       });
 }
@@ -406,24 +407,26 @@ bool HaEntityClimate::onTargetTemperatureRange(std::function<void(double low, do
   bool ok1 = _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, SUB_TARGET_TEMP_LOW),
       [this](std::string, std::string message) {
-        try {
-          _target_temp_low = std::stod(message);
+        char *end = nullptr;
+        double val = std::strtod(message.c_str(), &end);
+        if (end != message.c_str() && *end == '\0') {
+          _target_temp_low = val;
           if (_range_callback && _target_temp_high) {
             _range_callback(*_target_temp_low, *_target_temp_high);
           }
-        } catch (...) {
         }
       });
 
   bool ok2 = _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, SUB_TARGET_TEMP_HIGH),
       [this](std::string, std::string message) {
-        try {
-          _target_temp_high = std::stod(message);
+        char *end = nullptr;
+        double val = std::strtod(message.c_str(), &end);
+        if (end != message.c_str() && *end == '\0') {
+          _target_temp_high = val;
           if (_range_callback && _target_temp_low) {
             _range_callback(*_target_temp_low, *_target_temp_high);
           }
-        } catch (...) {
         }
       });
 
@@ -564,9 +567,10 @@ bool HaEntityClimate::onTargetHumidity(std::function<void(uint8_t)> callback) {
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, SUB_TARGET_HUMIDITY),
       [callback](std::string, std::string message) {
-        try {
-          callback(static_cast<uint8_t>(std::atoi(message.c_str())));
-        } catch (...) {
+        char *end = nullptr;
+        long val = std::strtol(message.c_str(), &end, 10);
+        if (end != message.c_str() && *end == '\0' && val >= 0 && val <= 100) {
+          callback(static_cast<uint8_t>(val));
         }
       });
 }

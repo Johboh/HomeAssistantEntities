@@ -198,9 +198,10 @@ bool HaEntityHumidifier::onTargetHumidity(std::function<void(uint8_t humidity)> 
   return _ha_bridge.remote().subscribe(
       _ha_bridge.getTopic(HaBridge::TopicType::Command, COMPONENT, _child_object_id, OBJECT_ID_TARGET_HUMIDITY),
       [callback](std::string, std::string message) {
-        try {
-          callback(static_cast<uint8_t>(std::atoi(message.c_str())));
-        } catch (...) {
+        char *end = nullptr;
+        long val = std::strtol(message.c_str(), &end, 10);
+        if (end != message.c_str() && *end == '\0' && val >= 0 && val <= 100) {
+          callback(static_cast<uint8_t>(val));
         }
       });
 }
