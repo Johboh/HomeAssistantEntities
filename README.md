@@ -72,6 +72,75 @@ In addition to standard single-component discovery (`entity.publishConfiguration
   - Customize discovery prefix (`setDiscoveryPrefix`), availability payloads (`setAvailabilityPayloads`), and entity metadata (`entity_category`, `icon`, `expire_after`, `off_delay`, `suggested_display_precision`, `optimistic`, `enabled_by_default`).
   - Inspect exact state, command, availability, and discovery topics via `getTopic(...)`, `getAvailabilityTopic()`, `getDiscoveryTopic(...)`, and `getDeviceDiscoveryTopic()` when configuring Home Assistant MQTT Subentries manually.
 
+### Per-Entity Discovery vs. Unified Device Discovery
+
+This library supports two complementary discovery mechanisms for Home Assistant:
+
+#### 1. Per-Entity Discovery (Classic Path)
+In the classic approach, each entity publishes its own discovery configuration to its own topic:  
+`<discovery_prefix>/<component>/<node_id>/<object_id>/config`
+
+```cpp
+// Publish each entity individually:
+temperature.publishConfiguration();
+humidity.publishConfiguration();
+relay.publishConfiguration();
+```
+
+- **How it works**: Every entity sends a self-contained retained JSON payload containing its configuration and device metadata.
+- **Pros**:
+  - **Minimal packet size**: Each message is small (300–800 bytes), making it ideal for memory-constrained MCUs (e.g. ESP8266 or Arduino with default 512-byte MQTT buffers).
+  - **Independent lifecycle**: Entities can be initialized, published, updated, or removed individually at any time without touching other entities.
+  - **Universal compatibility**: Works with any Home Assistant release that supports MQTT discovery.
+- **Cons**:
+  - **Broker chattiness**: $N$ entities require $N$ separate retained discovery topics on the MQTT broker.
+  - **Duplicated metadata**: The `device` information is repeated inside each individual entity's discovery message.
+  - **Individual cleanup**: Deleting a device requires removing each entity topic individually with `entity.unpublishConfiguration()`.
+
+#### 2. Unified Device-Based Discovery (Device Path)
+Introduced in Home Assistant 2024.2, device discovery publishes a single unified discovery payload representing the entire device and all its entities to:  
+`<discovery_prefix>/device/<node_id>/config`
+
+```cpp
+// Publish the entire device and all its entities in one atomic payload:
+ha_bridge.publishDeviceConfiguration({temperature, humidity, relay});
+```
+
+- **How it works**: A single retained JSON payload publishes the device's identifiers, origin information, and a `components` dictionary mapping each entity's `object_id` to its platform and options.
+- **Pros**:
+  - **Atomic discovery**: A single retained MQTT message registers or updates the entire device and all its entities at once.
+  - **Clean broker**: Only 1 retained discovery topic per physical device on the broker instead of $N$.
+  - **Atomic cleanup**: Calling `ha_bridge.unpublishDeviceConfiguration()` instantly removes the entire device and all its entities from Home Assistant.
+  - **Child devices**: Seamlessly groups sub-devices (`child_devices` on a smart power strip) under the parent device in one payload.
+- **Cons**:
+  - **Larger packet size**: The combined JSON document can reach 2–8 KB. The MQTT client buffer (`max_message_size` or `MQTT_MAX_PACKET_SIZE`) and available heap memory must be sized accordingly.
+  - **Requires Home Assistant 2024.2+**: Older Home Assistant versions do not support device-based discovery.
+  - **Migration step required**: If an existing deployment already used per-entity discovery, switching directly to device discovery leaves old retained per-entity topics on the broker, causing entities to appear twice. Use `ha_bridge.migrateToDeviceConfiguration(...)` to transition safely.
+
+#### Comparison Table
+
+| Feature | Per-Entity Discovery (`publishConfiguration`) | Unified Device Discovery (`publishDeviceConfiguration`) |
+| :--- | :--- | :--- |
+| **MQTT Topic** | `<prefix>/<component>/<node_id>/<object_id>/config` | `<prefix>/device/<node_id>/config` |
+| **Retained Messages** | $N$ messages (one per entity) | 1 message per physical device |
+| **Message Size** | ~300 – 800 bytes per message | ~2 – 8 KB single message |
+| **RAM / Buffer Requirement** | Low (works with 512-byte MQTT buffers) | Medium (requires 4–16 KB MQTT buffers & heap) |
+| **Home Assistant Version** | All versions | Home Assistant 2024.2+ |
+| **Unpublish / Removal** | Per entity (`entity.unpublishConfiguration()`) | Entire device (`ha_bridge.unpublishDeviceConfiguration()`) |
+| **Child Devices** | Supported via individual bridge instances | Supported natively in single bundle |
+| **Example Code** | [Arduino: Sensors](https://github.com/Johboh/HomeAssistantEntities/blob/main/examples/arduino/sensors/sensors.ino)<br>[ESP-IDF: Sensors](https://github.com/Johboh/HomeAssistantEntities/blob/main/examples/espidf/sensors/main/main.cpp) | [Arduino: Child Devices](https://github.com/Johboh/HomeAssistantEntities/blob/main/examples/arduino/child_devices/child_devices.ino)<br>[ESP-IDF: Child Devices](https://github.com/Johboh/HomeAssistantEntities/blob/main/examples/espidf/child_devices/main/main.cpp) |
+
+#### Migrating Existing Devices Safely
+To migrate existing devices from per-entity discovery to unified device discovery without creating duplicate entities or losing entity customizations in Home Assistant:
+
+```cpp
+std::vector<std::reference_wrapper<HaEntity>> all_entities = {temperature, humidity, relay};
+
+// Call once when upgrading firmware:
+ha_bridge.migrateToDeviceConfiguration(all_entities);
+```
+`migrateToDeviceConfiguration()` first publishes `{"migrate_discovery": true}` to each entity's old single-component topic, publishes the new device discovery payload, and purges the old retained topics with empty payloads.
+
 ### Installation
 #### PlatformIO (Arduino or ESP-IDF):
 Add the following to `lib_deps`:
