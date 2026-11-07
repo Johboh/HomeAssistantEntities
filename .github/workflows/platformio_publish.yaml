@@ -2,6 +2,8 @@ name: Push to PlatformIO registry
 on:
   release:
     types: [created]
+  workflow_dispatch:
+
 jobs:
   build_examples_for_verification:
     uses: ./.github/workflows/platformio.yaml
