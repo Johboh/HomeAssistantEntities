@@ -13,43 +13,59 @@
 #include <nlohmann/json.hpp>
 
 #include <entities/HaEntityActuator.h>
+#include <entities/HaEntityAlarmControlPanel.h>
 #include <entities/HaEntityAtmosphericPressure.h>
 #include <entities/HaEntityBoolean.h>
 #include <entities/HaEntityBrightness.h>
 #include <entities/HaEntityButton.h>
+#include <entities/HaEntityCamera.h>
 #include <entities/HaEntityCarbonDioxide.h>
 #include <entities/HaEntityCarbonMonoxide.h>
+#include <entities/HaEntityClimate.h>
 #include <entities/HaEntityCover.h>
 #include <entities/HaEntityCurrent.h>
+#include <entities/HaEntityDate.h>
+#include <entities/HaEntityDateTime.h>
+#include <entities/HaEntityDeviceTracker.h>
 #include <entities/HaEntityDeviceTrigger.h>
 #include <entities/HaEntityDistance.h>
 #include <entities/HaEntityDoor.h>
 #include <entities/HaEntityEnergy.h>
 #include <entities/HaEntityEvent.h>
 #include <entities/HaEntityFan.h>
+#include <entities/HaEntityHumidifier.h>
 #include <entities/HaEntityHumidity.h>
 #include <entities/HaEntityIlluminance.h>
+#include <entities/HaEntityImage.h>
 #include <entities/HaEntityJson.h>
+#include <entities/HaEntityLawnMower.h>
 #include <entities/HaEntityLight.h>
 #include <entities/HaEntityLock.h>
 #include <entities/HaEntityMotion.h>
+#include <entities/HaEntityNotify.h>
 #include <entities/HaEntityNumber.h>
 #include <entities/HaEntityParticulateMatter.h>
 #include <entities/HaEntityPower.h>
+#include <entities/HaEntityScene.h>
 #include <entities/HaEntitySelect.h>
 #include <entities/HaEntitySensor.h>
 #include <entities/HaEntitySignalStrength.h>
+#include <entities/HaEntitySiren.h>
 #include <entities/HaEntitySound.h>
 #include <entities/HaEntityString.h>
 #include <entities/HaEntitySwitch.h>
+#include <entities/HaEntityTag.h>
 #include <entities/HaEntityTemperature.h>
 #include <entities/HaEntityText.h>
+#include <entities/HaEntityTime.h>
 #include <entities/HaEntityTimestamp.h>
 #include <entities/HaEntityUnitConcentration.h>
 #include <entities/HaEntityUpdate.h>
+#include <entities/HaEntityVacuum.h>
 #include <entities/HaEntityValve.h>
 #include <entities/HaEntityVolatileOrganicCompounds.h>
 #include <entities/HaEntityVoltage.h>
+#include <entities/HaEntityWaterHeater.h>
 #include <entities/HaEntityWeight.h>
 
 #define TAG "example"
@@ -163,6 +179,22 @@ HaEntityWeight _ha_entity_weight(ha_bridge, "weight", std::nullopt,
                                  {.unit = HaEntityWeight::Unit::kg, .force_update = false});
 HaEntitySignalStrength _ha_entity_signal_strength(ha_bridge, "signal_strength", std::nullopt,
                                                   {.unit = HaEntitySignalStrength::Unit::dBm, .force_update = false});
+HaEntityAlarmControlPanel _ha_entity_alarm(ha_bridge, "alarm");
+HaEntityCamera _ha_entity_camera(ha_bridge, "camera");
+HaEntityClimate _ha_entity_climate(ha_bridge, "climate");
+HaEntityDate _ha_entity_date(ha_bridge, "date");
+HaEntityDateTime _ha_entity_datetime(ha_bridge, "datetime");
+HaEntityDeviceTracker _ha_entity_tracker(ha_bridge, "tracker");
+HaEntityHumidifier _ha_entity_humidifier(ha_bridge, "humidifier");
+HaEntityImage _ha_entity_image(ha_bridge, "image");
+HaEntityLawnMower _ha_entity_mower(ha_bridge, "lawn_mower");
+HaEntityNotify _ha_entity_notify(ha_bridge, "notify");
+HaEntityScene _ha_entity_scene(ha_bridge, "scene");
+HaEntitySiren _ha_entity_siren(ha_bridge, "siren");
+HaEntityTag _ha_entity_tag(ha_bridge, "tag");
+HaEntityTime _ha_entity_time(ha_bridge, "time");
+HaEntityVacuum _ha_entity_vacuum(ha_bridge, "vacuum");
+HaEntityWaterHeater _ha_entity_water_heater(ha_bridge, "water_heater");
 
 void haStateTask(void *pvParameters) {
   nlohmann::json jsn;
@@ -217,6 +249,30 @@ void haStateTask(void *pvParameters) {
     _ha_entity_voltage.publish(55.0);
     _ha_entity_weight.publish(55.0);
     _ha_entity_signal_strength.publish(-67);
+    _ha_entity_alarm.publish(HaEntityAlarmControlPanel::State::Disarmed);
+    const uint8_t dummy_cam_img[] = {0xFF, 0xD8, 0xFF, 0xD9};
+    _ha_entity_camera.publishImage(dummy_cam_img, sizeof(dummy_cam_img));
+    _ha_entity_climate.publishMode(HaEntityClimate::Mode::Heat);
+    _ha_entity_climate.publishCurrentTemperature(21.5);
+    _ha_entity_climate.publishTargetTemperature(22.0);
+    _ha_entity_climate.publishAction(HaEntityClimate::Action::Heating);
+    _ha_entity_date.publish("2026-11-07");
+    _ha_entity_datetime.publish("2026-11-07T12:00:00");
+    _ha_entity_tracker.publishLocation(59.3293, 18.0686, 10.0, 95);
+    _ha_entity_humidifier.publish(true);
+    _ha_entity_humidifier.publishCurrentHumidity(45);
+    _ha_entity_humidifier.publishTargetHumidity(50);
+    _ha_entity_humidifier.publishAction(HaEntityHumidifier::Action::Humidifying);
+    _ha_entity_image.publishUrl("https://placehold.co/600x400.png");
+    _ha_entity_mower.publish(HaEntityLawnMower::Activity::Mowing);
+    _ha_entity_siren.publish(false);
+    _ha_entity_tag.publishTag("TAG_A1B2C3D4");
+    _ha_entity_time.publish("12:30:00");
+    _ha_entity_vacuum.publish(HaEntityVacuum::State::Docked);
+    _ha_entity_vacuum.publishBattery(100);
+    _ha_entity_water_heater.publishCurrentTemperature(55.0);
+    _ha_entity_water_heater.publishTargetTemperature(60.0);
+    _ha_entity_water_heater.publishMode("eco");
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }
@@ -265,6 +321,22 @@ void publishAllConfigurations() {
   _ha_entity_voltage.publishConfiguration();
   _ha_entity_weight.publishConfiguration();
   _ha_entity_signal_strength.publishConfiguration();
+  _ha_entity_alarm.publishConfiguration();
+  _ha_entity_camera.publishConfiguration();
+  _ha_entity_climate.publishConfiguration();
+  _ha_entity_date.publishConfiguration();
+  _ha_entity_datetime.publishConfiguration();
+  _ha_entity_tracker.publishConfiguration();
+  _ha_entity_humidifier.publishConfiguration();
+  _ha_entity_image.publishConfiguration();
+  _ha_entity_mower.publishConfiguration();
+  _ha_entity_notify.publishConfiguration();
+  _ha_entity_scene.publishConfiguration();
+  _ha_entity_siren.publishConfiguration();
+  _ha_entity_tag.publishConfiguration();
+  _ha_entity_time.publishConfiguration();
+  _ha_entity_vacuum.publishConfiguration();
+  _ha_entity_water_heater.publishConfiguration();
 }
 
 void app_main(void) {
@@ -283,28 +355,43 @@ void app_main(void) {
 
     // Register for callbacks.
     _ha_entity_actuator.onCommand([](const std::string &cmd) {});
+    _ha_entity_alarm.onCommand([](HaEntityAlarmControlPanel::Command cmd, const std::string &code) {});
     _ha_entity_button.onCommand([]() {});
+    _ha_entity_climate.onMode([](HaEntityClimate::Mode mode) {});
+    _ha_entity_climate.onTargetTemperature([](double temp) {});
     _ha_entity_cover.onCommand([](HaEntityCover::Action action) {});
     _ha_entity_cover.onPosition([](uint8_t position) {});
     _ha_entity_cover.onTilt([](uint8_t tilt) {});
+    _ha_entity_date.onCommand([](const std::string &date) {});
+    _ha_entity_datetime.onCommand([](const std::string &dt) {});
     _ha_entity_fan.onCommand([](bool on) {});
     _ha_entity_fan.onSpeed([](uint32_t speed) {});
     _ha_entity_fan.onPreset([](std::string preset) {});
     _ha_entity_fan.onDirection([](std::string direction) {});
     _ha_entity_fan.onOscillation([](bool oscillation) {});
+    _ha_entity_humidifier.onCommand([](bool on) {});
+    _ha_entity_humidifier.onTargetHumidity([](uint8_t target) {});
     _ha_entity_light.onCommand([](bool on) {});
     _ha_entity_light.onBrightness([](uint8_t brightness) {});
     _ha_entity_light.onColorTemperature([](uint16_t color_temp) {});
     _ha_entity_light.onRgb([](HaEntityLight::RGB rgb) {});
     _ha_entity_light.onEffect([](std::string effect) {});
     _ha_entity_lock.onCommand([](HaEntityLock::Action action) {});
+    _ha_entity_mower.onCommand([](HaEntityLawnMower::Action action) {});
+    _ha_entity_notify.onNotify([](const std::string &message, const std::string &title) {});
     _ha_entity_number.onCommand([](float number) {});
+    _ha_entity_scene.onActivate([]() {});
     _ha_entity_select.onCommand([](std::string selected) {});
+    _ha_entity_siren.onCommand([](bool on) {});
     _ha_entity_text.onCommand([](std::string text) {});
+    _ha_entity_time.onCommand([](const std::string &time) {});
     _ha_entity_switch.onCommand([](bool on) {});
     _ha_entity_update.onCommand([]() {});
+    _ha_entity_vacuum.onCommand([](HaEntityVacuum::Command cmd) {});
     _ha_entity_valve.onCommand([](HaEntityValve::Action action) {});
     _ha_entity_valve.onPosition([](uint8_t position) {});
+    _ha_entity_water_heater.onMode([](const std::string &mode) {});
+    _ha_entity_water_heater.onTargetTemperature([](double temp) {});
 
     // Re-publish configurations if Home Assistant restarts while we stay connected to MQTT.
     ha_bridge.onHomeAssistantBirth([]() { publishAllConfigurations(); });

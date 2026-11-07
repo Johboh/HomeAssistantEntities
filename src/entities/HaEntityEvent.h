@@ -14,10 +14,37 @@
 #include <string>
 #include <vector>
 
+/* clang-format off */
 /**
  * @brief Represents an MQTT Event entity (`event.mqtt`) that emits discrete typed events to Home Assistant.
  *
  * See https://www.home-assistant.io/integrations/event.mqtt/
+ *
+ * @section event_vs_trigger Event Entity vs. Device Trigger
+ * While both `HaEntityEvent` and `HaEntityDeviceTrigger` handle momentary occurrences (such as button presses,
+ * doorbell rings, or motion pulses), they serve distinct purposes in Home Assistant:
+ *
+ * | Feature | HaEntityEvent (`event.mqtt`) | HaEntityDeviceTrigger (`device_trigger.mqtt`) |
+ * | :--- | :--- | :--- |
+ * | **Entity Registry** | **Yes** — registered as a full entity (`event.<name>`) | **No** — no entity ID exists in Home Assistant |
+ * | **UI & Dashboards** | Visible on Lovelace dashboards with last event & timestamp | Not visible on dashboards or in state tables |
+ * | **History & Logbook** | Recorded in Home Assistant history and logbook entries | Not recorded in history or logbook |
+ * | **State & Attributes** | State is the timestamp of last event (ISO 8601); holds `event_type` + custom attributes | Stateless (no state or attributes stored) |
+ * | **Payloads** | Non-retained JSON containing `event_type` and optional extra metadata | Simple string or empty match payload on a trigger topic |
+ * | **Automation Usage** | Trigger via standard state triggers (`platform: state`) or attribute triggers on `event_type` | Trigger via Device Automations (`platform: device`) in the UI automation builder |
+ * | **Device Dependency** | Optional (recommended) | **Mandatory** (`ha_bridge` must have device info configured) |
+ * | **Multiple Event Types**| Single entity supports multiple types (e.g. `single_press`, `double_press`, `long_press`) | Requires a separate `HaEntityDeviceTrigger` instance per type/subtype combination |
+ *
+ * @section when_to_use_event_entity When to use HaEntityEvent
+ * - **Dashboards and UI**: You want users to see when the event occurred and what event type fired on their cards.
+ * - **History and Auditing**: You want occurrences logged in Home Assistant's Logbook and History timeline (e.g. doorbell presses or RFID scans).
+ * - **Rich Metadata**: You need to send contextual data alongside the event (e.g. `duration_ms`, `battery_level`, or `user_id`).
+ * - **Consolidated Controls**: You want a single entity representing a multi-function button or controller rather than multiple disparate triggers.
+ * - **Modern HA Integrations**: Event entities are Home Assistant's modern standard (HA 2023.7+) for transient, stateless signals.
+ *
+ * @section when_to_use_device_trigger_instead When to use HaEntityDeviceTrigger instead
+ * - Choose `HaEntityDeviceTrigger` when you only want simple, stateless automation hooks in Home Assistant's UI automation editor
+ *   under "Device -> Trigger" dropdowns, without creating entity IDs or cluttering the user's dashboard and logbook.
  *
  * @par Example
  * @code
@@ -33,6 +60,7 @@
  * doorbell.publish("single_press", {{"duration_ms", 120U}});
  * @endcode
  */
+/* clang-format on */
 class HaEntityEvent : public HaEntity {
 public:
   enum class DeviceClass {

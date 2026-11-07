@@ -2672,4 +2672,170 @@ public:
 } // namespace Undefined
 } // namespace Light
 
+namespace Humidifier {
+class Humidifier : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "humidifier"; }
+  std::optional<std::string> deviceClass() const override { return "humidifier"; }
+};
+
+class Dehumidifier : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "humidifier"; }
+  std::optional<std::string> deviceClass() const override { return "dehumidifier"; }
+};
+
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "humidifier"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "humidifier"; }
+};
+} // namespace Undefined
+} // namespace Humidifier
+
+namespace Siren {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "siren"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "siren"; }
+};
+} // namespace Undefined
+} // namespace Siren
+
+namespace AlarmControlPanel {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "alarm_control_panel"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "alarm_control_panel"; }
+};
+} // namespace Undefined
+} // namespace AlarmControlPanel
+
+namespace WaterHeater {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "water_heater"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "water_heater"; }
+};
+} // namespace Undefined
+} // namespace WaterHeater
+
+namespace DeviceTracker {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "device_tracker"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "device_tracker"; }
+};
+} // namespace Undefined
+} // namespace DeviceTracker
+
+namespace Scene {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "scene"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "scene"; }
+};
+} // namespace Undefined
+} // namespace Scene
+
+namespace LawnMower {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "lawn_mower"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "lawn_mower"; }
+};
+} // namespace Undefined
+} // namespace LawnMower
+
+namespace Vacuum {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "vacuum"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "vacuum"; }
+};
+} // namespace Undefined
+} // namespace Vacuum
+
+namespace Camera {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "camera"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "camera"; }
+};
+} // namespace Undefined
+} // namespace Camera
+
+namespace Image {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "image"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "image"; }
+};
+} // namespace Undefined
+} // namespace Image
+
+namespace Notify {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "notify"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "notify"; }
+};
+} // namespace Undefined
+} // namespace Notify
+
+namespace Date {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "date"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "date"; }
+};
+} // namespace Undefined
+} // namespace Date
+
+namespace Time {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "time"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "time"; }
+};
+} // namespace Undefined
+} // namespace Time
+
+namespace DateTime {
+namespace Undefined {
+class Empty : public ActuatorDeviceClass {
+public:
+  std::string component() const override { return "datetime"; }
+  std::optional<std::string> deviceClass() const override { return std::nullopt; }
+  std::string objectId() const override { return "datetime"; }
+};
+} // namespace Undefined
+} // namespace DateTime
+
 }; // namespace homeassistantentities

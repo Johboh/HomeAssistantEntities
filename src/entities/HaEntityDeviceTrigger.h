@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 
+/* clang-format off */
 /**
  * @brief Represents an MQTT Device Trigger (`device_trigger.mqtt`) for firing stateless automation triggers in Home
  * Assistant.
@@ -16,6 +17,33 @@
  * Note: Home Assistant requires device information (`identifiers` or `connections`) to be populated on the `HaBridge`
  * when using device triggers.
  * See https://www.home-assistant.io/integrations/device_trigger.mqtt/
+ *
+ * @section trigger_vs_event Device Trigger vs. Event Entity
+ * Both `HaEntityDeviceTrigger` and `HaEntityEvent` can respond to momentary occurrences (such as button presses,
+ * RF remotes, or sensor triggers), but they differ fundamentally in how Home Assistant exposes them:
+ *
+ * | Feature | HaEntityDeviceTrigger (`device_trigger.mqtt`) | HaEntityEvent (`event.mqtt`) |
+ * | :--- | :--- | :--- |
+ * | **Entity Registry** | **No** — does not create an `entity_id` | **Yes** — registered as `event.<name>` |
+ * | **UI & Dashboards** | Not visible on dashboards or in entity lists | Visible on Lovelace dashboards with last event & timestamp |
+ * | **History & Logbook** | Not recorded in history or logbook | Recorded in Home Assistant history and logbook |
+ * | **State & Attributes** | Stateless (fires instantaneous trigger only) | State is ISO timestamp of last event + holds `event_type` & custom attributes |
+ * | **Payloads** | Simple string matching `subtype` or empty payload | Non-retained JSON with `event_type` and arbitrary attributes |
+ * | **Automation Usage** | Exposed directly in Home Assistant UI automation editor under "Device -> Trigger" | Triggered via standard entity state/attribute automations (`platform: state`) |
+ * | **Device Dependency** | **Mandatory** (`ha_bridge` must have device info configured) | Optional (recommended) |
+ * | **Multiple Actions** | Separate `HaEntityDeviceTrigger` instance required for each type/subtype | Single entity handles an array of `event_types` |
+ *
+ * @section when_to_use_device_trigger When to use HaEntityDeviceTrigger
+ * - **Device Automation UI**: You want triggers to show up directly in Home Assistant's visual automation editor
+ *   under Device Triggers (e.g., "When [Device Name] Button 1 short press...").
+ * - **No Entity Clutter**: You specifically do not want extra entities in the entity registry, dashboard states,
+ *   or logbook for high-frequency or purely automated actions.
+ * - **Simplicity**: You only need to trigger automations without transmitting contextual event attributes or storing timestamps.
+ *
+ * @section when_to_use_event_entity_instead When to use HaEntityEvent instead
+ * - Choose `HaEntityEvent` if you want occurrences displayed on dashboards, recorded in the logbook and history,
+ *   need to carry extra attributes (such as duration, tag ID, or payload data), or want a single entity to handle
+ *   multiple related event types (`single_press`, `double_press`, `long_press`).
  *
  * @par Example
  * @code
@@ -32,6 +60,7 @@
  * short_press.publish();
  * @endcode
  */
+/* clang-format on */
 class HaEntityDeviceTrigger : public HaEntity {
 public:
   struct Configuration {
