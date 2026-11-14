@@ -162,7 +162,7 @@ ha_bridge.migrateToDeviceConfiguration(all_entities);
 #### PlatformIO (Arduino or ESP-IDF):
 Add the following to `lib_deps`:
 ```
-   Johboh/HomeAssistantEntities@^10.0.1
+   Johboh/HomeAssistantEntities@^10.0.2
 ```
 You also need an MQTT library and a JSON library. See Dependencies section. Suggestion:
 ```
@@ -178,7 +178,7 @@ In your existing `idf_component.yml` or in a new `idf_component.yml` next to you
 ```
 dependencies:
   johboh/homeassistantentities:
-    version: ">=10.0.1"
+    version: ">=10.0.2"
 ```
 
 You also need an MQTT library. See Dependencies section. Suggestion:
