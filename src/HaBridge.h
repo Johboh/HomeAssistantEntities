@@ -144,9 +144,15 @@ public:
   void setAvailabilityPayloads(std::string payload_available, std::string payload_not_available);
 
   /**
-   * @brief Subscribe to Home Assistant's birth message topic (`<discovery_prefix>/status`) and invoke `callback` when
-   * `birth_payload` (default `"online"`) is received, e.g. to re-publish configurations and live states when Home
-   * Assistant restarts while this device stays connected to the MQTT broker.
+   * @brief Subscribe to Home Assistant's birth message topic and invoke `callback` every time `birth_payload` (default
+   * `"online"`) is received, e.g. to re-publish configurations and live states when Home Assistant restarts while this
+   * device stays connected to the MQTT broker.
+   *
+   * @param callback Function invoked on each matching birth message (including consecutive `"online"` messages).
+   * Pass an empty function (`nullptr`) to unregister this bridge's callback.
+   * @param birth_payload Expected birth payload string (defaults to `"online"`).
+   * @param status_topic Optional explicit birth topic. When empty (default), subscribes to `<discovery_prefix>/status`
+   * (i.e. `"homeassistant/status"` with the default prefix).
    *
    * Note: By default Home Assistant publishes its birth message with `retain: false`, so if Home Assistant is already
    * running when this device boots or reconnects to MQTT, no birth message is delivered. Register
@@ -154,10 +160,12 @@ public:
    * Home Assistant restarts are handled. Multiple `HaBridge` instances sharing the same `IMQTTRemote` can each register
    * their own `onHomeAssistantBirth` callback.
    */
-  bool onHomeAssistantBirth(std::function<void()> callback, std::string birth_payload = "online");
+  bool onHomeAssistantBirth(std::function<void()> callback, std::string birth_payload = "online",
+                            std::string status_topic = "");
 
   /**
    * @brief Call to publish the configuration for the HaEntity (single-component discovery).
+   * Published as a retained MQTT message (`retain = true`) at QoS 1.
    * This function will set the "availability_topic" and the "unique_id" field (except for "device_automation"
    * components where Home Assistant forbids them), as well as add "device" (and "child_device" / "origin" if set).
    *
@@ -170,7 +178,7 @@ public:
                             const std::string &child_object_id, const IJsonDocument &specific_doc);
 
   /**
-   * @brief Remove a single-component discovery configuration by publishing an empty retained payload (`""`).
+   * @brief Remove a single-component discovery configuration by publishing an empty retained payload (`""`) at QoS 1.
    */
   bool unpublishConfiguration(const std::string &component, const std::string &object_id,
                               const std::string &child_object_id = "");
@@ -178,7 +186,7 @@ public:
   /**
    * @brief Publish a single unified device-based discovery payload to `<discovery_prefix>/device/<node_id>/config`
    * containing `device`, `origin`, `availability_topic`, `components`, and (for any entities attached to a
-   * `childDevice(...)` bridge) `child_devices`.
+   * `childDevice(...)` bridge) `child_devices`, published as a retained MQTT message (`retain = true`) at QoS 1.
    *
    * Note: Home Assistant requires `this_device_json_doc` to have at least one entry in `identifiers` or `connections`.
    *
@@ -188,14 +196,14 @@ public:
   bool publishDeviceConfiguration(const std::vector<std::reference_wrapper<HaEntity>> &entities);
 
   /**
-   * @brief Remove a device-based discovery configuration by publishing an empty retained payload (`""`) to
+   * @brief Remove a device-based discovery configuration by publishing an empty retained payload (`""`) at QoS 1 to
    * `<discovery_prefix>/device/<node_id>/config`.
    */
   bool unpublishDeviceConfiguration();
 
   /**
    * @brief Migrate entities from single-component discovery to unified device-based discovery per the Home Assistant
-   * migration flow:
+   * migration flow (all steps published with `retain = true` at QoS 1):
    * 1. Publishes retained `{"migrate_discovery": true}` to each entity's single-component `/config` topic.
    * 2. Publishes the unified device-based discovery payload to `<discovery_prefix>/device/<node_id>/config`.
    * 3. Clears each old single-component `/config` topic by publishing an empty retained payload (`""`).
@@ -208,9 +216,10 @@ public:
    * @param topic MQTT topic to publish to.
    * @param message Payload string to publish.
    * @param retain `true` to set the MQTT retain flag on the message.
+   * @param qos MQTT Quality of Service level (`0` = at most once [default], `1` = at least once, `2` = exactly once).
    * @return true on success, false on failure.
    */
-  bool publishMessage(const std::string &topic, const std::string &message, bool retain = false);
+  bool publishMessage(const std::string &topic, const std::string &message, bool retain = false, uint8_t qos = 0);
 
   enum class TopicType {
     State,      // Topic where the entity publishes its state.

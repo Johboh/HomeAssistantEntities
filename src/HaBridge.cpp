@@ -15,6 +15,7 @@ using namespace homeassistantentities;
 namespace {
 constexpr const char *DEFAULT_ORIGIN_NAME = "HomeAssistantEntities";
 constexpr const char *DEFAULT_ORIGIN_SUPPORT_URL = "https://github.com/Johboh/HomeAssistantEntities";
+constexpr uint8_t DISCOVERY_QOS = 1;
 
 std::string combineObjectId(const std::string &object_id, const std::string &child_object_id) {
   std::string base = sanitizePath(trim(object_id));
@@ -54,6 +55,7 @@ struct BirthEntry {
 struct BirthTopicGroup {
   IMQTTRemote *remote = nullptr;
   std::string topic;
+  bool subscribed = false;
   std::vector<std::weak_ptr<BirthEntry>> listeners;
 };
 
@@ -206,12 +208,16 @@ void HaBridge::setAvailabilityPayloads(std::string payload_available, std::strin
   _payload_not_available = std::move(payload_not_available);
 }
 
-bool HaBridge::onHomeAssistantBirth(std::function<void()> callback, std::string birth_payload) {
+bool HaBridge::onHomeAssistantBirth(std::function<void()> callback, std::string birth_payload,
+                                    std::string status_topic) {
   if (!callback) {
     _birth_registration.reset();
     return false;
   }
-  std::string status_topic = _discovery_prefix + "/status";
+  std::string resolved_topic = trim(status_topic);
+  if (resolved_topic.empty()) {
+    resolved_topic = _discovery_prefix + "/status";
+  }
   auto entry = std::make_shared<BirthEntry>(BirthEntry{std::move(callback), std::move(birth_payload)});
   _birth_registration = entry;
 
@@ -224,24 +230,25 @@ bool HaBridge::onHomeAssistantBirth(std::function<void()> callback, std::string 
 #endif
     BirthTopicGroup *target = nullptr;
     for (auto &grp : reg.groups) {
-      if (grp.remote == remote_ptr && grp.topic == status_topic) {
+      if (grp.remote == remote_ptr && grp.topic == resolved_topic) {
         target = &grp;
         break;
       }
     }
     if (!target) {
-      reg.groups.push_back(BirthTopicGroup{remote_ptr, status_topic, {}});
+      reg.groups.push_back(BirthTopicGroup{remote_ptr, resolved_topic, false, {}});
       target = &reg.groups.back();
     }
     target->listeners.erase(std::remove_if(target->listeners.begin(), target->listeners.end(),
                                            [](const std::weak_ptr<BirthEntry> &w) { return w.expired(); }),
                             target->listeners.end());
-    need_subscribe = target->listeners.empty();
+    need_subscribe = !target->subscribed;
+    target->subscribed = true;
     target->listeners.push_back(entry);
   }
 
   if (need_subscribe) {
-    _remote.subscribe(status_topic, [remote_ptr](std::string topic, std::string msg) {
+    _remote.subscribe(resolved_topic, [remote_ptr](std::string topic, std::string msg) {
       dispatchBirthMessage(remote_ptr, topic, msg);
     });
   }
@@ -351,12 +358,12 @@ void HaBridge::publishConfiguration(const std::string &component, const std::str
   }
 
   auto message = toJsonString(doc);
-  publishMessage(getDiscoveryTopic(component, object_id, child_object_id), message, true);
+  publishMessage(getDiscoveryTopic(component, object_id, child_object_id), message, true, DISCOVERY_QOS);
 }
 
 bool HaBridge::unpublishConfiguration(const std::string &component, const std::string &object_id,
                                       const std::string &child_object_id) {
-  return publishMessage(getDiscoveryTopic(component, object_id, child_object_id), "", true);
+  return publishMessage(getDiscoveryTopic(component, object_id, child_object_id), "", true, DISCOVERY_QOS);
 }
 
 bool HaBridge::publishDeviceConfiguration(const std::vector<std::reference_wrapper<HaEntity>> &entities) {
@@ -540,10 +547,12 @@ bool HaBridge::publishDeviceConfiguration(const std::vector<std::reference_wrapp
     }
   }
 
-  return publishMessage(getDeviceDiscoveryTopic(), toJsonString(doc), true);
+  return publishMessage(getDeviceDiscoveryTopic(), toJsonString(doc), true, DISCOVERY_QOS);
 }
 
-bool HaBridge::unpublishDeviceConfiguration() { return publishMessage(getDeviceDiscoveryTopic(), "", true); }
+bool HaBridge::unpublishDeviceConfiguration() {
+  return publishMessage(getDeviceDiscoveryTopic(), "", true, DISCOVERY_QOS);
+}
 
 bool HaBridge::migrateToDeviceConfiguration(const std::vector<std::reference_wrapper<HaEntity>> &entities) {
   if (entities.empty()) {
@@ -563,7 +572,7 @@ bool HaBridge::migrateToDeviceConfiguration(const std::vector<std::reference_wra
     }
     HaBridge *comp_bridge = cfg.bridge ? cfg.bridge : this;
     std::string topic = comp_bridge->getDiscoveryTopic(cfg.component, cfg.object_id, cfg.child_object_id);
-    comp_bridge->publishMessage(topic, migrate_payload, true);
+    comp_bridge->publishMessage(topic, migrate_payload, true, DISCOVERY_QOS);
     old_topics.push_back(std::move(topic));
   }
 
@@ -572,16 +581,16 @@ bool HaBridge::migrateToDeviceConfiguration(const std::vector<std::reference_wra
   }
 
   for (const auto &topic : old_topics) {
-    publishMessage(topic, "", true);
+    publishMessage(topic, "", true, DISCOVERY_QOS);
   }
   return true;
 }
 
-bool HaBridge::publishMessage(const std::string &topic, const std::string &message, bool retain) {
+bool HaBridge::publishMessage(const std::string &topic, const std::string &message, bool retain, uint8_t qos) {
   if (_verbose) {
-    return _remote.publishMessageVerbose(topic, message, retain);
+    return _remote.publishMessageVerbose(topic, message, retain, qos);
   } else {
-    return _remote.publishMessage(topic, message, retain);
+    return _remote.publishMessage(topic, message, retain, qos);
   }
 }
 
