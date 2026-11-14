@@ -110,6 +110,8 @@ void HaBridge::populateDeviceJson(IJsonDocument &doc, const DeviceInfo &info) {
         addToJsonArray(ids, trimmed);
       }
     }
+  } else {
+    removeJsonKey(doc, "identifiers");
   }
   if (!info.connections.empty()) {
     JsonArrayType conns = createJsonArray(doc, "connections");
@@ -124,11 +126,15 @@ void HaBridge::populateDeviceJson(IJsonDocument &doc, const DeviceInfo &info) {
         addToJsonArray(conns, pair_doc["p"]);
       }
     }
+  } else {
+    removeJsonKey(doc, "connections");
   }
   auto setIfNonEmpty = [&](const char *key, const std::string &val) {
     auto trimmed = trim(val);
     if (!trimmed.empty()) {
       doc[key] = trimmed;
+    } else {
+      removeJsonKey(doc, key);
     }
   };
   setIfNonEmpty("name", info.name);

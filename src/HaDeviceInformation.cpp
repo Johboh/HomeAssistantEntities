@@ -198,15 +198,17 @@ std::string getMacAddress() {
 #if defined(HA_PLATFORM_ESP32)
   uint8_t mac[6] = {0};
   bool ok = false;
-#ifdef ESP_MAC_WIFI_STA
   esp_chip_info_t chip_info{};
   esp_chip_info(&chip_info);
   if ((chip_info.features & CHIP_FEATURE_WIFI_BGN) != 0 && esp_read_mac(mac, ESP_MAC_WIFI_STA) == ESP_OK) {
     ok = true;
   }
+  if (!ok) {
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    ok = (esp_read_mac(mac, ESP_MAC_BASE) == ESP_OK) || (esp_read_mac(mac, ESP_MAC_EFUSE_FACTORY) == ESP_OK);
+#else
+    ok = (esp_efuse_mac_get_default(mac) == ESP_OK);
 #endif
-  if (!ok && esp_efuse_mac_get_default(mac) == ESP_OK) {
-    ok = true;
   }
   if (!ok) {
     return "";
@@ -224,6 +226,9 @@ std::string getMacAddress() {
     return "";
   }
 #endif
+  if (mac[0] == 0 && mac[1] == 0 && mac[2] == 0 && mac[3] == 0 && mac[4] == 0 && mac[5] == 0) {
+    return "";
+  }
   char mac_str[18];
   std::snprintf(mac_str, sizeof(mac_str), "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4],
                 mac[5]);
@@ -236,19 +241,19 @@ std::string getMacAddress() {
 std::string getLocalIpAddress() {
 #if defined(HA_PLATFORM_ESP32)
   esp_netif_ip_info_t ip_info{};
-  esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+  esp_netif_t *candidates[] = {
+      esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"),
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-  if (netif == nullptr) {
-    netif = esp_netif_get_default_netif();
-  }
+      esp_netif_get_default_netif(),
 #endif
-  if (netif == nullptr) {
-    netif = esp_netif_get_handle_from_ifkey("ETH_DEF");
-  }
-  if (netif != nullptr && esp_netif_get_ip_info(netif, &ip_info) == ESP_OK && ip_info.ip.addr != 0) {
-    char ip_str[16];
-    std::snprintf(ip_str, sizeof(ip_str), IPSTR, IP2STR(&ip_info.ip));
-    return std::string(ip_str);
+      esp_netif_get_handle_from_ifkey("ETH_DEF"),
+  };
+  for (esp_netif_t *netif : candidates) {
+    if (netif != nullptr && esp_netif_get_ip_info(netif, &ip_info) == ESP_OK && ip_info.ip.addr != 0) {
+      char ip_str[16];
+      std::snprintf(ip_str, sizeof(ip_str), IPSTR, IP2STR(&ip_info.ip));
+      return std::string(ip_str);
+    }
   }
   return "";
 #elif defined(HA_PLATFORM_ESP8266)

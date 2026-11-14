@@ -35,6 +35,8 @@
 
 #define addObjectToJsonArray(arr) (arr.push_back(nlohmann::json::object()), arr.back())
 
+#define removeJsonKey(doc, key) (doc).erase(key)
+
 namespace homeassistantentities {
 inline void extractJsonStrings(const nlohmann::json &val, std::vector<std::string> &out) {
   if (val.is_string()) {
@@ -81,6 +83,8 @@ inline bool jsonHasNonEmptyArrayOrString(const nlohmann::json &val) {
 #define addToJsonArray(doc, value) doc.add(value)
 
 #define addObjectToJsonArray(arr) arr.add<JsonObject>()
+
+#define removeJsonKey(doc, key) (doc).remove(key)
 
 namespace homeassistantentities {
 template <typename Doc, typename Key> inline JsonObject haCreateJsonObject(Doc &&doc, const Key &name) {
