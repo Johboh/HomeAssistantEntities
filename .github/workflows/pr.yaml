@@ -9,5 +9,8 @@ jobs:
   build_platformio_examples_for_verification:
     uses: ./.github/workflows/platformio.yaml
 
+  build_arduino_examples_for_verification:
+    uses: ./.github/workflows/arduino_cli.yaml
+
   formatting_check:
     uses: ./.github/workflows/clang-format.yaml

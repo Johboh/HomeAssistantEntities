@@ -1,5 +1,9 @@
 name: PlatformIO CI
-on: [workflow_call, push]
+on:
+  workflow_call:
+  push:
+    branches:
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -68,14 +72,14 @@ jobs:
             extra_project_options: '--project-option="board_build.partitions=min_spiffs.csv"'
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install PlatformIO Core

@@ -1,17 +1,50 @@
 name: Push to Espressif Component Service
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
+  check_existing_ci:
+    runs-on: ubuntu-latest
+    outputs:
+      already_verified: ${{ steps.check.outputs.already_verified }}
+    steps:
+      - name: Check if ESP-IDF CI already passed for this commit
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: context.sha,
+              per_page: 100,
+            });
+            const passed = data.workflow_runs.some(
+              (run) =>
+                run.path === '.github/workflows/espidf.yaml' &&
+                run.status === 'completed' &&
+                run.conclusion === 'success'
+            );
+            core.info(`ESP-IDF CI already passed for ${context.sha}: ${passed}`);
+            core.setOutput('already_verified', passed ? 'true' : 'false');
+
   build_examples_for_verification:
+    needs: [check_existing_ci]
+    if: needs.check_existing_ci.outputs.already_verified != 'true'
     uses: ./.github/workflows/espidf.yaml
+
   upload_components:
     runs-on: ubuntu-latest
-    needs: [build_examples_for_verification]
+    needs: [check_existing_ci, build_examples_for_verification]
+    if: ${{ !cancelled() && needs.check_existing_ci.result == 'success' && (needs.check_existing_ci.outputs.already_verified == 'true' || needs.build_examples_for_verification.result == 'success') }}
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
       - name: Upload component to component registry
         uses: espressif/github-actions/upload_components@master
         with:

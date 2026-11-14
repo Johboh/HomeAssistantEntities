@@ -1,5 +1,9 @@
 name: ESP-IDF CI
-on: [workflow_call, push]
+on:
+  workflow_call:
+  push:
+    branches:
+      - '**'
 jobs:
   esp_idf_build:
     runs-on: ubuntu-latest
@@ -30,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
 
